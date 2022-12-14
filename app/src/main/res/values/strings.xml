@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">MedSched</string>
     <string name="login_as">Login as</string>
+
+    <string name="doctor_role">Doctor</string>
+    <string name="doctor_role_image_desc">Doctor Icon</string>
+    <string name="patient_role">Patient</string>
+    <string name="patient_role_image_desc">Patient Icon</string>
 </resources>

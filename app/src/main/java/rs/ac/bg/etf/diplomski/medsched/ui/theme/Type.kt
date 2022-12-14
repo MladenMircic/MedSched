@@ -18,6 +18,7 @@ val Quicksand = FontFamily(
 
 // Set of Material typography styles to start with
 val Typography = Typography(
+    defaultFontFamily = Quicksand,
     body1 = TextStyle(
         fontFamily = Quicksand,
         fontWeight = FontWeight.Normal,
