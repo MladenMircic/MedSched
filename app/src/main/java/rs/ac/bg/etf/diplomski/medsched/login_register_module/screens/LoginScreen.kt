@@ -47,7 +47,21 @@ fun LoginScreen(
             color = Blue15,
             modifier = Modifier.fillMaxSize()
         ) {
-
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(bottom = 60.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.no_account),
+                    color = Blue90
+                )
+                Text(
+                    text = stringResource(id = R.string.register_now),
+                    color = Blue90,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         // Main part of the login UI
@@ -138,7 +152,6 @@ fun LoginScreen(
                             Text(
                                 text = stringResource(id = R.string.next_button_text),
                                 fontSize = 24.sp,
-                                fontFamily = Quicksand,
                                 fontWeight = FontWeight.Bold,
                                 color = Blue95,
                                 modifier = Modifier.padding(bottom = 10.dp)

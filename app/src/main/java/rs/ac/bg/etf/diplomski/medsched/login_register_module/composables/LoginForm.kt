@@ -11,8 +11,11 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,7 +32,6 @@ import rs.ac.bg.etf.diplomski.medsched.ui.theme.RoundedShape20
 import rs.ac.bg.etf.diplomski.medsched.utils.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.utils.LOGIN_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.utils.LOGIN_BUTTON_PADDING
-import rs.ac.bg.etf.diplomski.medsched.utils.NEXT_BUTTON_HEIGHT
 
 @Composable
 fun LoginForm(

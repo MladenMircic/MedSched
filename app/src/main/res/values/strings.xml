@@ -13,4 +13,8 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login_button_text">Login</string>
+
+    <!-- Register prompt -->
+    <string name="no_account">Don\'t have an account?\u0020</string>
+    <string name="register_now">Register now</string>
 </resources>

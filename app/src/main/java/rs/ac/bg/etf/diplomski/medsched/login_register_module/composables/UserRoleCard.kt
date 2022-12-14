@@ -82,7 +82,6 @@ fun UserRoleCard(
             )
             Text(
                 text = roleName,
-                fontFamily = Quicksand,
                 fontWeight = FontWeight.Bold,
                 color =
                     if (selectedRole == roleName)
