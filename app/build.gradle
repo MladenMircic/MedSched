@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -74,5 +76,16 @@ dependencies {
 
     // Navigation animations dependency
     implementation "com.google.accompanist:accompanist-navigation-animation:0.28.0"
+
+    // Hilt dependencies
+    def hilt_dagger_version = "2.44"
+    implementation "com.google.dagger:hilt-android:$hilt_dagger_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_dagger_version"
+
+    // Retrofit
+    def retrofit_version = "2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
 
 }
