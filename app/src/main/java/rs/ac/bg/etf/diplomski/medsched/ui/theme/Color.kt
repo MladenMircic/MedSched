@@ -6,3 +6,10 @@ val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
+
+// Shades of blue for the app, base is Blue40
+val Blue95 = Color(0xFFE6ECFF)
+val Blue90 = Color(0xFFCCD9FF)
+val Blue85 = Color(0xFFB3C6FF)
+val Blue40 = Color(0xFF0033CC)
+val Blue15 = Color(0xFF00134D)
