@@ -2,8 +2,15 @@
     <string name="app_name">MedSched</string>
     <string name="login_as">Login as</string>
 
+    <!-- Role picking -->
     <string name="doctor_role">Doctor</string>
     <string name="doctor_role_image_desc">Doctor Icon</string>
     <string name="patient_role">Patient</string>
     <string name="patient_role_image_desc">Patient Icon</string>
+    <string name="next_button_text">Next</string>
+
+    <!-- Login form -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_button_text">Login</string>
 </resources>

@@ -14,4 +14,13 @@ class LoginViewModel : ViewModel() {
     fun setSelectedRole(roleName: String) {
         _loginState.update { it.copy(currentSelectedRole = roleName) }
     }
+
+    fun setEmail(email: String) {
+        _loginState.update { it.copy(email = email) }
+    }
+
+    fun setPassword(password: String) {
+        _loginState.update { it.copy(password = password) }
+    }
+
 }
