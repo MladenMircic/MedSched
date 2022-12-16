@@ -8,6 +8,7 @@
     <string name="patient_role">Patient</string>
     <string name="patient_role_image_desc">Patient Icon</string>
     <string name="next_button_text">Next</string>
+    <string name="no_role_picked">You must choose a role</string>
 
     <!-- Login form -->
     <string name="email">Email</string>

@@ -15,7 +15,14 @@ class LoginUseCase @Inject constructor(
         return try {
             Resource.Success(loginRegisterRepository.loginUser(user))
         } catch (e: HttpException) {
-            Resource.Error("User not found")
+            when (e.code()) {
+                404 -> {
+                    Resource.Error("User not found")
+                }
+                else -> {
+                    Resource.Error("Unknown error occured")
+                }
+            }
         } catch (e: IOException) {
             Resource.Error("No connection to the server")
         }

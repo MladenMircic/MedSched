@@ -38,6 +38,10 @@ class LoginViewModel @Inject constructor(
         _loginState.update { it.copy(password = password) }
     }
 
+    fun setIsRolePicked(isRolePicked: Boolean) {
+        _loginState.update { it.copy(isRolePicked = isRolePicked) }
+    }
+
     fun loginUser() = viewModelScope.launch {
         val response = loginUseCase(
             User(

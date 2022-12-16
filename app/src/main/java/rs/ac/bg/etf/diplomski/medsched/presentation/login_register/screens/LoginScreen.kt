@@ -2,11 +2,8 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.*
@@ -19,21 +16,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginFormDestination
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RoleSelectDestination
+import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
+import rs.ac.bg.etf.diplomski.medsched.commons.FORM_SURFACE_HEIGHT
+import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.LoginForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.UserRoleCard
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.models.roles
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
-import rs.ac.bg.etf.diplomski.medsched.commons.FORM_SURFACE_HEIGHT
-import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
-import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -95,37 +87,35 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(vertical = 36.dp)
                 ) {
-                    for (role in roles) {
-                        UserRoleCard(
-                            roleName = stringResource(id = role.roleName),
-                            roleImage = role.roleImage,
-                            selectedRole = loginUIState.currentSelectedRole,
-                            onRoleSelect = loginViewModel::setSelectedRole
-                        )
+                    if (!loginUIState.isRolePicked) {
+                        for (role in roles) {
+                            UserRoleCard(
+                                roleName = stringResource(id = role.roleName),
+                                roleImage = role.roleImage,
+                                selectedRole = loginUIState.currentSelectedRole,
+                                onRoleSelect = loginViewModel::setSelectedRole
+                            )
+                        }
                     }
                 }
 
-                val navController = rememberAnimatedNavController()
-                AnimatedNavHost(
-                    navController = navController,
-                    startDestination = RoleSelectDestination.route,
-                    enterTransition = {
-                        slideIntoContainer(
-                            towards = AnimatedContentScope.SlideDirection.Up,
+                AnimatedContent(
+                    targetState = loginUIState.isRolePicked,
+                    modifier = Modifier.fillMaxWidth(),
+                    transitionSpec = {
+                        slideInVertically(
+                            initialOffsetY = { it / 2 },
                             animationSpec = tween(
                                 durationMillis = 300,
-                                delayMillis = 300
+                                delayMillis = 100
                             )
                         ) + fadeIn(
                             animationSpec = tween(
                                 durationMillis = 300,
-                                delayMillis = 300
+                                delayMillis = 100
                             )
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            towards = AnimatedContentScope.SlideDirection.Down,
+                        ) with slideOutVertically(
+                            targetOffsetY = { -it / 2 },
                             animationSpec = tween(
                                 durationMillis = 300
                             )
@@ -135,12 +125,19 @@ fun LoginScreen(
                             )
                         )
                     }
-                ) {
-                    composable(route = RoleSelectDestination.route) {
-                        Spacer(modifier = Modifier.padding(top = DEFAULT_FORM_PADDING))
+                ) { isRolePicked ->
+                    if (!isRolePicked) {
                         Button(
                             onClick = {
-                                navController.navigate(LoginFormDestination.route)
+                                if (loginUIState.currentSelectedRole == null) {
+                                    Toast.makeText(
+                                        context,
+                                        context.resources.getString(R.string.no_role_picked),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    loginViewModel.setIsRolePicked(true)
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -161,8 +158,7 @@ fun LoginScreen(
                                 modifier = Modifier.padding(bottom = 10.dp)
                             )
                         }
-                    }
-                    composable(route = LoginFormDestination.route) {
+                    } else {
                         LoginForm(
                             email = loginUIState.email,
                             password = loginUIState.password,
@@ -181,6 +177,44 @@ fun LoginScreen(
                         )
                     }
                 }
+//                AnimatedNavHost(
+//                    navController = navController,
+//                    startDestination = RoleSelectDestination.route,
+//                    enterTransition = {
+//                        slideIntoContainer(
+//                            towards = AnimatedContentScope.SlideDirection.Up,
+//                            animationSpec = tween(
+//                                durationMillis = 300,
+//                                delayMillis = 300
+//                            )
+//                        ) + fadeIn(
+//                            animationSpec = tween(
+//                                durationMillis = 300,
+//                                delayMillis = 300
+//                            )
+//                        )
+//                    },
+//                    exitTransition = {
+//                        slideOutOfContainer(
+//                            towards = AnimatedContentScope.SlideDirection.Down,
+//                            animationSpec = tween(
+//                                durationMillis = 300
+//                            )
+//                        ) + fadeOut(
+//                            animationSpec = tween(
+//                                durationMillis = 300
+//                            )
+//                        )
+//                    }
+//                ) {
+//                    composable(route = RoleSelectDestination.route) {
+//                        Spacer(modifier = Modifier.padding(top = DEFAULT_FORM_PADDING))
+//
+//                    }
+//                    composable(route = LoginFormDestination.route) {
+//
+//                    }
+//                }
             }
         }
     }

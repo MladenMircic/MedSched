@@ -8,6 +8,7 @@
     <string name="patient_role">Pacijent</string>
     <string name="patient_role_image_desc">Ikona pacijenta</string>
     <string name="next_button_text">Dalje</string>
+    <string name="no_role_picked">Morate izabrati tip korisnika</string>
 
     <!-- Login form -->
     <string name="email">Email</string>

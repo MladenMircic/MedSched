@@ -51,6 +51,7 @@ fun LoginForm(
                 focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
                 backgroundColor = MaterialTheme.colors.textFieldBackground,
                 textColor = MaterialTheme.colors.textFieldText,
+                cursorColor = MaterialTheme.colors.textFieldText
             ),
             shape = RoundedShape20,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -73,6 +74,7 @@ fun LoginForm(
                 focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
                 backgroundColor = MaterialTheme.colors.textFieldBackground,
                 textColor = MaterialTheme.colors.textFieldText,
+                cursorColor = MaterialTheme.colors.textFieldText
             ),
             shape = RoundedShape20,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
