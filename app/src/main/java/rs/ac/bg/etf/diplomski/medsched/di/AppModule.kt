@@ -6,8 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginApiService
-import rs.ac.bg.etf.diplomski.medsched.utils.ApiConstants
+import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
+import rs.ac.bg.etf.diplomski.medsched.commons.Constants
+import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper
+import rs.ac.bg.etf.diplomski.medsched.data.repository.LoginRegisterRepositoryImpl
+import rs.ac.bg.etf.diplomski.medsched.domain.repository.LoginRegisterRepository
 import javax.inject.Singleton
 
 @Module
@@ -16,10 +19,22 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesLoginApi(): LoginApiService =
+    fun providesLoginRegisterApi(): LoginRegisterApi =
         Retrofit.Builder()
-            .baseUrl(ApiConstants.BASE_URL)
+            .baseUrl(Constants.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(LoginApiService::class.java)
+            .create(LoginRegisterApi::class.java)
+
+    @Singleton
+    @Provides
+    fun providesUserInfoMapper(): UserInfoMapper = UserInfoMapper()
+
+    @Singleton
+    @Provides
+    fun providesLoginRegisterRepository(
+        loginRegisterApi: LoginRegisterApi,
+        userInfoMapper: UserInfoMapper
+    ): LoginRegisterRepository =
+        LoginRegisterRepositoryImpl(loginRegisterApi, userInfoMapper)
 }
