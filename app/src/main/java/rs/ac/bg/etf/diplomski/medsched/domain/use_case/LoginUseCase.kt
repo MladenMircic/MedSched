@@ -20,7 +20,7 @@ class LoginUseCase @Inject constructor(
                     Resource.Error("User not found")
                 }
                 else -> {
-                    Resource.Error("Unknown error occured")
+                    Resource.Error("Unknown error occurred")
                 }
             }
         } catch (e: IOException) {

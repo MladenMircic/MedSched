@@ -4,21 +4,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -29,81 +30,56 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.commons.LOGIN_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.commons.LOGIN_BUTTON_PADDING
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CustomOutlinedTextField
 
 @Composable
 fun LoginForm(
     email: String,
+    emailError: String?,
     password: String,
+    passwordError: String?,
     updateEmail: (String) -> Unit,
     updatePassword: (String) -> Unit,
     onLoginButtonClick: () -> Unit
 ) {
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
     Column {
-        OutlinedTextField(
-            label = { Text(text = stringResource(id = R.string.email)) },
+        CustomOutlinedTextField(
             value = email,
             onValueChange = updateEmail,
-            colors = TextFieldDefaults.textFieldColors(
-                focusedLabelColor = MaterialTheme.colors.textFieldOutline,
-                focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
-                backgroundColor = MaterialTheme.colors.textFieldBackground,
-                textColor = MaterialTheme.colors.textFieldText,
-                cursorColor = MaterialTheme.colors.textFieldText
+            label = stringResource(id = R.string.email),
+            showError = emailError != null,
+            errorMessage = emailError ?: "",
+            leadingIconImageVector = Icons.Default.Email,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
             ),
-            shape = RoundedShape20,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Email,
-                    contentDescription = ""
-                )
-            },
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = DEFAULT_FORM_PADDING)
+                .fillMaxWidth(0.8f)
         )
-        OutlinedTextField(
-            label = { Text(text = stringResource(id = R.string.password)) },
+        CustomOutlinedTextField(
             value = password,
             onValueChange = updatePassword,
-            colors = TextFieldDefaults.textFieldColors(
-                focusedLabelColor = MaterialTheme.colors.textFieldOutline,
-                focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
-                backgroundColor = MaterialTheme.colors.textFieldBackground,
-                textColor = MaterialTheme.colors.textFieldText,
-                cursorColor = MaterialTheme.colors.textFieldText
+            label = stringResource(id = R.string.password),
+            isPasswordField = true,
+            isPasswordVisible = passwordVisible,
+            onVisibilityChange = { passwordVisible = it },
+            showError = passwordError != null,
+            errorMessage = passwordError ?: "",
+            leadingIconImageVector = Icons.Default.Password,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
             ),
-            shape = RoundedShape20,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation =
-                if (passwordVisible)
-                    VisualTransformation.None
-                else
-                    PasswordVisualTransformation(),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = ""
-                )
-            },
-            trailingIcon = {
-                val image = if (passwordVisible)
-                    Icons.Filled.Visibility
-                else Icons.Filled.VisibilityOff
-
-                // Please provide localized description for accessibility services
-                val description = if (passwordVisible) "Hide password" else "Show password"
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }){
-                    Icon(imageVector = image, description)
-                }
-            },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = DEFAULT_FORM_PADDING),
+                .fillMaxWidth(0.8f)
         )
         Button(
             onClick = onLoginButtonClick,

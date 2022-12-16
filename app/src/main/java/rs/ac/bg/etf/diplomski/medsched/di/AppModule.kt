@@ -28,10 +28,6 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesUserInfoMapper(): UserInfoMapper = UserInfoMapper()
-
-    @Singleton
-    @Provides
     fun providesLoginRegisterRepository(
         loginRegisterApi: LoginRegisterApi,
         userInfoMapper: UserInfoMapper

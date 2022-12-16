@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import rs.ac.bg.etf.diplomski.medsched.commons.LoginUIState
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.User
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.EmailValidation
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.PasswordValidation
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +22,7 @@ class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow(LoginUIState())
+    private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
 
     private val _loginStatusChannel = Channel<String>()
@@ -42,6 +44,26 @@ class LoginViewModel @Inject constructor(
         _loginState.update { it.copy(isRolePicked = isRolePicked) }
     }
 
+    fun validateLoginForm(): Boolean {
+        val emailResult = EmailValidation.validate(_loginState.value.email)
+        val passwordResult = PasswordValidation.validate(_loginState.value.password)
+        val hasError = listOf(
+            emailResult,
+            passwordResult
+        ).any { it.errorMessage != null }
+
+        if (hasError) {
+            _loginState.update {
+                it.copy(
+                    emailError = emailResult.errorMessage,
+                    passwordError = passwordResult.errorMessage
+                )
+            }
+        }
+
+        return !hasError
+    }
+
     fun loginUser() = viewModelScope.launch {
         val response = loginUseCase(
             User(
@@ -56,22 +78,9 @@ class LoginViewModel @Inject constructor(
             is Resource.Error -> {
                 _loginStatusChannel.send(response.message!!)
             }
-            else -> {
+            is Resource.Loading -> {
 
             }
         }
-//        val response = loginRepository.loginUser(
-//            UserEntity(
-//                email = _loginState.value.email,
-//                password = _loginState.value.password
-//            )
-//        )
-//        if (response.data != null) {
-//            _loginStatusChannel.send(response.data.message)
-//        }
-//        else {
-//            _loginStatusChannel.send(response.message ?: "NOTHING")
-//        }
-
     }
 }
