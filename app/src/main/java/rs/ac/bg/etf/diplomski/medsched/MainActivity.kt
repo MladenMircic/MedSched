@@ -10,9 +10,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import dagger.hilt.android.AndroidEntryPoint
 import rs.ac.bg.etf.diplomski.medsched.login_register_module.screens.LoginScreen
 import rs.ac.bg.etf.diplomski.medsched.ui.theme.MedSchedTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,15 +26,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
+fun LoginScreenPreview() {
     MedSchedTheme {
-        Greeting("Android")
+        LoginScreen()
     }
 }

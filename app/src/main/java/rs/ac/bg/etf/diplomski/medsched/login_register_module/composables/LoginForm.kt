@@ -25,10 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import rs.ac.bg.etf.diplomski.medsched.R
-import rs.ac.bg.etf.diplomski.medsched.ui.theme.Blue40
-import rs.ac.bg.etf.diplomski.medsched.ui.theme.Blue85
-import rs.ac.bg.etf.diplomski.medsched.ui.theme.Blue95
-import rs.ac.bg.etf.diplomski.medsched.ui.theme.RoundedShape20
+import rs.ac.bg.etf.diplomski.medsched.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.utils.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.utils.LOGIN_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.utils.LOGIN_BUTTON_PADDING
@@ -38,7 +35,8 @@ fun LoginForm(
     email: String,
     password: String,
     updateEmail: (String) -> Unit,
-    updatePassword: (String) -> Unit
+    updatePassword: (String) -> Unit,
+    onLoginButtonClick: () -> Unit
 ) {
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -49,10 +47,10 @@ fun LoginForm(
             value = email,
             onValueChange = updateEmail,
             colors = TextFieldDefaults.textFieldColors(
-                focusedLabelColor = Blue40,
-                focusedIndicatorColor = Blue40,
-                backgroundColor = Blue85,
-                textColor = Blue40,
+                focusedLabelColor = MaterialTheme.colors.textFieldOutline,
+                focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
+                backgroundColor = MaterialTheme.colors.textFieldBackground,
+                textColor = MaterialTheme.colors.textFieldText,
             ),
             shape = RoundedShape20,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -71,10 +69,10 @@ fun LoginForm(
             value = password,
             onValueChange = updatePassword,
             colors = TextFieldDefaults.textFieldColors(
-                focusedLabelColor = Blue40,
-                focusedIndicatorColor = Blue40,
-                backgroundColor = Blue85,
-                textColor = Blue40,
+                focusedLabelColor = MaterialTheme.colors.textFieldOutline,
+                focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
+                backgroundColor = MaterialTheme.colors.textFieldBackground,
+                textColor = MaterialTheme.colors.textFieldText,
             ),
             shape = RoundedShape20,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -106,10 +104,10 @@ fun LoginForm(
                 .padding(horizontal = DEFAULT_FORM_PADDING),
         )
         Button(
-            onClick = { },
+            onClick = onLoginButtonClick,
             shape = RoundedShape20,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Blue40
+                backgroundColor = MaterialTheme.colors.selectable
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -120,7 +118,7 @@ fun LoginForm(
                 text = stringResource(id = R.string.login_button_text),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Blue95,
+                color = BackgroundPrimaryLight,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }

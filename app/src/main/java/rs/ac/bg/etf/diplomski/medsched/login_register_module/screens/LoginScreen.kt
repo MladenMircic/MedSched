@@ -1,5 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.login_register_module.screens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -8,11 +10,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.login_register_module.LoginFormDestination
 import rs.ac.bg.etf.diplomski.medsched.login_register_module.RoleSelectDestination
@@ -40,11 +42,13 @@ fun LoginScreen(
 ) {
 
     val loginUIState by loginViewModel.loginState.collectAsState()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     Box {
         // Bottom part for register option
         Surface(
-            color = Blue15,
+            color = MaterialTheme.colors.secondary,
             modifier = Modifier.fillMaxSize()
         ) {
             Row(
@@ -66,12 +70,12 @@ fun LoginScreen(
 
         // Main part of the login UI
         Surface(
+            color = MaterialTheme.colors.primary,
             shape = RoundedShape60
                 .copy(topStart = ZeroCornerSize, topEnd = ZeroCornerSize),
             modifier = Modifier
                 .height(FORM_SURFACE_HEIGHT)
-                .fillMaxWidth(),
-
+                .fillMaxWidth()
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -79,7 +83,7 @@ fun LoginScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.login_as),
-                    color = Blue15,
+                    color = MaterialTheme.colors.textOnPrimary,
                     style = MaterialTheme.typography.h1
                 )
 
@@ -146,14 +150,14 @@ fun LoginScreen(
                                 ),
                             shape = RoundedShape20,
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Blue40
+                                backgroundColor = MaterialTheme.colors.selectable
                             )
                         ) {
                             Text(
                                 text = stringResource(id = R.string.next_button_text),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Blue95,
+                                color = BackgroundPrimaryLight,
                                 modifier = Modifier.padding(bottom = 10.dp)
                             )
                         }
@@ -163,7 +167,17 @@ fun LoginScreen(
                             email = loginUIState.email,
                             password = loginUIState.password,
                             updateEmail = loginViewModel::setEmail,
-                            updatePassword = loginViewModel::setPassword
+                            updatePassword = loginViewModel::setPassword,
+                            onLoginButtonClick = {
+                                coroutineScope.launch {
+                                    loginViewModel.loginUser()
+                                    loginViewModel.loginStatusChannel.collect {
+                                        Toast.makeText(context, it, Toast.LENGTH_LONG)
+                                            .show()
+                                        Log.d("TESTIRANJE", it)
+                                    }
+                                }
+                            }
                         )
                     }
                 }

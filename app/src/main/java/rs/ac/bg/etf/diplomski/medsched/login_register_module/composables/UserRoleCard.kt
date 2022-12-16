@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,7 +50,7 @@ fun UserRoleCard(
         shape = RoundedShape60,
         backgroundColor =
             if (selectedRole == roleName)
-                Blue40
+                MaterialTheme.colors.selectable
             else
                 Blue85,
         modifier = modifier
@@ -76,18 +77,18 @@ fun UserRoleCard(
                     .padding(bottom = 10.dp),
                 colorFilter =
                     if (selectedRole == roleName)
-                        ColorFilter.tint(color = Blue95)
+                        ColorFilter.tint(color = Color.White)
                     else
-                        null
+                        ColorFilter.tint(color = MaterialTheme.colors.primary)
             )
             Text(
                 text = roleName,
                 fontWeight = FontWeight.Bold,
                 color =
                     if (selectedRole == roleName)
-                        Blue95
+                        Color.White
                     else
-                        Color.Unspecified
+                        MaterialTheme.colors.primary
             )
         }
     }
