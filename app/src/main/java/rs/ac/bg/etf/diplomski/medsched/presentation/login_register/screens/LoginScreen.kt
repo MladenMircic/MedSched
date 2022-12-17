@@ -1,16 +1,14 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,13 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
-import rs.ac.bg.etf.diplomski.medsched.commons.FORM_SURFACE_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginFormDestination
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
@@ -45,28 +42,13 @@ fun LoginScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    Box {
-        // Bottom part for register option
-        Surface(
-            color = MaterialTheme.colors.secondary,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.Bottom,
-                modifier = Modifier.padding(bottom = 60.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.no_account),
-                    color = Blue90
-                )
-                Text(
-                    text = stringResource(id = R.string.register_now),
-                    color = Blue90,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                color = MaterialTheme.colors.secondary
+            )
+    ) {
 
         // Main part of the login UI
         Surface(
@@ -74,8 +56,8 @@ fun LoginScreen(
             shape = RoundedShape60
                 .copy(topStart = ZeroCornerSize, topEnd = ZeroCornerSize),
             modifier = Modifier
-                .height(FORM_SURFACE_HEIGHT)
                 .fillMaxWidth()
+                .weight(0.8f)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,6 +69,7 @@ fun LoginScreen(
                     style = MaterialTheme.typography.h1
                 )
 
+                // NavHost for login progression with animation
                 val navController = rememberAnimatedNavController()
                 AnimatedNavHost(
                     navController = navController,
@@ -223,13 +206,11 @@ fun LoginScreen(
                                 updateEmail = loginViewModel::setEmail,
                                 updatePassword = loginViewModel::setPassword,
                                 onLoginButtonClick = {
-                                    if (loginViewModel.validateLoginForm()) {
-                                        coroutineScope.launch {
-                                            loginViewModel.loginUser()
-                                            loginViewModel.loginStatusChannel.collect {
-                                                Toast.makeText(context, it, Toast.LENGTH_LONG)
-                                                    .show()
-                                            }
+                                    loginViewModel.loginUser()
+                                    coroutineScope.launch {
+                                        loginViewModel.loginStatusChannel.collect {
+                                            Toast.makeText(context, it, Toast.LENGTH_LONG)
+                                                .show()
                                         }
                                     }
                                 }
@@ -237,6 +218,33 @@ fun LoginScreen(
                         }
                     }
                 }
+            }
+        }
+
+        // Bottom part for register option
+        Surface(
+            color = MaterialTheme.colors.secondary,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.no_account),
+                    color = Blue90
+                )
+                Text(
+                    text = stringResource(id = R.string.register_now),
+                    color = Blue90,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clickable {
+
+                        }
+                )
             }
         }
     }

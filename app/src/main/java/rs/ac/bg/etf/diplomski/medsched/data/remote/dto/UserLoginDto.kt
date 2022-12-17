@@ -4,12 +4,15 @@ import com.squareup.moshi.Json
 import rs.ac.bg.etf.diplomski.medsched.domain.model.UserLogin
 
 data class UserLoginDto(
-    @Json(name = "userFound")
-    val userFound: Boolean
+    @Json(name = "emailError")
+    val emailError: String? = null,
+    @Json(name = "passwordCorrect")
+    val passwordError: String? = null
 )
 
 fun UserLoginDto.toUserLogin(): UserLogin {
     return UserLogin(
-        userFound = userFound
+        emailError = emailError,
+        passwordError = passwordError
     )
 }

@@ -100,10 +100,9 @@ fun CustomOutlinedTextField(
             Text(
                 text = errorMessage,
                 color = MaterialTheme.colors.error,
-                modifier = Modifier
+                modifier = modifier
                     .padding(start = 8.dp)
                     .offset(y = (-8).dp)
-                    .fillMaxWidth(0.9f)
             )
         }
     }

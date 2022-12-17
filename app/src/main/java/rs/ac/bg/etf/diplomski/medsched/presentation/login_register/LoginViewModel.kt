@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,8 +41,16 @@ class LoginViewModel @Inject constructor(
         _loginState.update { it.copy(password = password) }
     }
 
-    fun setIsRolePicked(isRolePicked: Boolean) {
-        _loginState.update { it.copy(isRolePicked = isRolePicked) }
+    fun resetLoginState() {
+        _loginState.update {
+            it.copy(
+                currentSelectedRole = null,
+                email = "",
+                emailError = null,
+                password = "",
+                passwordError = null
+            )
+        }
     }
 
     fun validateLoginForm(): Boolean {
@@ -73,10 +82,15 @@ class LoginViewModel @Inject constructor(
         )
         when (response) {
             is Resource.Success -> {
-                _loginStatusChannel.send("User found")
+                _loginState.update {
+                    it.copy(
+                        emailError = response.data?.emailError,
+                        passwordError = response.data?.passwordError
+                    )
+                }
             }
             is Resource.Error -> {
-                _loginStatusChannel.send(response.message!!)
+                response.message?.let { _loginStatusChannel.send(it) }
             }
             is Resource.Loading -> {
 
