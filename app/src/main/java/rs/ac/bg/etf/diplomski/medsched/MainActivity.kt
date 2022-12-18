@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import dagger.hilt.android.AndroidEntryPoint
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.LoginScreen
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.RegisterScreen
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.MedSchedTheme
 
 @AndroidEntryPoint
@@ -15,7 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MedSchedTheme {
-                LoginScreen()
+                RegisterScreen()
             }
         }
     }

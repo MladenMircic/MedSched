@@ -24,7 +24,7 @@ object EmailValidation: FormValidation() {
         if (!Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
             return ValidationResult(
                 success = false,
-                errorId = R.string.email
+                errorId = R.string.email_error_format
             )
         }
         return ValidationResult(success = true)

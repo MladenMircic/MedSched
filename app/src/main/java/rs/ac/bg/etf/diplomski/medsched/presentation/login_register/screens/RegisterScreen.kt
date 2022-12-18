@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,11 +13,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RegisterViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.RegisterForm
@@ -29,6 +33,8 @@ fun RegisterScreen(
     registerViewModel: RegisterViewModel = viewModel()
 ) {
     val registerState by registerViewModel.registerState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -73,7 +79,17 @@ fun RegisterScreen(
                     updateLBO = {
                         registerViewModel.setFieldValue(RegisterViewModel.RegisterField.LBO, it)
                     },
-                    onRegisterButtonClick = registerViewModel::validateRegisterForm
+                    onRegisterButtonClick = {
+                        if (registerViewModel.validateRegisterForm()) {
+                            registerViewModel.registerUser()
+                            coroutineScope.launch {
+                                registerViewModel.registerFeedbackFlow.collect {
+                                    Toast.makeText(context, context.getString(it), Toast.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
+                        }
+                    }
                 )
             }
         }

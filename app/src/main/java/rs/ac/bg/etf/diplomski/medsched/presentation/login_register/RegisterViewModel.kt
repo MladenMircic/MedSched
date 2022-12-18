@@ -1,19 +1,31 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import rs.ac.bg.etf.diplomski.medsched.R
+import rs.ac.bg.etf.diplomski.medsched.commons.Resource
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.RegisterState
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor() : ViewModel()  {
+class RegisterViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase
+) : ViewModel()  {
 
     private val _registerState = MutableStateFlow(RegisterState())
     val registerState = _registerState.asStateFlow()
+
+    private val _registerFeedbackChannel = Channel<Int>()
+    val registerFeedbackFlow = _registerFeedbackChannel.receiveAsFlow()
 
     fun setFieldValue(registerField: RegisterField, text: String) {
         when (registerField) {
@@ -61,6 +73,30 @@ class RegisterViewModel @Inject constructor() : ViewModel()  {
         }
 
         return !hasError
+    }
+
+    fun registerUser() = viewModelScope.launch {
+        val response = registerUseCase(
+            User(
+                email = _registerState.value.email,
+                password = _registerState.value.password,
+                role = 1, // Patient
+                phone = _registerState.value.phone,
+                ssn = _registerState.value.ssn
+            )
+        )
+
+        when (response) {
+            is Resource.Success -> {
+                _registerFeedbackChannel.send(R.string.registration_success)
+            }
+            is Resource.Error -> {
+                response.message?.let { _registerFeedbackChannel.send(it) }
+            }
+            is Resource.Loading -> {
+
+            }
+        }
     }
 
     enum class RegisterField {

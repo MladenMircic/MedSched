@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.model.User
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.FormValidation
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
@@ -25,7 +25,7 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
 
-    private val _loginStatusChannel = Channel<String>()
+    private val _loginStatusChannel = Channel<Int>()
     val loginStatusChannel = _loginStatusChannel.receiveAsFlow()
 
     fun setSelectedRole(roleName: String) {

@@ -207,8 +207,11 @@ fun LoginScreen(
                                         loginViewModel.loginUser()
                                         coroutineScope.launch {
                                             loginViewModel.loginStatusChannel.collect {
-                                                Toast.makeText(context, it, Toast.LENGTH_LONG)
-                                                    .show()
+                                                Toast.makeText(
+                                                    context,
+                                                    context.getString(it),
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
                                         }
                                     }

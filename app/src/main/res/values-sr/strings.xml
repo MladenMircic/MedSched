@@ -25,6 +25,13 @@
     <string name="phone">Broj telefona</string>
     <string name="social_security_number">LBO</string>
     <string name="register_button_text">Registruj se</string>
+    <string name="registration_success">Uspešno ste se registrovali</string>
+
+    <!-- General errors -->
+    <string name="unknown_error">Dogodila se nepoznata greška</string>
+    <string name="no_connection">
+        Dogodila se greška prilikom pristupa mreži. Proverite svoju internet konekciju
+    </string>
 
     <!-- Login errors -->
     <string name="email_error_login">Email je nepostojeći</string>
@@ -32,12 +39,13 @@
 
     <!-- Register errors -->
     <string name="empty_field">Ovo polje ne sme biti prazno</string>
-    <string name="email_error_register">Morate uneti email u ispravnom formatu</string>
+    <string name="email_error_format">Morate uneti email u ispravnom formatu</string>
     <string name="password_error_register">
         Lozinka mora sadržati barem 8 karaktera, jedan broj i veliko slovo
     </string>
     <string name="confirm_password_error">Ovo polje se mora poklapati sa lozinkom</string>
     <string name="phone_error">Broj telefona mora biti u ispravnom formatu</string>
     <string name="ssn_error">LBO mora biti u ispravnom formatu</string>
+    <string name="account_already_exists">Nalog već postoji</string>
 
 </resources>
