@@ -60,16 +60,14 @@ class RegisterViewModel @Inject constructor(
             ssnResult
         ).any { it.errorId != null }
 
-        if (hasError) {
-            _registerState.update {
-                it.copy(
-                    emailError = emailResult.errorId,
-                    passwordError = passwordResult.errorId,
-                    confirmPasswordError = confirmPasswordResult.errorId,
-                    phoneError = phoneResult.errorId,
-                    ssnError = ssnResult.errorId
-                )
-            }
+        _registerState.update {
+            it.copy(
+                emailError = emailResult.errorId,
+                passwordError = passwordResult.errorId,
+                confirmPasswordError = confirmPasswordResult.errorId,
+                phoneError = phoneResult.errorId,
+                ssnError = ssnResult.errorId
+            )
         }
 
         return !hasError
@@ -86,17 +84,21 @@ class RegisterViewModel @Inject constructor(
             )
         )
 
-        when (response) {
-            is Resource.Success -> {
-                _registerFeedbackChannel.send(R.string.registration_success)
-            }
-            is Resource.Error -> {
-                response.message?.let { _registerFeedbackChannel.send(it) }
-            }
-            is Resource.Loading -> {
-
+        response.collect {
+            _registerState.update { value -> value.copy(isLoading = false) }
+            when (it) {
+                is Resource.Success -> {
+                    _registerFeedbackChannel.send(R.string.registration_success)
+                }
+                is Resource.Error -> {
+                    it.message?.let { message -> _registerFeedbackChannel.send(message) }
+                }
+                is Resource.Loading -> {
+                    _registerState.update { value -> value.copy(isLoading = true) }
+                }
             }
         }
+
     }
 
     enum class RegisterField {

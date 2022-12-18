@@ -1,5 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.use_case
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
 import rs.ac.bg.etf.diplomski.medsched.R
@@ -12,22 +14,23 @@ import javax.inject.Inject
 class RegisterUseCase @Inject constructor(
     private val loginRegisterRepository: LoginRegisterRepository
 ) {
-    suspend operator fun invoke(user: User): Resource<RegisterResponse> {
-        return try {
+    suspend operator fun invoke(user: User): Flow<Resource<RegisterResponse>> = flow {
+        emit(Resource.Loading())
+        try {
             val result = loginRegisterRepository.registerUser(user)
             when (result.success) {
-                true -> Resource.Success(result)
+                true -> emit(Resource.Success(result))
                 false -> {
                     when (result.accountExists) {
-                        true -> Resource.Error(R.string.account_already_exists)
-                        false -> Resource.Error(R.string.unknown_error)
+                        true -> emit(Resource.Error(R.string.account_already_exists))
+                        false -> emit(Resource.Error(R.string.unknown_error))
                     }
                 }
             }
         } catch (e: HttpException) {
-            Resource.Error(R.string.unknown_error)
+            emit(Resource.Error(R.string.unknown_error))
         } catch (e: IOException) {
-            Resource.Error(R.string.no_connection)
+            emit(Resource.Error(R.string.no_connection))
         }
     }
 }
