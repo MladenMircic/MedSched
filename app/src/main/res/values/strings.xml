@@ -18,4 +18,25 @@
     <!-- Register prompt -->
     <string name="no_account">Don\'t have an account?\u0020</string>
     <string name="register_now">Register now</string>
+
+    <!-- Register form -->
+    <string name="registration">Registration</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="phone">Phone number</string>
+    <string name="social_security_number">SSN</string>
+    <string name="register_button_text">Register</string>
+
+    <!-- Login errors -->
+    <string name="email_error_login">Email does not exist</string>
+    <string name="password_error_login">Password is incorrect</string>
+
+    <!-- Register errors -->
+    <string name="empty_field">This field must not be empty</string>
+    <string name="email_error_register">You must enter email in correct format</string>
+    <string name="password_error_register">
+        Password must contain at least 8 characters, one digit and one uppercase
+    </string>
+    <string name="confirm_password_error">This field must match password field</string>
+    <string name="phone_error">Phone number must be in correct form</string>
+    <string name="ssn_error">You must enter SSN in correct format</string>
 </resources>

@@ -18,4 +18,26 @@
     <!-- Register prompt -->
     <string name="no_account">Nemate nalog?\u0020</string>
     <string name="register_now">Registrujte se</string>
+
+    <!-- Register form -->
+    <string name="registration">Registracija</string>
+    <string name="confirm_password">Potvrdi lozinku</string>
+    <string name="phone">Broj telefona</string>
+    <string name="social_security_number">LBO</string>
+    <string name="register_button_text">Registruj se</string>
+
+    <!-- Login errors -->
+    <string name="email_error_login">Email je nepostojeći</string>
+    <string name="password_error_login">Lozinka nije ispravna</string>
+
+    <!-- Register errors -->
+    <string name="empty_field">Ovo polje ne sme biti prazno</string>
+    <string name="email_error_register">Morate uneti email u ispravnom formatu</string>
+    <string name="password_error_register">
+        Lozinka mora sadržati barem 8 karaktera, jedan broj i veliko slovo
+    </string>
+    <string name="confirm_password_error">Ovo polje se mora poklapati sa lozinkom</string>
+    <string name="phone_error">Broj telefona mora biti u ispravnom formatu</string>
+    <string name="ssn_error">LBO mora biti u ispravnom formatu</string>
+
 </resources>

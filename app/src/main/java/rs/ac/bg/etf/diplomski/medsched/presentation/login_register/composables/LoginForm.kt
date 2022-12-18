@@ -6,9 +6,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,23 +25,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import rs.ac.bg.etf.diplomski.medsched.R
-import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
-import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.commons.LOGIN_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.commons.LOGIN_BUTTON_PADDING
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
+import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.BackgroundPrimaryLight
+import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape20
+import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.selectable
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CustomOutlinedTextField
 
 @Composable
 fun LoginForm(
-    email: String,
-    emailError: String?,
-    password: String,
-    passwordError: String?,
+    loginState: LoginState,
     updateEmail: (String) -> Unit,
     updatePassword: (String) -> Unit,
     onLoginButtonClick: () -> Unit
@@ -48,11 +49,11 @@ fun LoginForm(
 
     Column {
         CustomOutlinedTextField(
-            value = email,
+            value = loginState.email,
             onValueChange = updateEmail,
             label = stringResource(id = R.string.email),
-            showError = emailError != null,
-            errorMessage = emailError ?: "",
+            showError = loginState.emailError != null,
+            errorMessage = loginState.emailError?.let { stringResource(id = it) } ?: "",
             leadingIconImageVector = Icons.Default.Email,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
@@ -65,14 +66,14 @@ fun LoginForm(
                 .fillMaxWidth(0.8f)
         )
         CustomOutlinedTextField(
-            value = password,
+            value = loginState.password,
             onValueChange = updatePassword,
             label = stringResource(id = R.string.password),
             isPasswordField = true,
             isPasswordVisible = passwordVisible,
             onVisibilityChange = { passwordVisible = it },
-            showError = passwordError != null,
-            errorMessage = passwordError ?: "",
+            showError = loginState.passwordError != null,
+            errorMessage = loginState.passwordError?.let { stringResource(id = it) } ?: "",
             leadingIconImageVector = Icons.Default.Password,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,

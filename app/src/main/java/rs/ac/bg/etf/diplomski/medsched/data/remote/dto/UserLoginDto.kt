@@ -5,14 +5,15 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.UserLogin
 
 data class UserLoginDto(
     @Json(name = "emailError")
-    val emailError: String? = null,
+    val hasEmailError: Boolean = false,
     @Json(name = "passwordCorrect")
-    val passwordError: String? = null
-)
-
-fun UserLoginDto.toUserLogin(): UserLogin {
-    return UserLogin(
-        emailError = emailError,
-        passwordError = passwordError
-    )
+    val hasPasswordError: Boolean = false
+) {
+    fun toUserLogin(): UserLogin {
+        return UserLogin(
+            hasEmailError = hasEmailError,
+            hasPasswordError = hasPasswordError
+        )
+    }
 }
+

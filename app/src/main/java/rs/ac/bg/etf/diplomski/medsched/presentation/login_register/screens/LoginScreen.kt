@@ -199,18 +199,17 @@ fun LoginScreen(
                                 )
                             }
                             LoginForm(
-                                email = loginUIState.email,
-                                emailError = loginUIState.emailError,
-                                password = loginUIState.password,
-                                passwordError = loginUIState.passwordError,
+                                loginState = loginUIState,
                                 updateEmail = loginViewModel::setEmail,
                                 updatePassword = loginViewModel::setPassword,
                                 onLoginButtonClick = {
-                                    loginViewModel.loginUser()
-                                    coroutineScope.launch {
-                                        loginViewModel.loginStatusChannel.collect {
-                                            Toast.makeText(context, it, Toast.LENGTH_LONG)
-                                                .show()
+                                    if (loginViewModel.validateLoginForm()) {
+                                        loginViewModel.loginUser()
+                                        coroutineScope.launch {
+                                            loginViewModel.loginStatusChannel.collect {
+                                                Toast.makeText(context, it, Toast.LENGTH_LONG)
+                                                    .show()
+                                            }
                                         }
                                     }
                                 }

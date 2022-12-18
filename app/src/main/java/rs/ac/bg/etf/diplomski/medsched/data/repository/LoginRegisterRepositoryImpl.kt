@@ -2,7 +2,6 @@ package rs.ac.bg.etf.diplomski.medsched.data.repository
 
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.toUserLogin
 import rs.ac.bg.etf.diplomski.medsched.domain.model.User
 import rs.ac.bg.etf.diplomski.medsched.domain.model.UserLogin
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.LoginRegisterRepository

@@ -1,6 +1,5 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,11 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.User
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.EmailValidation
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.FormValidation
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginUseCase
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.PasswordValidation
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
 import javax.inject.Inject
 
@@ -54,18 +53,18 @@ class LoginViewModel @Inject constructor(
     }
 
     fun validateLoginForm(): Boolean {
-        val emailResult = EmailValidation.validate(_loginState.value.email)
-        val passwordResult = PasswordValidation.validate(_loginState.value.password)
+        val emailResult = FormValidation().validate(_loginState.value.email)
+        val passwordResult = FormValidation().validate(_loginState.value.password)
         val hasError = listOf(
             emailResult,
             passwordResult
-        ).any { it.errorMessage != null }
+        ).any { it.errorId != null }
 
         if (hasError) {
             _loginState.update {
                 it.copy(
-                    emailError = emailResult.errorMessage,
-                    passwordError = passwordResult.errorMessage
+                    emailError = emailResult.errorId,
+                    passwordError = passwordResult.errorId
                 )
             }
         }
@@ -74,6 +73,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun loginUser() = viewModelScope.launch {
+        _loginState.update { it.copy(isLoading = true) }
         val response = loginUseCase(
             User(
                 email = _loginState.value.email,
@@ -84,8 +84,12 @@ class LoginViewModel @Inject constructor(
             is Resource.Success -> {
                 _loginState.update {
                     it.copy(
-                        emailError = response.data?.emailError,
-                        passwordError = response.data?.passwordError
+                        emailError = if (response.data?.hasEmailError == true)
+                            R.string.email_error_login
+                        else null,
+                        passwordError = if (response.data?.hasPasswordError == true)
+                            R.string.password_error_login
+                        else null
                     )
                 }
             }
