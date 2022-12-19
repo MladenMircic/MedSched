@@ -18,6 +18,7 @@ val SelectableLight = Color(0xFF0033CC)
 val TextFieldBackgroundLight = Color(0xFFB3C6FF)
 val TextFieldTextLight = Color(0xFF0033CC)
 val TextFieldOutlineLight = Color(0xFF0033CC)
+val SuccessLight = Color(0xff15B000)
 
 val BackgroundPrimaryDark = Color(0xFF10131C)
 val BackgroundSecondaryDark = Color(0xFF1e2b43)
@@ -26,6 +27,7 @@ val SelectableDark = Color(0xFF1964e6)
 val TextFieldBackgroundDark = Color(0xFF31486e)
 val TextFieldTextDark = Color(0xFFCCD9FF)
 val TextFieldOutlineDark = Color(0xFFCCD9FF)
+val SuccessDark = Color(0xFF68CF66)
 
 // Shades for the dark mode
 val DarkBackgroundColor = Color(0xFF66d6ff)

@@ -88,6 +88,7 @@ class RegisterViewModel @Inject constructor(
             _registerState.update { value -> value.copy(isLoading = false) }
             when (it) {
                 is Resource.Success -> {
+                    _registerState.update { value -> value.copy(isSuccess = true) }
                     _registerFeedbackChannel.send(R.string.registration_success)
                 }
                 is Resource.Error -> {

@@ -17,3 +17,6 @@ val Colors.textFieldText: Color
 
 val Colors.textFieldOutline: Color
     get() = if (isLight) TextFieldOutlineLight else TextFieldOutlineDark
+
+val Colors.success: Color
+    get() = if (isLight) SuccessLight else SuccessDark
