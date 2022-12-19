@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RegisterViewModel
@@ -29,7 +29,8 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textOnPrimary
 
 @Composable
 fun RegisterScreen(
-    registerViewModel: RegisterViewModel = viewModel()
+    registerViewModel: RegisterViewModel = hiltViewModel(),
+    onBackToLogin: () -> Unit,
 ) {
     val registerState by registerViewModel.registerState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -104,11 +105,14 @@ fun RegisterScreen(
                             if (registerViewModel.validateRegisterForm()) {
                                 registerViewModel.registerUser()
                                 coroutineScope.launch {
-                                    registerViewModel.registerFeedbackFlow.collect { errorId ->
+                                    registerViewModel.registerFeedbackFlow.collect { messageId ->
                                         scaffoldState.snackbarHostState.showSnackbar(
-                                            message = context.getString(errorId),
+                                            message = context.getString(messageId),
                                             duration = SnackbarDuration.Long
                                         )
+                                    }
+                                    if (registerState.isSuccess) {
+                                        onBackToLogin()
                                     }
                                 }
                             }
@@ -129,15 +133,15 @@ fun RegisterScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = stringResource(id = R.string.no_account),
+                        text = stringResource(id = R.string.already_has_account),
                         color = Blue90
                     )
                     Text(
-                        text = stringResource(id = R.string.register_now),
+                        text = stringResource(id = R.string.login_now),
                         color = Blue90,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
-
+                            onBackToLogin()
                         }
                     )
                 }

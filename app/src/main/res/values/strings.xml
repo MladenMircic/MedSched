@@ -15,6 +15,10 @@
     <string name="password">Password</string>
     <string name="login_button_text">Login</string>
 
+    <!-- Login prompt -->
+    <string name="already_has_account">Already have an account?\u0020</string>
+    <string name="login_now">Login now</string>
+
     <!-- Register prompt -->
     <string name="no_account">Don\'t have an account?\u0020</string>
     <string name="register_now">Register now</string>

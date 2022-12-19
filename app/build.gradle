@@ -88,4 +88,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
 
+    // Library for injecting view models into navigation
+    def compose_hilt_navigation_version = "1.0.0"
+    implementation "androidx.hilt:hilt-navigation-compose:$compose_hilt_navigation_version"
+
 }

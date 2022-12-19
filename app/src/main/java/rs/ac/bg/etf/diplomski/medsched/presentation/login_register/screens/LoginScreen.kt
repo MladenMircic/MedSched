@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -24,9 +24,8 @@ import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginFormDestination
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginDestinations
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RoleSelectDestination
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.LoginForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.UserRoleCard
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.models.roles
@@ -35,12 +34,14 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun LoginScreen(
-    loginViewModel: LoginViewModel = viewModel()
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    onGoToRegister: () -> Unit
 ) {
 
     val loginUIState by loginViewModel.loginState.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val loginNavController = rememberAnimatedNavController()
 
     Column(
         modifier = Modifier
@@ -70,10 +71,9 @@ fun LoginScreen(
                 )
 
                 // NavHost for login progression with animation
-                val navController = rememberAnimatedNavController()
                 AnimatedNavHost(
-                    navController = navController,
-                    startDestination = RoleSelectDestination.route,
+                    navController = loginNavController,
+                    startDestination = LoginDestinations.RoleSelectDestination.route,
                     modifier = Modifier.fillMaxWidth(),
                     enterTransition = {
                         slideInVertically(
@@ -128,7 +128,7 @@ fun LoginScreen(
                         )
                     }
                 ) {
-                    composable(route = RoleSelectDestination.route) {
+                    composable(route = LoginDestinations.RoleSelectDestination.route) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -155,7 +155,7 @@ fun LoginScreen(
                                             Toast.LENGTH_LONG
                                         ).show()
                                     } else {
-                                        navController.navigate(LoginFormDestination.route)
+                                        loginNavController.navigate(LoginDestinations.LoginFormDestination.route)
                                     }
                                 },
                                 modifier = Modifier
@@ -179,7 +179,7 @@ fun LoginScreen(
                             }
                         }
                     }
-                    composable(route = LoginFormDestination.route) {
+                    composable(route = LoginDestinations.LoginFormDestination.route) {
                         Column {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -242,10 +242,10 @@ fun LoginScreen(
                     text = stringResource(id = R.string.register_now),
                     color = Blue90,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .clickable {
-
-                        }
+                    modifier = Modifier.clickable {
+                        onGoToRegister()
+                        loginNavController.popBackStack()
+                    }
                 )
             }
         }

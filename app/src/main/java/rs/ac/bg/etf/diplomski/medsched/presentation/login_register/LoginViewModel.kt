@@ -40,16 +40,8 @@ class LoginViewModel @Inject constructor(
         _loginState.update { it.copy(password = password) }
     }
 
-    fun resetLoginState() {
-        _loginState.update {
-            it.copy(
-                currentSelectedRole = null,
-                email = "",
-                emailError = null,
-                password = "",
-                passwordError = null
-            )
-        }
+    fun resetState() {
+        _loginState.update { LoginState() }
     }
 
     fun validateLoginForm(): Boolean {
@@ -80,24 +72,27 @@ class LoginViewModel @Inject constructor(
                 password = _loginState.value.password
             )
         )
-        when (response) {
-            is Resource.Success -> {
-                _loginState.update {
-                    it.copy(
-                        emailError = if (response.data?.hasEmailError == true)
-                            R.string.email_error_login
-                        else null,
-                        passwordError = if (response.data?.hasPasswordError == true)
-                            R.string.password_error_login
-                        else null
-                    )
+        response.collect {
+            _loginState.update { value -> value.copy(isLoading = false) }
+            when (it) {
+                is Resource.Success -> {
+                    _loginState.update { value ->
+                        value.copy(
+                            emailError = if (it.data?.hasEmailError == true)
+                                R.string.email_error_login
+                            else null,
+                            passwordError = if (it.data?.hasPasswordError == true)
+                                R.string.password_error_login
+                            else null
+                        )
+                    }
                 }
-            }
-            is Resource.Error -> {
-                response.message?.let { _loginStatusChannel.send(it) }
-            }
-            is Resource.Loading -> {
-
+                is Resource.Error -> {
+                    it.message?.let { message -> _loginStatusChannel.send(message) }
+                }
+                is Resource.Loading -> {
+                    _loginState.update { value -> value.copy(isLoading = true) }
+                }
             }
         }
     }

@@ -17,11 +17,11 @@ class RegisterUseCase @Inject constructor(
     suspend operator fun invoke(user: User): Flow<Resource<RegisterResponse>> = flow {
         emit(Resource.Loading())
         try {
-            val result = loginRegisterRepository.registerUser(user)
-            when (result.success) {
-                true -> emit(Resource.Success(result))
+            val response = loginRegisterRepository.registerUser(user)
+            when (response.success) {
+                true -> emit(Resource.Success(response))
                 false -> {
-                    when (result.accountExists) {
+                    when (response.accountExists) {
                         true -> emit(Resource.Error(R.string.account_already_exists))
                         false -> emit(Resource.Error(R.string.unknown_error))
                     }

@@ -15,6 +15,10 @@
     <string name="password">Lozinka</string>
     <string name="login_button_text">Uloguj se</string>
 
+    <!-- Login prompt -->
+    <string name="already_has_account">Već imate nalog?\u0020</string>
+    <string name="login_now">Ulogujte se</string>
+
     <!-- Register prompt -->
     <string name="no_account">Nemate nalog?\u0020</string>
     <string name="register_now">Registrujte se</string>

@@ -1,5 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.use_case
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
 import rs.ac.bg.etf.diplomski.medsched.R
@@ -12,13 +14,14 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val loginRegisterRepository: LoginRegisterRepository
 ) {
-    suspend operator fun invoke(user: User): Resource<LoginResponse> {
-        return try {
-            Resource.Success(loginRegisterRepository.loginUser(user))
+    suspend operator fun invoke(user: User): Flow<Resource<LoginResponse>> = flow {
+        emit(Resource.Loading())
+        try {
+            emit(Resource.Success(loginRegisterRepository.loginUser(user)))
         } catch (e: HttpException) {
-            Resource.Error(R.string.unknown_error)
+            emit(Resource.Error(R.string.unknown_error))
         } catch (e: IOException) {
-            Resource.Error(R.string.no_connection)
+            emit(Resource.Error(R.string.no_connection))
         }
     }
 }
