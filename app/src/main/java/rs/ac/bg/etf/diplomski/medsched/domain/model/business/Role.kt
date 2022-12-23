@@ -1,19 +1,20 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.models
+package rs.ac.bg.etf.diplomski.medsched.domain.model.business
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import rs.ac.bg.etf.diplomski.medsched.R
 
-data class RoleModel(
-    val roleName: Int,
+data class Role(
+    @StringRes val roleName: Int,
     @DrawableRes val roleImage: Int,
 )
 
 val roles = listOf(
-    RoleModel(
+    Role(
         roleName = R.string.doctor_role,
         roleImage = R.drawable.doctor_icon
     ),
-    RoleModel(
+    Role(
         roleName = R.string.patient_role,
         roleImage = R.drawable.patient_icon
     )

@@ -3,10 +3,8 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
@@ -23,9 +21,6 @@ class RegisterViewModel @Inject constructor(
 
     private val _registerState = MutableStateFlow(RegisterState())
     val registerState = _registerState.asStateFlow()
-
-    private val _registerFeedbackChannel = Channel<Int>()
-    val registerFeedbackFlow = _registerFeedbackChannel.receiveAsFlow()
 
     fun setFieldValue(registerField: RegisterField, text: String) {
         when (registerField) {
@@ -89,10 +84,10 @@ class RegisterViewModel @Inject constructor(
             when (it) {
                 is Resource.Success -> {
                     _registerState.update { value -> value.copy(isSuccess = true) }
-                    _registerFeedbackChannel.send(R.string.registration_success)
+                    _registerState.update { value -> value.copy(snackBarMessage = R.string.registration_success) }
                 }
                 is Resource.Error -> {
-                    it.message?.let { message -> _registerFeedbackChannel.send(message) }
+                    _registerState.update { value -> value.copy(snackBarMessage = it.message) }
                 }
                 is Resource.Loading -> {
                     _registerState.update { value -> value.copy(isLoading = true) }

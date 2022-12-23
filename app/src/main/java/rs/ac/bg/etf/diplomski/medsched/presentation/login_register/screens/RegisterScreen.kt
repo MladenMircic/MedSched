@@ -8,9 +8,9 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RegisterViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.RegisterForm
@@ -33,7 +33,6 @@ fun RegisterScreen(
     onBackToLogin: () -> Unit,
 ) {
     val registerState by registerViewModel.registerState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
 
@@ -104,20 +103,23 @@ fun RegisterScreen(
                         onRegisterButtonClick = {
                             if (registerViewModel.validateRegisterForm()) {
                                 registerViewModel.registerUser()
-                                coroutineScope.launch {
-                                    registerViewModel.registerFeedbackFlow.collect { messageId ->
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = context.getString(messageId),
-                                            duration = SnackbarDuration.Long
-                                        )
-                                    }
-                                    if (registerState.isSuccess) {
-                                        onBackToLogin()
-                                    }
-                                }
                             }
                         }
                     )
+
+                    // Show an error snackBar and go back to login if register is success
+                    LaunchedEffect(key1 = registerState.snackBarMessage) {
+                        registerState.snackBarMessage?.let {
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message = context.getString(registerState.snackBarMessage!!),
+                                duration = SnackbarDuration.Long
+                            )
+                            if (registerState.isSuccess) {
+                                delay(1000L)
+                                onBackToLogin()
+                            }
+                        }
+                    }
                 }
             }
 

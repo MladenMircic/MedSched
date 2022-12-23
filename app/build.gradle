@@ -86,10 +86,17 @@ dependencies {
     def retrofit_version = "2.9.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
+
+    // OkHttp
+    def okHttp_version = "5.0.0-alpha.10"
+    implementation "com.squareup.okhttp3:okhttp:$okHttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okHttp_version"
 
     // Library for injecting view models into navigation
     def compose_hilt_navigation_version = "1.0.0"
     implementation "androidx.hilt:hilt-navigation-compose:$compose_hilt_navigation_version"
+
+    // Android datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 }

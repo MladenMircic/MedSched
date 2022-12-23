@@ -7,12 +7,15 @@ data class LoginResponseDto(
     @Json(name = "hasEmailError")
     val hasEmailError: Boolean = false,
     @Json(name = "hasPasswordCorrect")
-    val hasPasswordError: Boolean = false
+    val hasPasswordError: Boolean = false,
+    @Json(name = "token")
+    val token: String? = null
 ) {
     fun toUserLogin(): LoginResponse {
         return LoginResponse(
             hasEmailError = hasEmailError,
-            hasPasswordError = hasPasswordError
+            hasPasswordError = hasPasswordError,
+            token = token
         )
     }
 }

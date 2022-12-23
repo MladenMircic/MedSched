@@ -12,5 +12,6 @@ data class RegisterState(
     val ssn: String = "",
     val ssnError: Int? = null,
     val isLoading: Boolean = false,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val snackBarMessage: Int? = null
 )

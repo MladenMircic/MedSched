@@ -1,32 +1,48 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.FormValidation
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginAuthUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginAuthUseCase: LoginAuthUseCase
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
 
-    private val _loginStatusChannel = Channel<Int>()
-    val loginStatusChannel = _loginStatusChannel.receiveAsFlow()
+    var alreadyLogged by mutableStateOf<Boolean?>(null)
+
+    // Authenticate the user if his token is still valid
+    init {
+        viewModelScope.launch {
+            val response = loginAuthUseCase.authenticate()
+            response.collect {
+                when (it) {
+                    is Resource.Success -> {
+                        alreadyLogged = it.data
+                    }
+                    is Resource.Error -> Unit
+                    is Resource.Loading -> Unit
+                }
+            }
+        }
+    }
 
     fun setSelectedRole(roleName: String) {
         _loginState.update { it.copy(currentSelectedRole = roleName) }
@@ -38,10 +54,6 @@ class LoginViewModel @Inject constructor(
 
     fun setPassword(password: String) {
         _loginState.update { it.copy(password = password) }
-    }
-
-    fun resetState() {
-        _loginState.update { LoginState() }
     }
 
     fun validateLoginForm(): Boolean {
@@ -66,7 +78,7 @@ class LoginViewModel @Inject constructor(
 
     fun loginUser() = viewModelScope.launch {
         _loginState.update { it.copy(isLoading = true) }
-        val response = loginUseCase(
+        val response = loginAuthUseCase.login(
             User(
                 email = _loginState.value.email,
                 password = _loginState.value.password
@@ -86,9 +98,12 @@ class LoginViewModel @Inject constructor(
                             else null
                         )
                     }
+                    if (it.data?.hasEmailError == false && !it.data.hasPasswordError) {
+                        _loginState.update { value -> value.copy(isSuccess = true) }
+                    }
                 }
                 is Resource.Error -> {
-                    it.message?.let { message -> _loginStatusChannel.send(message) }
+                    _loginState.update { value -> value.copy(snackBarMessageId = it.message) }
                 }
                 is Resource.Loading -> {
                     _loginState.update { value -> value.copy(isLoading = true) }

@@ -20,4 +20,7 @@ class LoginRegisterRepositoryImpl @Inject constructor(
         loginRegisterApi.registerUser(userInfoMapper.toRegisterRequestDto(user))
             .toRegisterResponse()
 
+    override suspend fun authenticateUser(bearerToken: String) {
+        loginRegisterApi.authenticateUser("Bearer $bearerToken")
+    }
 }

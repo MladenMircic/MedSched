@@ -20,27 +20,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.roles
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginDestinations
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.LoginForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.UserRoleCard
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.models.roles
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel(),
+    onLoginSuccess: () -> Unit,
     onGoToRegister: () -> Unit
 ) {
 
-    val loginUIState by loginViewModel.loginState.collectAsState()
+    val loginState by loginViewModel.loginState.collectAsState()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val loginNavController = rememberAnimatedNavController()
 
     Column(
@@ -73,7 +72,7 @@ fun LoginScreen(
                 // NavHost for login progression with animation
                 AnimatedNavHost(
                     navController = loginNavController,
-                    startDestination = LoginDestinations.RoleSelectDestination.route,
+                    startDestination = LoginDestinations.RoleSelect.route,
                     modifier = Modifier.fillMaxWidth(),
                     enterTransition = {
                         slideInVertically(
@@ -128,7 +127,7 @@ fun LoginScreen(
                         )
                     }
                 ) {
-                    composable(route = LoginDestinations.RoleSelectDestination.route) {
+                    composable(route = LoginDestinations.RoleSelect.route) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -141,21 +140,21 @@ fun LoginScreen(
                                     UserRoleCard(
                                         roleName = stringResource(id = role.roleName),
                                         roleImage = role.roleImage,
-                                        selectedRole = loginUIState.currentSelectedRole,
+                                        selectedRole = loginState.currentSelectedRole,
                                         onRoleSelect = loginViewModel::setSelectedRole
                                     )
                                 }
                             }
                             Button(
                                 onClick = {
-                                    if (loginUIState.currentSelectedRole == null) {
+                                    if (loginState.currentSelectedRole == null) {
                                         Toast.makeText(
                                             context,
                                             context.resources.getString(R.string.no_role_picked),
                                             Toast.LENGTH_LONG
                                         ).show()
                                     } else {
-                                        loginNavController.navigate(LoginDestinations.LoginFormDestination.route)
+                                        loginNavController.navigate(LoginDestinations.LoginForm.route)
                                     }
                                 },
                                 modifier = Modifier
@@ -179,7 +178,7 @@ fun LoginScreen(
                             }
                         }
                     }
-                    composable(route = LoginDestinations.LoginFormDestination.route) {
+                    composable(route = LoginDestinations.LoginForm.route) {
                         Column {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -189,7 +188,7 @@ fun LoginScreen(
                                     .padding(vertical = 36.dp)
                             ) {
                                 val selectedRole = roles.first {
-                                    stringResource(id = it.roleName) == loginUIState.currentSelectedRole
+                                    stringResource(id = it.roleName) == loginState.currentSelectedRole
                                 }
                                 UserRoleCard(
                                     roleName = stringResource(id = selectedRole.roleName),
@@ -199,24 +198,31 @@ fun LoginScreen(
                                 )
                             }
                             LoginForm(
-                                loginState = loginUIState,
+                                loginState = loginState,
                                 updateEmail = loginViewModel::setEmail,
                                 updatePassword = loginViewModel::setPassword,
                                 onLoginButtonClick = {
                                     if (loginViewModel.validateLoginForm()) {
                                         loginViewModel.loginUser()
-                                        coroutineScope.launch {
-                                            loginViewModel.loginStatusChannel.collect {
-                                                Toast.makeText(
-                                                    context,
-                                                    context.getString(it),
-                                                    Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-                                        }
                                     }
                                 }
                             )
+                            // If login is not successful, display message here
+                            LaunchedEffect(key1 = loginState.snackBarMessageId) {
+                                loginState.snackBarMessageId?.let {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(loginState.snackBarMessageId!!),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                            // If login is successful, continue to the main page
+                            LaunchedEffect(key1 = loginState.isSuccess) {
+                                loginState.isSuccess?.let {
+                                    onLoginSuccess()
+                                }
+                            }
                         }
                     }
                 }
@@ -244,7 +250,6 @@ fun LoginScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable {
                         onGoToRegister()
-                        loginNavController.popBackStack()
                     }
                 )
             }
