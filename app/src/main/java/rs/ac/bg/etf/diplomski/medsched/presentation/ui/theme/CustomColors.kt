@@ -9,6 +9,9 @@ val Colors.textOnPrimary: Color
 val Colors.selectable: Color
     get() = if (isLight) SelectableLight else SelectableDark
 
+val Colors.selectableBottomNavbar: Color
+    get() = if (isLight) SelectableLight else BackgroundPrimaryDark
+
 val Colors.textFieldBackground: Color
     get() = if (isLight) TextFieldBackgroundLight else TextFieldBackgroundDark
 

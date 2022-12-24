@@ -51,4 +51,9 @@
     <string name="phone_error">Phone number must be in correct form</string>
     <string name="ssn_error">You must enter SSN in correct format</string>
     <string name="account_already_exists">Account already exists</string>
+
+    <!-- Patient -->
+    <string name="navbar_home">Home</string>
+    <string name="navbar_scheduled">Scheduled</string>
+    <string name="navbar_account">Account</string>
 </resources>

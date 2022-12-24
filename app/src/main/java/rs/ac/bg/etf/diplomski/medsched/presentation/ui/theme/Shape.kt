@@ -11,4 +11,5 @@ val Shapes = Shapes(
 )
 
 val RoundedShape60 = RoundedCornerShape(60.dp)
+val RoundedShape40 = RoundedCornerShape(40.dp)
 val RoundedShape20 = RoundedCornerShape(20.dp)

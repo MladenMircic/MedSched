@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.graphs.Graph
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginRegisterDestinations
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Quicksand
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.logo
@@ -73,7 +73,7 @@ fun SplashScreen(
         loginViewModel.alreadyLogged?.let { logged ->
             onJumpDestination(
                 if (!logged)
-                    LoginRegisterDestinations.Login.route
+                    Login.route
                 else
                     Graph.PATIENT
             )

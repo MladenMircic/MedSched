@@ -52,4 +52,8 @@
     <string name="ssn_error">LBO mora biti u ispravnom formatu</string>
     <string name="account_already_exists">Nalog već postoji</string>
 
+    <!-- Patient -->
+    <string name="navbar_home">Glavna</string>
+    <string name="navbar_scheduled">Zakazani</string>
+    <string name="navbar_account">Nalog</string>
 </resources>

@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import rs.ac.bg.etf.diplomski.medsched.R
+import rs.ac.bg.etf.diplomski.medsched.presentation.composables.RegisterForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RegisterViewModel
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.RegisterForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Blue90
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape60
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.success

@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables
+package rs.ac.bg.etf.diplomski.medsched.presentation.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -6,9 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,34 +24,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.LOGIN_BUTTON_HEIGHT
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.RegisterState
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.BackgroundPrimaryLight
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape20
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.selectable
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CustomOutlinedTextField
 
 @Composable
-fun RegisterForm(
-    registerState: RegisterState,
+fun LoginForm(
+    loginState: LoginState,
     updateEmail: (String) -> Unit,
     updatePassword: (String) -> Unit,
-    updateConfirmPassword: (String) -> Unit,
-    updatePhone: (String) -> Unit,
-    updateLBO: (String) -> Unit,
-    onRegisterButtonClick: () -> Unit
+    onLoginButtonClick: () -> Unit
 ) {
+
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Column {
         CustomOutlinedTextField(
-            value = registerState.email,
+            value = loginState.email,
             onValueChange = updateEmail,
             label = stringResource(id = R.string.email),
-            showError = registerState.emailError != null,
-            errorMessage = registerState.emailError?.let { stringResource(id = it) } ?: "",
-            leadingIconImageVector = Icons.Filled.Email,
+            showError = loginState.emailError != null,
+            errorMessage = loginState.emailError?.let { stringResource(id = it) } ?: "",
+            leadingIconImageVector = Icons.Default.Email,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -65,75 +60,18 @@ fun RegisterForm(
                 .fillMaxWidth(0.8f)
         )
         CustomOutlinedTextField(
-            value = registerState.password,
+            value = loginState.password,
             onValueChange = updatePassword,
             label = stringResource(id = R.string.password),
             isPasswordField = true,
             isPasswordVisible = passwordVisible,
             onVisibilityChange = { passwordVisible = it },
-            showError = registerState.passwordError != null,
-            errorMessage = registerState.passwordError?.let { stringResource(id = it) } ?: "",
-            leadingIconImageVector = Icons.Filled.Password,
+            showError = loginState.passwordError != null,
+            errorMessage = loginState.passwordError?.let { stringResource(id = it) } ?: "",
+            leadingIconImageVector = Icons.Default.Password,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-        )
-        CustomOutlinedTextField(
-            value = registerState.confirmPassword,
-            onValueChange = updateConfirmPassword,
-            label = stringResource(id = R.string.confirm_password),
-            isPasswordField = true,
-            isPasswordVisible = confirmPasswordVisible,
-            onVisibilityChange = { confirmPasswordVisible = it },
-            showError = registerState.confirmPasswordError != null,
-            errorMessage = registerState.confirmPasswordError?.let { stringResource(id = it) } ?: "",
-            leadingIconImageVector = Icons.Filled.Password,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-        )
-        CustomOutlinedTextField(
-            value = registerState.phone,
-            onValueChange = updatePhone,
-            label = stringResource(id = R.string.phone),
-            showError = registerState.phoneError != null,
-            errorMessage = registerState.phoneError?.let { stringResource(id = it) } ?: "",
-            leadingIconImageVector = Icons.Filled.Phone,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Phone,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-        )
-        CustomOutlinedTextField(
-            value = registerState.ssn,
-            onValueChange = updateLBO,
-            label = stringResource(id = R.string.social_security_number),
-            showError = registerState.ssnError != null,
-            errorMessage = registerState.ssnError?.let { stringResource(id = it) } ?: "",
-            leadingIconImageVector = Icons.Filled.MedicalServices,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
             ),
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -144,7 +82,7 @@ fun RegisterForm(
             modifier = Modifier.fillMaxWidth()
         ) {
             Button(
-                onClick = onRegisterButtonClick,
+                onClick = onLoginButtonClick,
                 shape = RoundedShape20,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.selectable
@@ -153,7 +91,7 @@ fun RegisterForm(
                     .fillMaxWidth(0.5f)
                     .height(LOGIN_BUTTON_HEIGHT)
             ) {
-                if (registerState.isLoading) {
+                if (loginState.isLoading) {
                     CircularProgressIndicator(
                         color = BackgroundPrimaryLight,
                         modifier = Modifier
@@ -162,7 +100,7 @@ fun RegisterForm(
                     )
                 }
                 Text(
-                    text = stringResource(id = R.string.register_button_text),
+                    text = stringResource(id = R.string.login_button_text),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = BackgroundPrimaryLight,
@@ -172,5 +110,6 @@ fun RegisterForm(
                 )
             }
         }
+
     }
 }

@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables
+package rs.ac.bg.etf.diplomski.medsched.presentation.composables
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Spring
@@ -25,11 +25,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import rs.ac.bg.etf.diplomski.medsched.commons.ROLE_IMAGE_SIZE
+import rs.ac.bg.etf.diplomski.medsched.commons.USER_CARD_SIZE
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Blue85
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape60
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.selectable
-import rs.ac.bg.etf.diplomski.medsched.commons.ROLE_IMAGE_SIZE
-import rs.ac.bg.etf.diplomski.medsched.commons.USER_CARD_SIZE
 
 @Composable
 fun UserRoleCard(

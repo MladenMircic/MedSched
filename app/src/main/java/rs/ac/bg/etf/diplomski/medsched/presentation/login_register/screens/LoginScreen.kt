@@ -24,10 +24,11 @@ import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.roles
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginDestinations
+import rs.ac.bg.etf.diplomski.medsched.presentation.composables.LoginForm
+import rs.ac.bg.etf.diplomski.medsched.presentation.composables.UserRoleCard
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.InfoForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.LoginForm
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.composables.UserRoleCard
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RoleSelect
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -72,7 +73,7 @@ fun LoginScreen(
                 // NavHost for login progression with animation
                 AnimatedNavHost(
                     navController = loginNavController,
-                    startDestination = LoginDestinations.RoleSelect.route,
+                    startDestination = RoleSelect.route,
                     modifier = Modifier.fillMaxWidth(),
                     enterTransition = {
                         slideInVertically(
@@ -127,7 +128,7 @@ fun LoginScreen(
                         )
                     }
                 ) {
-                    composable(route = LoginDestinations.RoleSelect.route) {
+                    composable(route = RoleSelect.route) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -154,7 +155,7 @@ fun LoginScreen(
                                             Toast.LENGTH_LONG
                                         ).show()
                                     } else {
-                                        loginNavController.navigate(LoginDestinations.LoginForm.route)
+                                        loginNavController.navigate(InfoForm.route)
                                     }
                                 },
                                 modifier = Modifier
@@ -178,7 +179,7 @@ fun LoginScreen(
                             }
                         }
                     }
-                    composable(route = LoginDestinations.LoginForm.route) {
+                    composable(route = InfoForm.route) {
                         Column {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly,

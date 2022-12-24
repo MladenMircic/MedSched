@@ -6,7 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginRegisterDestinations
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Authentication
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Register
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.LoginScreen
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.RegisterScreen
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.SplashScreen
@@ -16,50 +18,50 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.Splas
 fun NavGraphBuilder.authenticationNavGraph(navController: NavHostController) {
     navigation(
         route = Graph.AUTHENTICATION,
-        startDestination = LoginRegisterDestinations.SplashScreen.route
+        startDestination = Authentication.route
     ) {
-        composable(route = LoginRegisterDestinations.SplashScreen.route) {
+        composable(route = Authentication.route) {
             SplashScreen(
                 onJumpDestination = { route ->
                     navController.navigateWithPopInclusive(
                         toRoute = route,
-                        popToRoute = LoginRegisterDestinations.SplashScreen.route,
+                        popToRoute = Authentication.route,
                         launchSingle = true
                     )
                 }
             )
         }
-        composable(route = LoginRegisterDestinations.Login.route) {
+        composable(route = Login.route) {
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigateWithPopInclusive(
                         toRoute = Graph.PATIENT,
-                        popToRoute = LoginRegisterDestinations.Login.route,
+                        popToRoute = Login.route,
                         launchSingle = true
                     )
                 },
                 onGoToRegister = {
                     navController.navigateWithPopInclusive(
-                        toRoute = LoginRegisterDestinations.Register.route,
-                        popToRoute = LoginRegisterDestinations.Login.route,
+                        toRoute = Register.route,
+                        popToRoute = Login.route,
                     )
                 }
             )
         }
-        composable(route = LoginRegisterDestinations.Register.route) {
+        composable(route = Register.route) {
             RegisterScreen(
                 onBackToLogin = {
                     navController.navigateWithPopInclusive(
-                        toRoute = LoginRegisterDestinations.Login.route,
-                        popToRoute = LoginRegisterDestinations.Register.route,
+                        toRoute = Login.route,
+                        popToRoute = Register.route,
                     )
                 }
             )
 
             BackHandler(enabled = true) {
                 navController.navigateWithPopInclusive(
-                    toRoute = LoginRegisterDestinations.Login.route,
-                    popToRoute = LoginRegisterDestinations.Register.route,
+                    toRoute = Login.route,
+                    popToRoute = Register.route,
                 )
             }
         }
