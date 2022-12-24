@@ -8,10 +8,8 @@ sealed class LoginRegisterDestinations(val route: String) {
 }
 
 
-// Login destinations
+// Login form destinations
 sealed class LoginDestinations(val route: String) {
     object RoleSelect: LoginDestinations("role_select")
     object LoginForm: LoginDestinations("login_form")
 }
-
-// Register destinations

@@ -13,9 +13,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -34,12 +34,37 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesLoginRegisterApi(): LoginRegisterApi {
+    fun providesRetrofit(
+        dataStore: DataStore<Preferences>
+    ): Retrofit {
+        // Logging interceptor
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
 
+        // Authorization header interceptor
+        val headerInterceptor = Interceptor { chain ->
+            runBlocking(Dispatchers.IO) {
+                var request = chain.request()
+                val pathSegments = request.url.pathSegments
+
+                if (!pathSegments.any { Constants.SKIP_HEADER_APPEND_PATHS.contains(it) }) {
+                    val token = dataStore.data.first()[PreferenceKeys.USER_TOKEN_KEY]
+                    request = request.newBuilder()
+                        .addHeader(
+                            "Authorization",
+                            "Bearer $token"
+                        )
+                        .build()
+                }
+
+                return@runBlocking chain.proceed(request)
+            }
+        }
+
+        // Building a client with all defined interceptors
         val okHttpClient = OkHttpClient.Builder().apply {
+            addInterceptor(headerInterceptor)
             addInterceptor(httpLoggingInterceptor)
         }.build()
 
@@ -48,8 +73,12 @@ object AppModule {
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(LoginRegisterApi::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun providesLoginRegisterApi(retrofit: Retrofit): LoginRegisterApi =
+        retrofit.create(LoginRegisterApi::class.java)
 
     @Singleton
     @Provides

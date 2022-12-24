@@ -41,13 +41,8 @@ class LoginAuthUseCase @Inject constructor(
     suspend fun authenticate(): Flow<Resource<Boolean>> = flow {
         emit(Resource.Loading())
         try {
-            // Collecting user token from data store
-            dataStore.data.collect {
-                // Authentication will throw an exception if token is invalid
-                loginRegisterRepository
-                    .authenticateUser(it[PreferenceKeys.USER_TOKEN_KEY] ?: "")
-                emit(Resource.Success(true))
-            }
+            loginRegisterRepository.authenticateUser()
+            emit(Resource.Success(true))
         } catch (e: HttpException) {
             if (e.code() == HTTP_UNAUTHORIZED) {
                 emit(Resource.Success(false))

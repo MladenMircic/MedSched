@@ -33,7 +33,7 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavHostController) {
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigateWithPopInclusive(
-                        toRoute = "proba",
+                        toRoute = Graph.PATIENT,
                         popToRoute = LoginRegisterDestinations.Login.route,
                         launchSingle = true
                     )

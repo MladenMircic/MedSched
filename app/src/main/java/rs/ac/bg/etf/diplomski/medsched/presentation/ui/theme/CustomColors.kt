@@ -20,3 +20,6 @@ val Colors.textFieldOutline: Color
 
 val Colors.success: Color
     get() = if (isLight) SuccessLight else SuccessDark
+
+val Colors.logo: Color
+    get() = if (isLight) BackgroundSecondaryLight else BackgroundPrimaryLight

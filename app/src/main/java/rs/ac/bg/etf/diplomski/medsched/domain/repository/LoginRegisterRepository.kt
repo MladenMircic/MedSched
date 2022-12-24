@@ -10,5 +10,5 @@ interface LoginRegisterRepository {
 
     suspend fun registerUser(user: User): RegisterResponse
 
-    suspend fun authenticateUser(bearerToken: String)
+    suspend fun authenticateUser()
 }

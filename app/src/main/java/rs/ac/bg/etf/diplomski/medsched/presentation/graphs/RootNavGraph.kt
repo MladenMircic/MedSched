@@ -14,10 +14,12 @@ fun RootNavigationGraph(navController: NavHostController) {
         startDestination = Graph.AUTHENTICATION
     ) {
         authenticationNavGraph(navController)
+        patientNavGraph(navController)
     }
 }
 
 object Graph {
     const val ROOT = "root_graph"
     const val AUTHENTICATION = "auth_graph"
+    const val PATIENT = "patient_graph"
 }
