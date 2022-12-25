@@ -18,10 +18,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.delay
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.RegisterForm
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RegisterViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.RegisterEvent
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.RegisterViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Blue90
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape60
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.success
@@ -75,42 +75,69 @@ fun RegisterScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.verticalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(vertical = 10.dp)
                 ) {
                     Text(
                         text = stringResource(id = R.string.registration),
                         color = MaterialTheme.colors.textOnPrimary,
-                        style = MaterialTheme.typography.h1
+                        style = MaterialTheme.typography.h1,
+                        modifier = Modifier.padding(bottom = 15.dp)
                     )
 
                     RegisterForm(
                         registerState = registerState,
                         updateEmail = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.EMAIL, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.EMAIL, text
+                                )
+                            )
                         },
                         updateFirstName = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.FIRST_NAME, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.FIRST_NAME, text
+                                )
+                            )
                         },
                         updateLastName = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.LAST_NAME, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.LAST_NAME, text
+                                )
+                            )
                         },
                         updatePassword = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.PASSWORD, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.PASSWORD, text
+                                )
+                            )
                         },
                         updateConfirmPassword = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.CONFIRM_PASSWORD, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.CONFIRM_PASSWORD, text
+                                )
+                            )
                         },
                         updatePhone = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.PHONE, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.PHONE, text
+                                )
+                            )
                         },
                         updateLBO = { text ->
-                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.LBO, text)
+                            registerViewModel.onEvent(
+                                RegisterEvent.FieldChange(
+                                    RegisterViewModel.RegisterField.LBO, text
+                                )
+                            )
                         },
-                        onRegisterButtonClick = {
-                            if (registerViewModel.validateRegisterForm()) {
-                                registerViewModel.registerUser()
-                            }
-                        }
+                        onRegisterButtonClick = { registerViewModel.onEvent(RegisterEvent.Submit) }
                     )
 
                     // Show an error snackBar and go back to login if register is success
@@ -118,10 +145,9 @@ fun RegisterScreen(
                         registerState.snackBarMessage?.let {
                             scaffoldState.snackbarHostState.showSnackbar(
                                 message = context.getString(registerState.snackBarMessage!!),
-                                duration = SnackbarDuration.Long
+                                duration = SnackbarDuration.Short
                             )
                             if (registerState.isSuccess) {
-                                delay(1000L)
                                 onBackToLogin()
                             }
                         }

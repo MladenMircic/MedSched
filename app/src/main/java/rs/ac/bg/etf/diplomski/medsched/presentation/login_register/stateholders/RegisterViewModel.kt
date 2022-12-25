@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
+package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +11,7 @@ import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.RegisterEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.RegisterState
 import javax.inject.Inject
 
@@ -22,7 +23,7 @@ class RegisterViewModel @Inject constructor(
     private val _registerState = MutableStateFlow(RegisterState())
     val registerState = _registerState.asStateFlow()
 
-    fun setFieldValue(registerField: RegisterField, text: String) {
+    private fun setFieldValue(registerField: RegisterField, text: String) {
         when (registerField) {
             RegisterField.EMAIL ->
                 _registerState.update { it.copy(email = text) }
@@ -41,7 +42,20 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun validateRegisterForm(): Boolean {
+    fun onEvent(registerEvent: RegisterEvent) {
+        when (registerEvent) {
+            is RegisterEvent.FieldChange -> {
+                setFieldValue(registerEvent.registerField, registerEvent.value)
+            }
+            is RegisterEvent.Submit -> {
+                if (validateRegisterForm()) {
+                    registerUser()
+                }
+            }
+        }
+    }
+
+    private fun validateRegisterForm(): Boolean {
         val stateVal = _registerState.value
         val emailResult = EmailValidation.validate(stateVal.email)
         val firstNameResult = FormValidation().validate(stateVal.firstName)
@@ -78,7 +92,7 @@ class RegisterViewModel @Inject constructor(
         return !hasError
     }
 
-    fun registerUser() = viewModelScope.launch {
+    private fun registerUser() = viewModelScope.launch {
         val response = registerUseCase(
             User(
                 email = _registerState.value.email,

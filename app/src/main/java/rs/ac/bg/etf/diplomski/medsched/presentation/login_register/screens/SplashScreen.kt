@@ -22,7 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.graphs.Graph
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Quicksand
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.logo
 

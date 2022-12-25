@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        scheduleAutoLogout(15, TimeUnit.MINUTES)
+        scheduleAutoLogout(20, TimeUnit.SECONDS)
         setContent {
             MedSchedTheme {
                 RootNavigationGraph(navController = rememberAnimatedNavController())
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onUserInteraction() {
         super.onUserInteraction()
-        scheduleAutoLogout(15, TimeUnit.MINUTES)
+        scheduleAutoLogout(20, TimeUnit.SECONDS)
     }
 
     private fun scheduleAutoLogout(delay: Long, timeUnit: TimeUnit) {

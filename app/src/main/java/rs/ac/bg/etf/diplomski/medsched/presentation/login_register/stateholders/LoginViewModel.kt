@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.login_register
+package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +15,7 @@ import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.FormValidation
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginAuthUseCase
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.LoginEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
 import javax.inject.Inject
 
@@ -44,19 +45,26 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun setSelectedRole(roleName: String) {
-        _loginState.update { it.copy(currentSelectedRole = roleName) }
+    fun onEvent(loginEvent: LoginEvent) {
+        when (loginEvent) {
+            is LoginEvent.EmailChange -> {
+                _loginState.update { it.copy(email = loginEvent.email) }
+            }
+            is LoginEvent.PasswordChange -> {
+                _loginState.update { it.copy(password = loginEvent.password) }
+            }
+            is LoginEvent.RoleChange -> {
+                _loginState.update { it.copy(currentSelectedRole = loginEvent.role) }
+            }
+            is LoginEvent.Submit -> {
+                if (validateLoginForm()) {
+                    loginUser()
+                }
+            }
+        }
     }
 
-    fun setEmail(email: String) {
-        _loginState.update { it.copy(email = email) }
-    }
-
-    fun setPassword(password: String) {
-        _loginState.update { it.copy(password = password) }
-    }
-
-    fun validateLoginForm(): Boolean {
+    private fun validateLoginForm(): Boolean {
         val emailResult = FormValidation().validate(_loginState.value.email)
         val passwordResult = FormValidation().validate(_loginState.value.password)
         val hasError = listOf(
@@ -76,7 +84,7 @@ class LoginViewModel @Inject constructor(
         return !hasError
     }
 
-    fun loginUser() = viewModelScope.launch {
+    private fun loginUser() = viewModelScope.launch {
         _loginState.update { it.copy(isLoading = true) }
         val response = loginAuthUseCase.login(
             User(

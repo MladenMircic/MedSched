@@ -27,8 +27,9 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.roles
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.LoginForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.UserRoleCard
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.InfoForm
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.RoleSelect
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.LoginEvent
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.LoginViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -142,7 +143,9 @@ fun LoginScreen(
                                         roleName = stringResource(id = role.roleName),
                                         roleImage = role.roleImage,
                                         selectedRole = loginState.currentSelectedRole,
-                                        onRoleSelect = loginViewModel::setSelectedRole
+                                        onRoleSelect = {
+                                            loginViewModel.onEvent(LoginEvent.RoleChange(it))
+                                        }
                                     )
                                 }
                             }
@@ -200,12 +203,14 @@ fun LoginScreen(
                             }
                             LoginForm(
                                 loginState = loginState,
-                                updateEmail = loginViewModel::setEmail,
-                                updatePassword = loginViewModel::setPassword,
+                                updateEmail = {
+                                    loginViewModel.onEvent(LoginEvent.EmailChange(it))
+                                },
+                                updatePassword = {
+                                    loginViewModel.onEvent(LoginEvent.PasswordChange(it))
+                                },
                                 onLoginButtonClick = {
-                                    if (loginViewModel.validateLoginForm()) {
-                                        loginViewModel.loginUser()
-                                    }
+                                    loginViewModel.onEvent(LoginEvent.Submit)
                                 }
                             )
                             // If login is not successful, display message here
