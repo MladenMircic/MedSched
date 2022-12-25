@@ -20,7 +20,6 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.patientRoutes
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PatientMainScreen(navController: NavHostController = rememberAnimatedNavController()) {
-
     Scaffold(
         bottomBar = {
             CustomBottomBar(

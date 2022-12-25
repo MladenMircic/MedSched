@@ -12,13 +12,16 @@ class UserInfoMapper @Inject constructor() {
     fun toLoginRequestDto(user: User): LoginRequestDto {
         return LoginRequestDto(
             email = user.email,
-            password = user.password
+            password = user.password,
+            role = user.role
         )
     }
 
     fun toRegisterRequestDto(user: User): RegisterRequestDto {
         return RegisterRequestDto(
             email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
             password = user.password,
             role = user.role,
             phone = user.phone,

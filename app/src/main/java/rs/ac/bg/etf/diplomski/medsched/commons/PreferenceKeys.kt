@@ -6,5 +6,7 @@ class PreferenceKeys {
     companion object {
         const val USER_TOKEN_PREFERENCE = "UserToken"
         val USER_TOKEN_KEY = stringPreferencesKey("user_token")
+        const val USER_INFO_PREFERENCE = "UserInfo"
+        val USER_INFO_KEY = stringPreferencesKey("user_info")
     }
 }

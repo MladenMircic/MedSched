@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.medsched.domain.use_case
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.internal.http.HTTP_UNAUTHORIZED
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 class LoginAuthUseCase @Inject constructor(
     private val loginRegisterRepository: LoginRegisterRepository,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val moshi: Moshi
 ) {
     suspend fun login(user: User): Flow<Resource<LoginResponse>> = flow {
         emit(Resource.Loading())
@@ -28,6 +30,8 @@ class LoginAuthUseCase @Inject constructor(
             loginResponse.token?.let {
                 dataStore.edit { preferences ->
                     preferences[PreferenceKeys.USER_TOKEN_KEY] = loginResponse.token
+                    preferences[PreferenceKeys.USER_INFO_KEY] =
+                        moshi.adapter(User::class.java).toJson(loginResponse.user)
                 }
             }
             emit(Resource.Success(loginResponse))

@@ -26,6 +26,10 @@ class RegisterViewModel @Inject constructor(
         when (registerField) {
             RegisterField.EMAIL ->
                 _registerState.update { it.copy(email = text) }
+            RegisterField.FIRST_NAME ->
+                _registerState.update { it.copy(firstName = text) }
+            RegisterField.LAST_NAME ->
+                _registerState.update { it.copy(lastName = text) }
             RegisterField.PASSWORD ->
                 _registerState.update { it.copy(password = text) }
             RegisterField.CONFIRM_PASSWORD ->
@@ -40,6 +44,8 @@ class RegisterViewModel @Inject constructor(
     fun validateRegisterForm(): Boolean {
         val stateVal = _registerState.value
         val emailResult = EmailValidation.validate(stateVal.email)
+        val firstNameResult = FormValidation().validate(stateVal.firstName)
+        val lastNameResult = FormValidation().validate(stateVal.lastName)
         val passwordResult = PasswordValidation.validate(stateVal.password)
         val confirmPasswordResult = ConfirmPasswordEqualsValidation.validate(
             stateVal.confirmPassword, stateVal.password
@@ -49,6 +55,8 @@ class RegisterViewModel @Inject constructor(
 
         val hasError = listOf(
             emailResult,
+            firstNameResult,
+            lastNameResult,
             passwordResult,
             confirmPasswordResult,
             phoneResult,
@@ -58,6 +66,8 @@ class RegisterViewModel @Inject constructor(
         _registerState.update {
             it.copy(
                 emailError = emailResult.errorId,
+                firstNameError = firstNameResult.errorId,
+                lastNameError = lastNameResult.errorId,
                 passwordError = passwordResult.errorId,
                 confirmPasswordError = confirmPasswordResult.errorId,
                 phoneError = phoneResult.errorId,
@@ -72,6 +82,8 @@ class RegisterViewModel @Inject constructor(
         val response = registerUseCase(
             User(
                 email = _registerState.value.email,
+                firstName = _registerState.value.firstName,
+                lastName = _registerState.value.lastName,
                 password = _registerState.value.password,
                 role = 1, // Patient
                 phone = _registerState.value.phone,
@@ -98,6 +110,6 @@ class RegisterViewModel @Inject constructor(
     }
 
     enum class RegisterField {
-        EMAIL, PASSWORD, CONFIRM_PASSWORD, PHONE, LBO
+        EMAIL, FIRST_NAME, LAST_NAME, PASSWORD, CONFIRM_PASSWORD, PHONE, LBO
     }
 }

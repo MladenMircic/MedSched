@@ -25,6 +25,8 @@
 
     <!-- Register form -->
     <string name="registration">Registracija</string>
+    <string name="first_name">Ime</string>
+    <string name="last_name">Prezime</string>
     <string name="confirm_password">Potvrdi lozinku</string>
     <string name="phone">Broj telefona</string>
     <string name="social_security_number">LBO</string>
@@ -40,6 +42,7 @@
     <!-- Login errors -->
     <string name="email_error_login">Email je nepostojeći</string>
     <string name="password_error_login">Lozinka nije ispravna</string>
+    <string name="role_error_login">Korisnička uloga je neispravna</string>
 
     <!-- Register errors -->
     <string name="empty_field">Ovo polje ne sme biti prazno</string>

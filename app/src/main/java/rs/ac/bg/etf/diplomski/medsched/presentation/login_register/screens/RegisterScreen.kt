@@ -88,6 +88,12 @@ fun RegisterScreen(
                         updateEmail = { text ->
                             registerViewModel.setFieldValue(RegisterViewModel.RegisterField.EMAIL, text)
                         },
+                        updateFirstName = { text ->
+                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.FIRST_NAME, text)
+                        },
+                        updateLastName = { text ->
+                            registerViewModel.setFieldValue(RegisterViewModel.RegisterField.LAST_NAME, text)
+                        },
                         updatePassword = { text ->
                             registerViewModel.setFieldValue(RegisterViewModel.RegisterField.PASSWORD, text)
                         },

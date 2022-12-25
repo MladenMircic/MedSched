@@ -1,21 +1,24 @@
 package rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.model.response.LoginResponse
 
+@JsonClass(generateAdapter = true)
 data class LoginResponseDto(
-    @Json(name = "hasEmailError")
     val hasEmailError: Boolean = false,
-    @Json(name = "hasPasswordCorrect")
     val hasPasswordError: Boolean = false,
-    @Json(name = "token")
-    val token: String? = null
+    val hasRoleError: Boolean = false,
+    val token: String? = null,
+    val user: User? = null
 ) {
     fun toUserLogin(): LoginResponse {
         return LoginResponse(
             hasEmailError = hasEmailError,
             hasPasswordError = hasPasswordError,
-            token = token
+            hasRoleError = hasRoleError,
+            token = token,
+            user = user
         )
     }
 }

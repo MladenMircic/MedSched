@@ -5,10 +5,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +18,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +34,8 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CustomOutlinedTextFiel
 fun RegisterForm(
     registerState: RegisterState,
     updateEmail: (String) -> Unit,
+    updateFirstName: (String) -> Unit,
+    updateLastName: (String) -> Unit,
     updatePassword: (String) -> Unit,
     updateConfirmPassword: (String) -> Unit,
     updatePhone: (String) -> Unit,
@@ -56,6 +56,40 @@ fun RegisterForm(
             leadingIconImageVector = Icons.Filled.Email,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+        )
+        CustomOutlinedTextField(
+            value = registerState.firstName,
+            onValueChange = updateFirstName,
+            label = stringResource(id = R.string.first_name),
+            showError = registerState.firstNameError != null,
+            errorMessage = registerState.firstNameError?.let { stringResource(id = it) } ?: "",
+            leadingIconImageVector = Icons.Filled.Person,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+        )
+        CustomOutlinedTextField(
+            value = registerState.lastName,
+            onValueChange = updateLastName,
+            label = stringResource(id = R.string.last_name),
+            showError = registerState.lastNameError != null,
+            errorMessage = registerState.lastNameError?.let { stringResource(id = it) } ?: "",
+            leadingIconImageVector = Icons.Filled.Person,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(

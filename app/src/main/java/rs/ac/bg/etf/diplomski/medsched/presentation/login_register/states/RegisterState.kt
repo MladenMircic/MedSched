@@ -2,6 +2,10 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states
 
 data class RegisterState(
     val email: String = "",
+    val firstName: String = "",
+    val firstNameError: Int? = null,
+    val lastName: String = "",
+    val lastNameError: Int? = null,
     val emailError: Int? = null,
     val password: String = "",
     val passwordError: Int? = null,

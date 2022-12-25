@@ -81,7 +81,8 @@ class LoginViewModel @Inject constructor(
         val response = loginAuthUseCase.login(
             User(
                 email = _loginState.value.email,
-                password = _loginState.value.password
+                password = _loginState.value.password,
+                role = roleMap[_loginState.value.currentSelectedRole]!!
             )
         )
         response.collect {
@@ -95,7 +96,11 @@ class LoginViewModel @Inject constructor(
                             else null,
                             passwordError = if (it.data?.hasPasswordError == true)
                                 R.string.password_error_login
+                            else null,
+                            roleError = if (it.data?.hasRoleError == true)
+                                R.string.role_error_login
                             else null
+
                         )
                     }
                     if (it.data?.hasEmailError == false && !it.data.hasPasswordError) {
@@ -111,4 +116,9 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    private val roleMap = mapOf(
+        "Doctor" to 0,
+        "Patient" to 1
+    )
 }

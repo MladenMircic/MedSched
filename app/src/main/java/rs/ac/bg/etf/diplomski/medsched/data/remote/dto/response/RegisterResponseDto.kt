@@ -1,12 +1,11 @@
 package rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response
 
-import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import rs.ac.bg.etf.diplomski.medsched.domain.model.response.RegisterResponse
 
+@JsonClass(generateAdapter = true)
 data class RegisterResponseDto(
-    @Json(name = "success")
     val success: Boolean = false,
-    @Json(name = "accountExists")
     val accountExists: Boolean = false
 ) {
     fun toRegisterResponse(): RegisterResponse {
