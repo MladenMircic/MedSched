@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientMain
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHome
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BottomBarNavDestination
 
@@ -41,7 +41,7 @@ fun CustomBottomBar(
     ) {
         destinations.forEach { destination ->
             val currentDestination = backStackEntry?.destination
-            val currentRoute = currentDestination?.route ?: PatientMain.route
+            val currentRoute = currentDestination?.route ?: PatientHome.route
 
             val selected = currentRoute.startsWith(destination.route)
             val backgroundColor =
@@ -58,7 +58,7 @@ fun CustomBottomBar(
                         navController.navigate(destination.route) {
                             launchSingleTop = true
                             restoreState = true
-                            popUpTo(PatientMain.route) {
+                            popUpTo(PatientHome.route) {
                                 saveState = true
                             }
                         }

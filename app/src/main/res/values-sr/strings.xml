@@ -59,4 +59,5 @@
     <string name="navbar_home">Glavna</string>
     <string name="navbar_scheduled">Zakazani</string>
     <string name="navbar_account">Nalog</string>
+    <string name="welcome">Dobrodošli</string>
 </resources>

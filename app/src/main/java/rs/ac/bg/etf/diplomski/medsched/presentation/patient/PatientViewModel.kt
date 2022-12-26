@@ -13,7 +13,7 @@ class PatientViewModel @Inject constructor(
     private val patientRepository: PatientRepository
 ): ViewModel() {
 
-    val user = patientRepository.user
+    val userFlow = patientRepository.user
 
     private val _patientState = MutableStateFlow(PatientState())
     val patientState = _patientState.asStateFlow()

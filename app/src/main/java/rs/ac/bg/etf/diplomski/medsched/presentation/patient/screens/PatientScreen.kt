@@ -12,14 +12,14 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.CustomBottomBar
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHome
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientInfo
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientMain
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientScheduled
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.patientRoutes
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun PatientMainScreen(navController: NavHostController = rememberAnimatedNavController()) {
+fun PatientScreen(navController: NavHostController = rememberAnimatedNavController()) {
     Scaffold(
         bottomBar = {
             CustomBottomBar(
@@ -31,11 +31,11 @@ fun PatientMainScreen(navController: NavHostController = rememberAnimatedNavCont
     ) {
         AnimatedNavHost(
             navController = navController,
-            startDestination = PatientMain.route,
+            startDestination = PatientHome.route,
             modifier = Modifier.padding(it)
         ) {
-            composable(route = PatientMain.route) {
-                Text(text = "RADI1")
+            composable(route = PatientHome.route) {
+                PatientHomeScreen()
             }
             composable(route = PatientScheduled.route) {
                 Text(text = "RADI2")

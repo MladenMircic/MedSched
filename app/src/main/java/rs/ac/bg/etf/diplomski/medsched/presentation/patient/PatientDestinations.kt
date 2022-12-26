@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BottomBarNavDestination
 
-object PatientMain: BottomBarNavDestination {
+object PatientHome: BottomBarNavDestination {
     override val title: Int = R.string.navbar_home
     override val route: String = "patient_main_screen"
     override val imageUnselected: ImageVector = Icons.Outlined.Home
@@ -32,4 +32,4 @@ object PatientInfo: BottomBarNavDestination {
     override val imageSelected: ImageVector = Icons.Filled.Person
 }
 
-val patientRoutes = listOf(PatientMain, PatientScheduled, PatientInfo)
+val patientRoutes = listOf(PatientHome, PatientScheduled, PatientInfo)

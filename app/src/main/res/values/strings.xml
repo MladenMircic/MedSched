@@ -59,4 +59,5 @@
     <string name="navbar_home">Home</string>
     <string name="navbar_scheduled">Scheduled</string>
     <string name="navbar_account">Account</string>
+    <string name="welcome">Welcome</string>
 </resources>

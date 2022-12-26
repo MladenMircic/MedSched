@@ -22,13 +22,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.graphs.Graph
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
-import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.LoginViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.AuthenticationViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Quicksand
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.logo
 
 @Composable
 fun SplashScreen(
-    loginViewModel: LoginViewModel = hiltViewModel(),
+    authenticationViewModel: AuthenticationViewModel = hiltViewModel(),
     onJumpDestination: (String) -> Unit
 ) {
 
@@ -69,8 +69,8 @@ fun SplashScreen(
         }
     }
 
-    LaunchedEffect(key1 = loginViewModel.alreadyLogged) {
-        loginViewModel.alreadyLogged?.let { logged ->
+    LaunchedEffect(key1 = authenticationViewModel.alreadyLogged) {
+        authenticationViewModel.alreadyLogged?.let { logged ->
             onJumpDestination(
                 if (!logged)
                     Login.route

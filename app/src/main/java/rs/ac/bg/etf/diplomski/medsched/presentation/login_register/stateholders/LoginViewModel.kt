@@ -1,8 +1,5 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,24 +23,6 @@ class LoginViewModel @Inject constructor(
 
     private val _loginState = MutableStateFlow(LoginState())
     val loginState = _loginState.asStateFlow()
-
-    var alreadyLogged by mutableStateOf<Boolean?>(null)
-
-    // Authenticate the user if his token is still valid
-    init {
-        viewModelScope.launch {
-            val response = loginAuthUseCase.authenticate()
-            response.collect {
-                when (it) {
-                    is Resource.Success -> {
-                        alreadyLogged = it.data
-                    }
-                    is Resource.Error -> Unit
-                    is Resource.Loading -> Unit
-                }
-            }
-        }
-    }
 
     fun onEvent(loginEvent: LoginEvent) {
         when (loginEvent) {

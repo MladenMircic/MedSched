@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
+import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Authentication
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Register
@@ -15,7 +16,11 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.screens.Splas
 
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.authenticationNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.authenticationNavGraph(
+    navController: NavHostController,
+    rootViewModel: RootViewModel
+) {
+
     navigation(
         route = Graph.AUTHENTICATION,
         startDestination = Authentication.route
@@ -34,6 +39,7 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavHostController) {
         composable(route = Login.route) {
             LoginScreen(
                 onLoginSuccess = {
+                    rootViewModel.triggerAutoLogout()
                     navController.navigateWithPopInclusive(
                         toRoute = Graph.PATIENT,
                         popToRoute = Login.route,
