@@ -21,13 +21,11 @@ class AutoLogoutWorker @AssistedInject constructor(
     private val moshi: Moshi
 ): CoroutineWorker(context, workerParameters) {
 
-    private val emptyUser = User(email = "", password = "")
-
     override suspend fun doWork(): Result {
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.USER_TOKEN_KEY] = ""
             preferences[PreferenceKeys.USER_INFO_KEY] =
-                moshi.adapter(User::class.java).toJson(emptyUser)
+                moshi.adapter(User::class.java).toJson(User.EMPTY_USER)
         }
         return Result.success()
     }

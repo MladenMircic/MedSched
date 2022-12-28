@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Inject
@@ -24,4 +25,7 @@ class PatientRepositoryImpl @Inject constructor(
             preferences[PreferenceKeys.USER_INFO_KEY] ?: ""
         )
     }
+
+    override suspend fun getAllServices(): List<Service> =
+        patientApi.getAllServices().map { it.toService() }
 }

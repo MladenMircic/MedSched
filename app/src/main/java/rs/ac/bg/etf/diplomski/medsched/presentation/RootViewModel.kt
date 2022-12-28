@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.domain.background.AutoLogoutWorker
-import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BackgroundTaskDispatcher
+import rs.ac.bg.etf.diplomski.medsched.domain.background.BackgroundTaskDispatcher
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

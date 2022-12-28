@@ -11,4 +11,8 @@ data class User(
     val role: Int = 0,
     val phone: String = "",
     val ssn: String = ""
-)
+) {
+    companion object {
+        val EMPTY_USER = User(email = "", password = "")
+    }
+}

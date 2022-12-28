@@ -1,7 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.states
 
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHome
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
 
 data class PatientState(
-    val routeSelected: String = PatientHome.route
+    val serviceList: List<Service> = listOf()
 )

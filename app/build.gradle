@@ -111,4 +111,7 @@ dependencies {
     def work_version = "2.7.1"
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
+    // Coil
+    def coil_version = "2.2.2"
+    implementation "io.coil-kt:coil-compose:$coil_version"
 }
