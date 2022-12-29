@@ -41,6 +41,7 @@ object NetworkModule {
                 val pathSegments = request.url.pathSegments
 
                 if (!pathSegments.any { Constants.SKIP_HEADER_APPEND_PATHS.contains(it) }) {
+                    // TODO Promeniti logiku dohvatanja tokena
                     val token = dataStore.data.first()[PreferenceKeys.USER_TOKEN_KEY]
                     request = request.newBuilder()
                         .addHeader(
@@ -66,6 +67,8 @@ object NetworkModule {
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
     }
+
+
 
     @Singleton
     @Provides

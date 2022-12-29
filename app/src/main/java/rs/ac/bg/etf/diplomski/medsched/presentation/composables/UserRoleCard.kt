@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import rs.ac.bg.etf.diplomski.medsched.commons.ROLE_IMAGE_SIZE
+import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.commons.USER_CARD_SIZE
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Blue85
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape60
@@ -75,7 +75,7 @@ fun UserRoleCard(
                 painter = painterResource(id = roleImage),
                 contentDescription = "",
                 modifier = Modifier
-                    .size(ROLE_IMAGE_SIZE)
+                    .size(CARD_IMAGE_SIZE)
                     .padding(bottom = 10.dp),
                 colorFilter =
                     if (selectedRole == roleName)

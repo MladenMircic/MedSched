@@ -60,4 +60,6 @@
     <string name="navbar_scheduled">Zakazani</string>
     <string name="navbar_account">Nalog</string>
     <string name="welcome">Dobrodošli</string>
+    <string name="categories">Kategorije</string>
+    <string name="doctor_search">Pretražite doktore</string>
 </resources>

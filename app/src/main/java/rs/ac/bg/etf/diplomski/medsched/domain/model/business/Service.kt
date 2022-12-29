@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class Service(
     val name: String,
-    var imageRequest: ImageRequest? = null
+    var imageRequestBuilder: ImageRequest.Builder? = null
 )

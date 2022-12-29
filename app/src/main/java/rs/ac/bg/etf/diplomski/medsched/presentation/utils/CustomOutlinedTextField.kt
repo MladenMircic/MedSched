@@ -15,9 +15,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape20
-import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textFieldBackground
-import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textFieldOutline
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textFieldText
 
 @Composable
@@ -85,13 +84,7 @@ fun CustomOutlinedTextField(
                 isPasswordField -> PasswordVisualTransformation()
                 else -> VisualTransformation.None
             },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedLabelColor = MaterialTheme.colors.textFieldOutline,
-                focusedIndicatorColor = MaterialTheme.colors.textFieldOutline,
-                backgroundColor = MaterialTheme.colors.textFieldBackground,
-                textColor = MaterialTheme.colors.textFieldText,
-                cursorColor = MaterialTheme.colors.textFieldText
-            ),
+            colors = defaultButtonColors(),
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = true
