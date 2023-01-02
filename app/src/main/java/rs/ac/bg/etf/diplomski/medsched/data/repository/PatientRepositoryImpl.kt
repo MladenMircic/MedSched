@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
@@ -28,4 +29,8 @@ class PatientRepositoryImpl @Inject constructor(
 
     override suspend fun getAllServices(): List<Service> =
         patientApi.getAllServices().map { it.toService() }
+
+    override suspend fun getDoctors(category: String): List<DoctorForPatient> =
+        patientApi.getDoctors(category).map { it.toDoctorForPatient() }
+
 }

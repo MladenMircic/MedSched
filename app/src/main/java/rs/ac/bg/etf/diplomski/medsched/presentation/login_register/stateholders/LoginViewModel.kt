@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.FormValidation
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginAuthUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.LoginEvent
@@ -66,7 +66,7 @@ class LoginViewModel @Inject constructor(
     private fun loginUser() = viewModelScope.launch {
         _loginState.update { it.copy(isLoading = true) }
         val response = loginAuthUseCase.login(
-            User(
+            Patient(
                 email = _loginState.value.email,
                 password = _loginState.value.password,
                 role = roleMap[_loginState.value.currentSelectedRole]!!

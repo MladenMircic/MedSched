@@ -14,7 +14,8 @@ class LoginRegisterRepositoryImpl @Inject constructor(
 ) : LoginRegisterRepository {
 
     override suspend fun loginUser(user: User): LoginResponse =
-        loginRegisterApi.loginUser(userInfoMapper.toLoginRequestDto(user)).toUserLogin()
+        loginRegisterApi.loginUser(userInfoMapper.toLoginRequestDto(user))
+            .toLoginResponse()
 
     override suspend fun registerUser(user: User): RegisterResponse =
         loginRegisterApi.registerUser(userInfoMapper.toRegisterRequestDto(user))

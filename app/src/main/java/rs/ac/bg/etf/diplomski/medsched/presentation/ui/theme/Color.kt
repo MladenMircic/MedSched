@@ -9,7 +9,6 @@ val Teal200 = Color(0xFF03DAC5)
 
 // Shades for the light mode
 val BackgroundPrimaryLight = Color(0xFFE6ECFF)
-val Blue90 = Color(0xFFCCD9FF)
 val Blue85 = Color(0xFFB3C6FF)
 val Blue40 = Color(0xFF0033CC)
 val BackgroundSecondaryLight = Color(0xFF00134D)
@@ -28,6 +27,8 @@ val TextFieldBackgroundDark = Color(0xFF31486e)
 val TextFieldTextDark = Color(0xFFCCD9FF)
 val TextFieldOutlineDark = Color(0xFFCCD9FF)
 val SuccessDark = Color(0xFF68CF66)
+
+val TextOnSecondary = Color(0xFFCCD9FF)
 
 // Shades for the dark mode
 val DarkBackgroundColor = Color(0xFF66d6ff)

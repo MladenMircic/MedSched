@@ -60,6 +60,7 @@
     <string name="navbar_scheduled">Scheduled</string>
     <string name="navbar_account">Account</string>
     <string name="welcome">Welcome</string>
-    <string name="categories">Categories</string>
+    <string name="categories_list">Categories</string>
+    <string name="doctors_list">Doctors</string>
     <string name="doctor_search">Search for doctors</string>
 </resources>

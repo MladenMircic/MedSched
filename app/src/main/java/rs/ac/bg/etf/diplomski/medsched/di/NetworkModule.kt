@@ -2,6 +2,7 @@ package rs.ac.bg.etf.diplomski.medsched.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +28,8 @@ object NetworkModule {
     @Singleton
     @Provides
     fun providesRetrofit(
-        dataStore: DataStore<Preferences>
+        dataStore: DataStore<Preferences>,
+        moshi: Moshi
     ): Retrofit {
         // Logging interceptor
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
@@ -64,7 +66,7 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
 

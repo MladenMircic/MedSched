@@ -22,10 +22,10 @@ import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.RegisterForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.RegisterEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.RegisterViewModel
-import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Blue90
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape60
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.success
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textOnPrimary
+import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textOnSecondary
 
 @Composable
 fun RegisterScreen(
@@ -168,11 +168,11 @@ fun RegisterScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.already_has_account),
-                        color = Blue90
+                        color = MaterialTheme.colors.textOnSecondary
                     )
                     Text(
                         text = stringResource(id = R.string.login_now),
-                        color = Blue90,
+                        color = MaterialTheme.colors.textOnSecondary,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
                             onBackToLogin()

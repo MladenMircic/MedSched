@@ -11,6 +11,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BottomBarNavDestination
 
+interface PatientHomeDestinations {
+    val route: String
+}
+
+object PatientHomeStart: PatientHomeDestinations {
+    override val route: String = "patient_home_start"
+}
+
+object DoctorDetails: PatientHomeDestinations {
+    override val route: String = "doctor_details"
+}
+
 object PatientHome: BottomBarNavDestination {
     override val title: Int = R.string.navbar_home
     override val route: String = "patient_main_screen"

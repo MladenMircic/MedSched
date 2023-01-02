@@ -12,7 +12,8 @@ data class LoginResponseDto(
     val token: String? = null,
     val user: User? = null
 ) {
-    fun toUserLogin(): LoginResponse {
+
+    fun toLoginResponse(): LoginResponse {
         return LoginResponse(
             hasEmailError = hasEmailError,
             hasPasswordError = hasPasswordError,
@@ -22,4 +23,3 @@ data class LoginResponseDto(
         )
     }
 }
-

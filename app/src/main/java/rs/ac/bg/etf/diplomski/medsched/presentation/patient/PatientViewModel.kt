@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetDoctorsUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetServicesUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
@@ -21,7 +23,8 @@ import javax.inject.Inject
 class PatientViewModel @Inject constructor(
     patientRepository: PatientRepository,
     private val getServicesUseCase: GetServicesUseCase,
-    private val imageRequestUseCase: ImageRequestUseCase
+    private val imageRequestUseCase: ImageRequestUseCase,
+    private val getDoctorsUseCase: GetDoctorsUseCase
 ): ViewModel() {
 
     val userFlow = patientRepository.user
@@ -29,7 +32,10 @@ class PatientViewModel @Inject constructor(
     private val _patientState = MutableStateFlow(PatientState())
     val patientState = _patientState.asStateFlow()
 
-    init { getAllServices() }
+    init {
+        getAllServices()
+        getDoctors()
+    }
 
     fun onEvent(patientEvent: PatientEvent) {
         when (patientEvent) {
@@ -41,6 +47,10 @@ class PatientViewModel @Inject constructor(
             }
             is PatientEvent.SearchForDoctor -> {
 
+            }
+            is PatientEvent.SelectDoctor -> {
+                Log.d("TESTIRANJE", patientEvent.index.toString())
+                _patientState.update { it.copy(selectedDoctor = patientEvent.index) }
             }
             is PatientEvent.GetAllServices -> {
                 getAllServices()
@@ -68,6 +78,33 @@ class PatientViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
 
+                }
+            }
+        }
+    }
+
+    private fun getDoctors() = viewModelScope.launch {
+        val patientState = _patientState.value
+        val serviceCategory: String = if (patientState.selectedService != null)
+            patientState.serviceList[patientState.selectedService].name
+        else ""
+        val response = getDoctorsUseCase(serviceCategory)
+
+        response.collect { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    _patientState.update {
+                        it.copy(
+                            doctorList = resource.data!!,
+                            doctorsLoading = false
+                        )
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+                is Resource.Loading -> {
+                    _patientState.update { it.copy(doctorsLoading = true) }
                 }
             }
         }

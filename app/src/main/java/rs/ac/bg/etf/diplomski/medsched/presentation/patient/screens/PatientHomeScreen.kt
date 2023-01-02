@@ -1,24 +1,29 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -30,120 +35,203 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PatientHomeScreen(
-    patientViewModel: PatientViewModel = hiltViewModel()
+    patientViewModel: PatientViewModel = hiltViewModel(),
+    toggleBottomBar: () -> Unit
+) {
+    val navController = rememberAnimatedNavController()
+
+    AnimatedNavHost(
+        navController = navController,
+        startDestination = PatientHomeStart.route,
+        enterTransition = { fadeIn(animationSpec = tween(durationMillis = 1)) },
+        exitTransition = { fadeOut(animationSpec = tween(durationMillis = 1)) }
+    ) {
+        composable(route = PatientHomeStart.route) {
+            PatientStart(
+                patientViewModel = patientViewModel,
+                navigateToDoctorDetails = {
+                    navController.navigate(DoctorDetails.route)
+                },
+                onDoctorSelected = toggleBottomBar
+            )
+        }
+        composable(route = DoctorDetails.route) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.secondary)
+            ) {
+                Text(text = "FUNKCIONIRA", color = Color.White)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun PatientStart(
+    patientViewModel: PatientViewModel,
+    navigateToDoctorDetails: () -> Unit,
+    onDoctorSelected: () -> Unit
 ) {
     val user by patientViewModel.userFlow.collectAsState(initial = null)
     val patientState by patientViewModel.patientState.collectAsState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxHeight(0.12f)
-                .padding(horizontal = 16.dp)
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                user?.let {
-                    Text(
-                        text = "${stringResource(id = R.string.welcome)},",
-                        fontFamily = Quicksand,
-                        fontSize = 22.sp,
-                        color = MaterialTheme.colors.textOnPrimary
-                    )
-                    Text(
-                        text = "${user!!.firstName} ${user!!.lastName}",
-                        fontFamily = Quicksand,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp,
-                        color = MaterialTheme.colors.textOnPrimary,
-                        modifier = Modifier.offset(y = (-8).dp)
-                    )
-                }
+    val doctorDetailsScreenScale by animateFloatAsState(
+        targetValue = if (patientState.selectedDoctor != null) 25f else 1f,
+        animationSpec = tween(
+            durationMillis = 800,
+            easing = LinearEasing
+        ),
+        finishedListener = {
+            if (patientState.selectedDoctor != null) {
+                navigateToDoctorDetails()
             }
-            Image(
-                painter = painterResource(id = R.drawable.caduceus),
-                contentDescription = "",
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textOnPrimary),
-                contentScale = ContentScale.Fit
-            )
         }
+    )
+
+    Box {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
-                .padding(top = 30.dp)
+                .fillMaxSize()
+                .padding(top = 16.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxHeight(0.12f)
+                    .padding(horizontal = 16.dp)
             ) {
-                Box(
-                    contentAlignment = Alignment.CenterEnd
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    OutlinedTextField(
-                        value = patientState.searchKeyWord,
-                        onValueChange = { patientViewModel.onEvent(PatientEvent.SearchTextChange(it)) },
-                        shape = RoundedShape20,
-                        placeholder = {
-                            Text(
-                                text = stringResource(id = R.string.doctor_search),
-                                fontFamily = Quicksand
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Search
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onSearch = {
-
-                            }
-                        ),
-                        colors = defaultButtonColors(),
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(60.dp)
-                    )
-                    Button(
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.textFieldOutline
-                        ),
-                        shape = RoundedShape20,
-                        modifier = Modifier
-                            .height(60.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Doctor search button"
+                    user?.let {
+                        Text(
+                            text = "${stringResource(id = R.string.welcome)},",
+                            fontFamily = Quicksand,
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colors.textOnPrimary
+                        )
+                        Text(
+                            text = "${user!!.firstName} ${user!!.lastName}",
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp,
+                            color = MaterialTheme.colors.textOnPrimary,
+                            modifier = Modifier.offset(y = (-8).dp)
                         )
                     }
                 }
+                Image(
+                    painter = painterResource(id = R.drawable.caduceus),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(
+                        color = MaterialTheme.colors.textOnPrimary
+                    ),
+                    contentScale = ContentScale.Fit
+                )
             }
-            Spacer(modifier = Modifier.padding(top = 16.dp))
-            CategoriesList(
-                patientState = patientState,
-                onItemSelected = {
-                    patientViewModel.onEvent(PatientEvent.SelectService(it))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(top = 30.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        OutlinedTextField(
+                            value = patientState.searchKeyWord,
+                            onValueChange = {
+                                patientViewModel.onEvent(PatientEvent.SearchTextChange(it))
+                            },
+                            shape = RoundedShape20,
+                            placeholder = {
+                                Text(
+                                    text = stringResource(id = R.string.doctor_search),
+                                    fontFamily = Quicksand
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Search
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onSearch = {
+
+                                }
+                            ),
+                            colors = defaultButtonColors(),
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(60.dp)
+                        )
+                        Button(
+                            onClick = {},
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.textFieldOutline
+                            ),
+                            shape = RoundedShape20,
+                            modifier = Modifier
+                                .height(60.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = "Doctor search button"
+                            )
+                        }
+                    }
                 }
-            )
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+                CategoriesList(
+                    patientState = patientState,
+                    onCategorySelected = {
+                        patientViewModel.onEvent(PatientEvent.SelectService(it))
+                    }
+                )
+                Spacer(modifier = Modifier.padding(top = 16.dp))
+                DoctorsList(
+                    patientState = patientState,
+                    onDoctorSelected = {
+                        patientViewModel.onEvent(PatientEvent.SelectDoctor(it))
+                        onDoctorSelected()
+                    }
+                )
+            }
+        }
+        if (patientState.selectedDoctor != null) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .scale(doctorDetailsScreenScale)
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colors.secondary)
+                )
+            }
         }
     }
 }
@@ -162,7 +250,7 @@ suspend fun LazyListState.animateScrollAndCentralizeItem(index: Int) {
 @Composable
 fun CategoriesList(
     patientState: PatientState,
-    onItemSelected: (Int) -> Unit
+    onCategorySelected: (Int) -> Unit
 ) {
 
     val rememberLazyListState = rememberLazyListState()
@@ -170,7 +258,7 @@ fun CategoriesList(
     val interactionSource = remember { MutableInteractionSource() }
 
     Text(
-        text = stringResource(id = R.string.categories),
+        text = stringResource(id = R.string.categories_list),
         fontFamily = Quicksand,
         fontWeight = FontWeight.Bold,
         fontSize = 34.sp,
@@ -196,7 +284,7 @@ fun CategoriesList(
                         interactionSource = interactionSource,
                         indication = null
                     ) {
-                        onItemSelected(index)
+                        onCategorySelected(index)
                         coroutineScope.launch {
                             rememberLazyListState
                                 .animateScrollAndCentralizeItem(index)
@@ -234,4 +322,62 @@ fun CategoriesList(
             }
         }
     }
+}
+
+@Composable
+fun DoctorsList(
+    patientState: PatientState,
+    onDoctorSelected: (Int) -> Unit
+) {
+    Text(
+        text = stringResource(id = R.string.doctors_list),
+        fontFamily = Quicksand,
+        fontWeight = FontWeight.Bold,
+        fontSize = 34.sp,
+        color = MaterialTheme.colors.textOnPrimary,
+        modifier = Modifier.padding(start = 16.dp)
+    )
+    if (!patientState.doctorsLoading) {
+        Spacer(modifier = Modifier.padding(top = 26.dp))
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            itemsIndexed(patientState.doctorList) { index, doctor ->
+                Card(
+                    shape = RoundedShape20,
+                    backgroundColor = MaterialTheme.colors.secondary,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(50.dp)
+                        .clickable {
+                            onDoctorSelected(index)
+                        }
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "${doctor.firstName} ${doctor.lastName}",
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colors.textOnSecondary
+                        )
+                    }
+                }
+            }
+        }
+    } else {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colors.textOnPrimary)
+        }
+    }
+
 }

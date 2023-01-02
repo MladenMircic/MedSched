@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.RegisterEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.RegisterState
@@ -94,7 +94,7 @@ class RegisterViewModel @Inject constructor(
 
     private fun registerUser() = viewModelScope.launch {
         val response = registerUseCase(
-            User(
+            Patient(
                 email = _registerState.value.email,
                 firstName = _registerState.value.firstName,
                 lastName = _registerState.value.lastName,

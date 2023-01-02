@@ -11,7 +11,6 @@ import com.squareup.moshi.Moshi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 
 @HiltWorker
 class AutoLogoutWorker @AssistedInject constructor(
@@ -24,8 +23,6 @@ class AutoLogoutWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.USER_TOKEN_KEY] = ""
-            preferences[PreferenceKeys.USER_INFO_KEY] =
-                moshi.adapter(User::class.java).toJson(User.EMPTY_USER)
         }
         return Result.success()
     }

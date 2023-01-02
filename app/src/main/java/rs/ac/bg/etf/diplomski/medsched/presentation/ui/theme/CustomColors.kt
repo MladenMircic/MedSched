@@ -6,6 +6,9 @@ import androidx.compose.ui.graphics.Color
 val Colors.textOnPrimary: Color
     get() = if (isLight) TextOnPrimaryLight else TextOnPrimaryDark
 
+val Colors.textOnSecondary: Color
+    get() = TextOnSecondary
+
 val Colors.selectable: Color
     get() = if (isLight) SelectableLight else SelectableDark
 

@@ -4,11 +4,11 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class RegisterRequestDto(
-    val email: String,
-    val firstName: String,
-    val lastName: String,
-    val password: String,
-    val role: Int,
-    val phone: String,
-    val ssn: String
+    val email: String = "",
+    val firstName: String = "",
+    val lastName: String = "",
+    val password: String = "",
+    val role: Int = -1,
+    val phone: String = "",
+    val ssn: String = ""
 )

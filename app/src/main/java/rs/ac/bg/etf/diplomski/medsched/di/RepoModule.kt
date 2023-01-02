@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.work.WorkManager
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,7 @@ import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
 import rs.ac.bg.etf.diplomski.medsched.data.repository.LoginRegisterRepositoryImpl
 import rs.ac.bg.etf.diplomski.medsched.data.repository.PatientRepositoryImpl
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.LoginRegisterRepository
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Singleton
@@ -72,8 +74,13 @@ object RepoModule {
 
     @Singleton
     @Provides
-    fun providesGsonConverter(): Moshi =
+    fun providesMoshiConverter(): Moshi =
         Moshi.Builder()
+            .add(
+                PolymorphicJsonAdapterFactory.of(User::class.java, "type")
+                    .withSubtype(Patient::class.java, UserType.PATIENT.name)
+                    .withSubtype(Doctor::class.java, UserType.DOCTOR.name)
+            )
             .addLast(KotlinJsonAdapterFactory())
             .build()
 }

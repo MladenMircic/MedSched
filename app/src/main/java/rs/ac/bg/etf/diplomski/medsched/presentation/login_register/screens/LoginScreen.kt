@@ -248,11 +248,11 @@ fun LoginScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.no_account),
-                    color = Blue90
+                    color = MaterialTheme.colors.textOnSecondary
                 )
                 Text(
                     text = stringResource(id = R.string.register_now),
-                    color = Blue90,
+                    color = MaterialTheme.colors.textOnSecondary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable {
                         onGoToRegister()
