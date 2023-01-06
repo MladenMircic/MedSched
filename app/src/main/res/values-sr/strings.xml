@@ -63,6 +63,8 @@
     <string name="categories_list">Kategorije</string>
     <string name="doctors_list">Doktori</string>
     <string name="doctor_search">Pretražite doktore</string>
-    <string name="schedule_appointment">Zakaži</string>
+    <string name="schedule_appointment">Zakaži pregled</string>
+    <string name="schedule_appointment_button">Zakaži</string>
     <string name="appointment_time">Vreme</string>
+    <string name="exam_name">Ime pregleda</string>
 </resources>

@@ -281,7 +281,7 @@ fun CategoriesList(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
-        itemsIndexed(patientState.serviceList) { index, service ->
+        itemsIndexed(patientState.categoryList) { index, service ->
             Card(
                 shape = RoundedShape40,
                 backgroundColor = if (patientState.selectedService == index)

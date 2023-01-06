@@ -42,13 +42,14 @@ import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.BOOK_APPOINTMENT_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.commons.DOCTOR_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
+import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import java.time.format.TextStyle
 import java.util.*
-import java.util.concurrent.TimeUnit
 
+@OptIn(ExperimentalMaterialApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DoctorAppointmentScreen(
@@ -59,7 +60,11 @@ fun DoctorAppointmentScreen(
     val appointmentState by patientViewModel.appointmentState.collectAsState()
     var selectedTime by rememberSaveable { mutableStateOf(-1) }
     var showScreen by rememberSaveable { mutableStateOf(false) }
+    var examNameDropdownExpanded by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(true) {
+        patientViewModel.fetchServicesForDoctor()
+        patientViewModel.fetchScheduledAppointments()
         delay(200L)
         showScreen = true
     }
@@ -157,7 +162,6 @@ fun DoctorAppointmentScreen(
                 shape = RoundedShape60
                     .copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
             ) {
-                val numbers = (0..5).toList()
                 LazyVerticalGrid(
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -167,12 +171,79 @@ fun DoctorAppointmentScreen(
                     item(
                         span = { GridItemSpan(3) }
                     ) {
+                        Text(
+                            text = stringResource(id = R.string.schedule_appointment),
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp,
+                            color = MaterialTheme.colors.textOnPrimary,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    item(
+                        span = { GridItemSpan(3) }
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ExposedDropdownMenuBox(
+                                expanded = examNameDropdownExpanded,
+                                onExpandedChange = {
+                                    examNameDropdownExpanded = !examNameDropdownExpanded
+                                },
+                                modifier = Modifier.fillMaxWidth(0.8f)
+                            ) {
+                                OutlinedTextField(
+                                    label = { Text(text = stringResource(id = R.string.exam_name)) },
+                                    readOnly = true,
+                                    value = appointmentState.currentExamName,
+                                    onValueChange = {},
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(
+                                            expanded = examNameDropdownExpanded
+                                        )
+                                    },
+                                    shape = RoundedShape20,
+                                    colors = defaultButtonColors()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = examNameDropdownExpanded,
+                                    onDismissRequest = { examNameDropdownExpanded = false },
+                                    modifier = Modifier
+                                        .background(color = MaterialTheme.colors.secondary)
+                                ) {
+                                    appointmentState.examNameList.forEach { examName ->
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                examNameDropdownExpanded = false
+                                                patientViewModel.onEvent(
+                                                    PatientEvent.SetAppointmentExamName(examName)
+                                                )
+                                            }
+                                        ) {
+                                            Text(
+                                                text = examName,
+                                                fontFamily = Quicksand,
+                                                fontSize = 18.sp,
+                                                color = MaterialTheme.colors.textOnSecondary
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    item(
+                        span = { GridItemSpan(3) }
+                    ) {
                         DateTimeCalendar(
                             today = LocalDate.now(),
                             onSelectionChanged = {
                                  patientViewModel.onEvent(
                                      PatientEvent.SetAppointmentDate(it.firstOrNull())
                                  )
+                                patientViewModel.fetchScheduledAppointments()
                             },
                             dayContent = { DayContent(dayState = it) },
                         )
@@ -188,14 +259,10 @@ fun DoctorAppointmentScreen(
                             color = MaterialTheme.colors.textOnPrimary
                         )
                     }
-                    itemsIndexed(numbers) { index, number ->
+                    itemsIndexed(appointmentState.availableTimes) { index, time ->
                         AppointmentTimeCard(
                             isSelected = selectedTime == index,
-                            time = String.format(
-                                "%02d:%02d",
-                                TimeUnit.SECONDS.toMinutes(number.toLong()),
-                                TimeUnit.SECONDS.toSeconds(number.toLong()) % 60
-                            ),
+                            time = time.toString(),
                             onSelect = {
                                 selectedTime = index
                             }
@@ -215,7 +282,7 @@ fun DoctorAppointmentScreen(
                             onClick = { /*TODO*/ }
                         ) {
                             Text(
-                                text = stringResource(id = R.string.schedule_appointment),
+                                text = stringResource(id = R.string.schedule_appointment_button),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = BackgroundPrimaryLight,

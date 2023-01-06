@@ -13,7 +13,7 @@ import javax.inject.Inject
 class GetDoctorsUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
-    suspend operator fun invoke(category: String) : Flow<Resource<List<DoctorForPatient>>> = flow {
+    operator fun invoke(category: String) : Flow<Resource<List<DoctorForPatient>>> = flow {
         emit(Resource.Loading())
         try {
             emit(Resource.Success(patientRepository.getDoctors(category)))

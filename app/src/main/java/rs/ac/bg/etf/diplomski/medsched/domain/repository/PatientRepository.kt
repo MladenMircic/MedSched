@@ -1,14 +1,17 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 
 interface PatientRepository {
 
     val user: Flow<User?>
 
-    suspend fun getAllServices(): List<Service>
+    suspend fun getAllServices(): List<Category>
     suspend fun getDoctors(category: String): List<DoctorForPatient>
+    suspend fun getAllAppointmentsForDoctorAtDate(
+        appointmentRequest: AppointmentRequest
+    ) : List<Appointment>
+    suspend fun getAllServicesForDoctor(doctorId: Int): List<Service>
 }

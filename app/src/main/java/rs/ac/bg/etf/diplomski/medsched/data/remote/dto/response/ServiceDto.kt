@@ -5,11 +5,15 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
 
 @JsonClass(generateAdapter = true)
 data class ServiceDto(
-    val name: String
+    val id: Int,
+    val name: String,
+    val category: String
 ) {
     fun toService(): Service {
         return Service(
-            name = name
+            id = id,
+            name = name,
+            category = category
         )
     }
 }

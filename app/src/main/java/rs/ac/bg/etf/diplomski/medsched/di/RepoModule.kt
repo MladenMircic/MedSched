@@ -18,7 +18,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
+import rs.ac.bg.etf.diplomski.medsched.commons.LocalDateAdapter
+import rs.ac.bg.etf.diplomski.medsched.commons.LocalTimeAdapter
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
+import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
@@ -46,9 +49,10 @@ object RepoModule {
     fun providesPatientRepository(
         dataStore: DataStore<Preferences>,
         moshi: Moshi,
-        patientApi: PatientApi
+        patientApi: PatientApi,
+        patientInfoMapper: PatientInfoMapper
     ): PatientRepository =
-        PatientRepositoryImpl(dataStore, moshi, patientApi)
+        PatientRepositoryImpl(dataStore, moshi, patientApi, patientInfoMapper)
 
     @Singleton
     @Provides
@@ -81,6 +85,8 @@ object RepoModule {
                     .withSubtype(Patient::class.java, UserType.PATIENT.name)
                     .withSubtype(Doctor::class.java, UserType.DOCTOR.name)
             )
+            .add(LocalDateAdapter())
+            .add(LocalTimeAdapter())
             .addLast(KotlinJsonAdapterFactory())
             .build()
 }
