@@ -1,6 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.model.business
 
 data class Doctor(
+    override val id: Int = 0,
     override val email: String,
     override val firstName: String = "",
     override val lastName: String = "",

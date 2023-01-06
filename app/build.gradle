@@ -9,6 +9,14 @@ android {
     namespace 'rs.ac.bg.etf.diplomski.medsched'
     compileSdk 33
 
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\Maki\\keystore.jks')
+            storePassword 'Hunter3-1'
+            keyAlias 'key0'
+            keyPassword 'Hunter3-1'
+        }
+    }
     defaultConfig {
         applicationId "rs.ac.bg.etf.diplomski.medsched"
         minSdk 21
@@ -20,6 +28,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        signingConfig signingConfigs.release
     }
 
     buildTypes {
@@ -115,4 +124,8 @@ dependencies {
     // Coil
     def coil_version = "2.2.2"
     implementation "io.coil-kt:coil-compose:$coil_version"
+
+    def compose_calendar_version = "1.0.2"
+    implementation "io.github.boguszpawlowski.composecalendar:composecalendar:$compose_calendar_version"
+    implementation "io.github.boguszpawlowski.composecalendar:kotlinx-datetime:$compose_calendar_version"
 }

@@ -15,11 +15,12 @@ class ImageRequestUseCase @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
 
-    suspend operator fun invoke(relativePath: String): ImageRequest.Builder =
+    suspend operator fun invoke(relativePath: String): ImageRequest =
         ImageRequest.Builder(context)
             .data("${SERVICE_ICONS_URL}/$relativePath")
             .addHeader(
                 "Authorization",
                 "Bearer ${dataStore.data.first()[PreferenceKeys.USER_TOKEN_KEY]}"
             )
+            .build()
 }

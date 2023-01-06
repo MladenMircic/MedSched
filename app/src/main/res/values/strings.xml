@@ -63,4 +63,6 @@
     <string name="categories_list">Categories</string>
     <string name="doctors_list">Doctors</string>
     <string name="doctor_search">Search for doctors</string>
+    <string name="schedule_appointment">Schedule</string>
+    <string name="appointment_time">Time</string>
 </resources>

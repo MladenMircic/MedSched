@@ -7,6 +7,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -21,22 +22,21 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.patientRoutes
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PatientScreen(navController: NavHostController = rememberAnimatedNavController()) {
-    var visibleBottomBar by remember { mutableStateOf(true) }
+    var visibleBottomBar by rememberSaveable { mutableStateOf(true) }
     Scaffold(
         bottomBar = {
             AnimatedVisibility(
                 visible = visibleBottomBar,
                 enter = slideInVertically(
                     animationSpec = tween(
-                        durationMillis = 300,
-                        delayMillis = 400
+                        durationMillis = 200,
+                        delayMillis = 300
                     ),
                     initialOffsetY = { it }
                 ),
                 exit = slideOutVertically(
                     animationSpec = tween(
-                        durationMillis = 300,
-                        delayMillis = 400
+                        durationMillis = 500
                     ),
                     targetOffsetY = { it }
                 )

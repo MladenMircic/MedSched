@@ -31,7 +31,11 @@ fun RootNavigationGraph(
         token?.let {
             if (currentDestination?.hierarchy?.any { it.route == Graph.AUTHENTICATION } == false
                 && token == "") {
-                navController.navigate(Graph.AUTHENTICATION)
+                navController.navigate(Graph.AUTHENTICATION) {
+                    popUpTo(Graph.PATIENT) {
+                        inclusive = true
+                    }
+                }
                 rootViewModel.loggedIn = false
             }
         }

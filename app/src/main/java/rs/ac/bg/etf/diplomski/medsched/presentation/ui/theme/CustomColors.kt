@@ -29,3 +29,9 @@ val Colors.success: Color
 
 val Colors.logo: Color
     get() = if (isLight) BackgroundSecondaryLight else BackgroundPrimaryLight
+
+val Colors.calendarField: Color
+    get() = if (isLight) Blue85 else BackgroundSecondaryDark
+
+val Colors.calendarFieldText: Color
+    get() = if (isLight) TextOnPrimaryLight else TextOnSecondary

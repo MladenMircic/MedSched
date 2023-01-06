@@ -33,8 +33,8 @@ class RootViewModel @Inject constructor(
         backgroundTaskDispatcher.doDelayedBackgroundTask<AutoLogoutWorker>(
             Constants.AUTO_LOGOUT_TASK_NAME,
             ExistingWorkPolicy.REPLACE,
-            20,
-            TimeUnit.SECONDS
+            30,
+            TimeUnit.MINUTES
         )
     }
 }
