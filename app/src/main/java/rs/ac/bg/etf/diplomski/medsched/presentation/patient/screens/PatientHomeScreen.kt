@@ -46,6 +46,7 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.Loader
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -406,7 +407,7 @@ fun DoctorsList(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            CircularProgressIndicator(color = MaterialTheme.colors.textOnPrimary)
+            Loader()
         }
     }
 

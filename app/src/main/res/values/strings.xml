@@ -67,4 +67,6 @@
     <string name="schedule_appointment_button">Schedule</string>
     <string name="appointment_time">Time</string>
     <string name="exam_name">Exam name</string>
+    <string name="schedule_success">Successfully scheduled</string>
+    <string name="schedule_failure">Scheduling failed, please try again</string>
 </resources>

@@ -2,8 +2,8 @@ package rs.ac.bg.etf.diplomski.medsched.data.remote
 
 import retrofit2.http.*
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.CategoryDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.DoctorForPatientDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.ServiceDto
@@ -23,4 +23,7 @@ interface PatientApi {
     suspend fun getScheduledAppointments(
         @Body appointmentsRequestDto: AppointmentsRequestDto
     ): List<AppointmentDto>
+
+    @POST("/${Constants.PATIENT_ENDPOINTS}/scheduleAppointment")
+    suspend fun scheduleAppointment(@Body appointmentDto: AppointmentDto)
 }

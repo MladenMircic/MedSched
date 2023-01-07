@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.domain.use_case
+package rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient
 
 import okio.IOException
 import retrofit2.HttpException

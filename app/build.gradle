@@ -128,4 +128,7 @@ dependencies {
     def compose_calendar_version = "1.0.2"
     implementation "io.github.boguszpawlowski.composecalendar:composecalendar:$compose_calendar_version"
     implementation "io.github.boguszpawlowski.composecalendar:kotlinx-datetime:$compose_calendar_version"
+
+    def lottie_version = "5.2.0"
+    implementation "com.airbnb.android:lottie-compose:$lottie_version"
 }

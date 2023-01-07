@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response
+package rs.ac.bg.etf.diplomski.medsched.data.remote.dto
 
 import com.squareup.moshi.JsonClass
 import kotlinx.datetime.LocalDate

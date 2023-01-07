@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.domain.use_case
+package rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient
 
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Inject

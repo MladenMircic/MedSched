@@ -67,4 +67,6 @@
     <string name="schedule_appointment_button">Zakaži</string>
     <string name="appointment_time">Vreme</string>
     <string name="exam_name">Ime pregleda</string>
+    <string name="schedule_success">Uspešno zakazano</string>
+    <string name="schedule_failure">Neuspelo zakazivanje, pokušajte ponovo</string>
 </resources>

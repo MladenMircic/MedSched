@@ -11,6 +11,7 @@ import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication.RegisterUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.RegisterEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.RegisterState
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.domain.use_case
+package rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

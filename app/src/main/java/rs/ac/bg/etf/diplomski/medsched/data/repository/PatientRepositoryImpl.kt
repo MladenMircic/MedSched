@@ -44,5 +44,9 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun getAllServicesForDoctor(doctorId: Int): List<Service> =
         patientApi.getServicesForDoctor(doctorId).map { it.toService() }
 
+    override suspend fun scheduleAppointment(appointment: Appointment) {
+        patientApi.scheduleAppointment(patientInfoMapper.toAppointmentDto(appointment))
+    }
+
 
 }

@@ -14,4 +14,5 @@ interface PatientRepository {
         appointmentRequest: AppointmentRequest
     ) : List<Appointment>
     suspend fun getAllServicesForDoctor(doctorId: Int): List<Service>
+    suspend fun scheduleAppointment(appointment: Appointment)
 }

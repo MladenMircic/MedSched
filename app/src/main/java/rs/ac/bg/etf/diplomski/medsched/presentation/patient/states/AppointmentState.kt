@@ -11,5 +11,6 @@ data class AppointmentState(
     val currentExamName: String = "",
     val selectedDate: LocalDate = LocalDate.now(),
     val availableTimes: List<LocalTime> = listOf(),
-    val selectedTime: String? = null
+    val selectedTime: Int = -1,
+    val scheduledMessageId: Int? = null
 )

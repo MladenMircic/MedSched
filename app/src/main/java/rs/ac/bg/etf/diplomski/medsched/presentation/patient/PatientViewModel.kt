@@ -12,11 +12,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.AppointmentState
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
@@ -29,7 +32,8 @@ class PatientViewModel @Inject constructor(
     private val imageRequestUseCase: ImageRequestUseCase,
     private val getDoctorsUseCase: GetDoctorsUseCase,
     private val getScheduledAppointmentsUseCase: GetScheduledAppointmentsUseCase,
-    private val getServicesForDoctorUseCase: GetServicesForDoctorUseCase
+    private val getServicesForDoctorUseCase: GetServicesForDoctorUseCase,
+    private val scheduleAppointmentUseCase: ScheduleAppointmentUseCase
 ): ViewModel() {
 
     val userFlow = patientRepository.user
@@ -64,13 +68,20 @@ class PatientViewModel @Inject constructor(
                     it.copy(selectedDate = patientEvent.date ?: LocalDate.now())
                 }
             }
+            is PatientEvent.SetAppointmentTime -> {
+                _appointmentState.update {
+                    it.copy(selectedTime = patientEvent.timeIndex)
+                }
+            }
             is PatientEvent.SelectDoctor -> {
                 _patientState.update { it.copy(selectedDoctor = patientEvent.index) }
             }
             is PatientEvent.GetAllServices -> {
                 getAllServices()
             }
-
+            is PatientEvent.ScheduleAppointment -> {
+                scheduleAppointment()
+            }
         }
     }
 
@@ -185,6 +196,44 @@ class PatientViewModel @Inject constructor(
             }
             is Resource.Error -> TODO()
             is Resource.Loading -> TODO()
+        }
+    }
+
+    private fun scheduleAppointment() = viewModelScope.launch {
+        val appointmentInfo = _appointmentState.value
+        val selectedTime = appointmentInfo.availableTimes[appointmentInfo.selectedTime]
+        userFlow.collect { user ->
+            val response = scheduleAppointmentUseCase(Appointment(
+                date = appointmentInfo.selectedDate,
+                time = selectedTime,
+                doctorId = getSelectedDoctor().id,
+                patientId = user!!.id,
+                examName = appointmentInfo.currentExamName
+            ))
+
+            response.collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        _appointmentState.update {
+                            it.copy(
+                                availableTimes = it.availableTimes
+                                    .filter { time ->
+                                        time != selectedTime
+                                    },
+                                scheduledMessageId = R.string.schedule_success
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _appointmentState.update {
+                            it.copy(scheduledMessageId = R.string.schedule_failure)
+                        }
+                    }
+                    is Resource.Loading -> {
+
+                    }
+                }
+            }
         }
     }
 }

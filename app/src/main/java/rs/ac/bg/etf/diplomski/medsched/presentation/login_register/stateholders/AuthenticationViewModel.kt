@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.LoginAuthUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication.LoginAuthUseCase
 import javax.inject.Inject
 
 @HiltViewModel

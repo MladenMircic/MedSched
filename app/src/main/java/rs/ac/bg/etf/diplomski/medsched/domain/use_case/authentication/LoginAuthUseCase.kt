@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.domain.use_case
+package rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

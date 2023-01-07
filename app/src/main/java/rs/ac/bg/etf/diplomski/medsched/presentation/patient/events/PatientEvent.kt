@@ -8,7 +8,8 @@ sealed class PatientEvent {
     data class SelectDoctor(val index: Int?): PatientEvent()
     data class SetAppointmentDate(val date: LocalDate?): PatientEvent()
     data class SetAppointmentExamName(val name: String): PatientEvent()
-    //data class ScheduleAppointment(): PatientEvent()
+    data class SetAppointmentTime(val timeIndex: Int): PatientEvent()
+    object ScheduleAppointment: PatientEvent()
     object SearchForDoctor: PatientEvent()
     object GetAllServices: PatientEvent()
 }

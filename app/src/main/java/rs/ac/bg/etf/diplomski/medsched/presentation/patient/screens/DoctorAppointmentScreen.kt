@@ -1,6 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,8 +59,8 @@ fun DoctorAppointmentScreen(
     doctor: DoctorForPatient,
     onBackPressed: () -> Unit
 ) {
+    val context = LocalContext.current
     val appointmentState by patientViewModel.appointmentState.collectAsState()
-    var selectedTime by rememberSaveable { mutableStateOf(-1) }
     var showScreen by rememberSaveable { mutableStateOf(false) }
     var examNameDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -67,6 +69,16 @@ fun DoctorAppointmentScreen(
         patientViewModel.fetchScheduledAppointments()
         delay(200L)
         showScreen = true
+    }
+
+    LaunchedEffect(key1 = appointmentState.scheduledMessageId) {
+        appointmentState.scheduledMessageId?.let {
+            Toast.makeText(
+                context,
+                context.getString(it),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     Column(
@@ -107,9 +119,9 @@ fun DoctorAppointmentScreen(
             Surface(color = MaterialTheme.colors.secondary) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
                 ) {
                     AsyncImage(
                         model = doctor.imageRequest,
@@ -261,10 +273,10 @@ fun DoctorAppointmentScreen(
                     }
                     itemsIndexed(appointmentState.availableTimes) { index, time ->
                         AppointmentTimeCard(
-                            isSelected = selectedTime == index,
+                            isSelected = appointmentState.selectedTime == index,
                             time = time.toString(),
                             onSelect = {
-                                selectedTime = index
+                                patientViewModel.onEvent(PatientEvent.SetAppointmentTime(index))
                             }
                         )
                     }
@@ -279,7 +291,7 @@ fun DoctorAppointmentScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(BOOK_APPOINTMENT_BUTTON_HEIGHT),
-                            onClick = { /*TODO*/ }
+                            onClick = { patientViewModel.onEvent(PatientEvent.ScheduleAppointment) }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.schedule_appointment_button),

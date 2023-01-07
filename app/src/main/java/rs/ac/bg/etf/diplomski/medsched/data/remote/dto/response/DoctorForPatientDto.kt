@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 
 data class DoctorForPatientDto(
+    val id: Int,
     val email: String,
     val firstName: String,
     val lastName: String,
@@ -11,6 +12,7 @@ data class DoctorForPatientDto(
 ) {
     fun toDoctorForPatient(): DoctorForPatient {
         return DoctorForPatient(
+            id = id,
             email = email,
             firstName = firstName,
             lastName = lastName,
