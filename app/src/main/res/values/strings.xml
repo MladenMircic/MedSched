@@ -64,9 +64,11 @@
     <string name="doctors_list">Doctors</string>
     <string name="doctor_search">Search for doctors</string>
     <string name="schedule_appointment">Schedule an appointment</string>
+    <string name="scheduled_appointments">Scheduled appointments</string>
     <string name="schedule_appointment_button">Schedule</string>
     <string name="appointment_time">Time</string>
     <string name="exam_name">Exam name</string>
     <string name="schedule_success">Successfully scheduled</string>
     <string name="schedule_failure">Scheduling failed, please try again</string>
+    <string name="cancel_appointment_button">Cancel</string>
 </resources>

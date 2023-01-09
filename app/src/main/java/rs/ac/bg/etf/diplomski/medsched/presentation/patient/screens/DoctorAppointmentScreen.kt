@@ -45,7 +45,7 @@ import rs.ac.bg.etf.diplomski.medsched.commons.BOOK_APPOINTMENT_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.commons.DOCTOR_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import java.time.format.TextStyle
@@ -55,18 +55,18 @@ import java.util.*
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DoctorAppointmentScreen(
-    patientViewModel: PatientViewModel,
+    patientHomeViewModel: PatientHomeViewModel,
     doctor: DoctorForPatient,
     onBackPressed: () -> Unit
 ) {
     val context = LocalContext.current
-    val appointmentState by patientViewModel.appointmentState.collectAsState()
+    val appointmentState by patientHomeViewModel.appointmentState.collectAsState()
     var showScreen by rememberSaveable { mutableStateOf(false) }
     var examNameDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(true) {
-        patientViewModel.fetchServicesForDoctor()
-        patientViewModel.fetchScheduledAppointments()
+        patientHomeViewModel.fetchServicesForDoctor()
+        patientHomeViewModel.fetchScheduledAppointments()
         delay(200L)
         showScreen = true
     }
@@ -229,7 +229,7 @@ fun DoctorAppointmentScreen(
                                         DropdownMenuItem(
                                             onClick = {
                                                 examNameDropdownExpanded = false
-                                                patientViewModel.onEvent(
+                                                patientHomeViewModel.onEvent(
                                                     PatientEvent.SetAppointmentExamName(examName)
                                                 )
                                             }
@@ -252,10 +252,10 @@ fun DoctorAppointmentScreen(
                         DateTimeCalendar(
                             today = LocalDate.now(),
                             onSelectionChanged = {
-                                 patientViewModel.onEvent(
+                                 patientHomeViewModel.onEvent(
                                      PatientEvent.SetAppointmentDate(it.firstOrNull())
                                  )
-                                patientViewModel.fetchScheduledAppointments()
+                                patientHomeViewModel.fetchScheduledAppointments()
                             },
                             dayContent = { DayContent(dayState = it) },
                         )
@@ -276,7 +276,7 @@ fun DoctorAppointmentScreen(
                             isSelected = appointmentState.selectedTime == index,
                             time = time.toString(),
                             onSelect = {
-                                patientViewModel.onEvent(PatientEvent.SetAppointmentTime(index))
+                                patientHomeViewModel.onEvent(PatientEvent.SetAppointmentTime(index))
                             }
                         )
                     }
@@ -291,7 +291,7 @@ fun DoctorAppointmentScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(BOOK_APPOINTMENT_BUTTON_HEIGHT),
-                            onClick = { patientViewModel.onEvent(PatientEvent.ScheduleAppointment) }
+                            onClick = { patientHomeViewModel.onEvent(PatientEvent.ScheduleAppointment) }
                         ) {
                             Text(
                                 text = stringResource(id = R.string.schedule_appointment_button),

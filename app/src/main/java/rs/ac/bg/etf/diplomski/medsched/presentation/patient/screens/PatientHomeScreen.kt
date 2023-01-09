@@ -42,16 +42,16 @@ import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
-import rs.ac.bg.etf.diplomski.medsched.presentation.utils.Loader
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.HorizontalDotLoader
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PatientHomeScreen(
-    patientViewModel: PatientViewModel = hiltViewModel(),
+    patientHomeViewModel: PatientHomeViewModel = hiltViewModel(),
     toggleBottomBar: () -> Unit
 ) {
     val doctorDetailsNavController = rememberAnimatedNavController()
@@ -67,7 +67,7 @@ fun PatientHomeScreen(
             route = PatientHomeStart.route
         ) {
             PatientStart(
-                patientViewModel = patientViewModel,
+                patientHomeViewModel = patientHomeViewModel,
                 navigateToDoctorDetails = {
                     doctorDetailsNavController.navigate(DoctorDetails.route)
                 },
@@ -78,14 +78,14 @@ fun PatientHomeScreen(
             route = DoctorDetails.route
         ) {
             DoctorAppointmentScreen(
-                patientViewModel = patientViewModel,
-                doctor = patientViewModel.getSelectedDoctor(),
+                patientHomeViewModel = patientHomeViewModel,
+                doctor = patientHomeViewModel.getSelectedDoctor(),
                 onBackPressed = {
                     coroutineScope.launch {
                         delay(300L)
                         doctorDetailsNavController.popBackStack()
                         delay(200L)
-                        patientViewModel.onEvent(PatientEvent.SelectDoctor(null))
+                        patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(null))
                         toggleBottomBar()
                     }
                 }
@@ -97,12 +97,12 @@ fun PatientHomeScreen(
 
 @Composable
 fun PatientStart(
-    patientViewModel: PatientViewModel,
+    patientHomeViewModel: PatientHomeViewModel,
     navigateToDoctorDetails: () -> Unit,
     toggleBottomBar: () -> Unit
 ) {
-    val user by patientViewModel.userFlow.collectAsState(initial = null)
-    val patientState by patientViewModel.patientState.collectAsState()
+    val user by patientHomeViewModel.userFlow.collectAsState(initial = null)
+    val patientState by patientHomeViewModel.patientState.collectAsState()
     val scale by animateFloatAsState(
         targetValue = if (patientState.selectedDoctor != null) 25f else 1f,
         animationSpec = tween(
@@ -176,7 +176,7 @@ fun PatientStart(
                     OutlinedTextField(
                         value = patientState.searchKeyWord,
                         onValueChange = {
-                            patientViewModel.onEvent(PatientEvent.SearchTextChange(it))
+                            patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
                         },
                         shape = RoundedShape20,
                         placeholder = {
@@ -218,14 +218,14 @@ fun PatientStart(
             CategoriesList(
                 patientState = patientState,
                 onCategorySelected = {
-                    patientViewModel.onEvent(PatientEvent.SelectService(it))
+                    patientHomeViewModel.onEvent(PatientEvent.SelectService(it))
                 }
             )
             Spacer(modifier = Modifier.padding(top = 16.dp))
             DoctorsList(
                 patientState = patientState,
                 onDoctorSelected = {
-                    patientViewModel.onEvent(PatientEvent.SelectDoctor(it))
+                    patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(it))
                     toggleBottomBar()
                 }
             )
@@ -407,7 +407,7 @@ fun DoctorsList(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            Loader()
+            HorizontalDotLoader(color = Blue85)
         }
     }
 

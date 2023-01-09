@@ -18,8 +18,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
-import rs.ac.bg.etf.diplomski.medsched.commons.LocalDateAdapter
-import rs.ac.bg.etf.diplomski.medsched.commons.LocalTimeAdapter
+import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.LocalDateAdapter
+import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.LocalTimeAdapter
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper

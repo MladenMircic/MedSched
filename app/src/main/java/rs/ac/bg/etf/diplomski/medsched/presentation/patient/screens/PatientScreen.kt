@@ -14,10 +14,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.CustomBottomBar
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHome
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientInfo
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientScheduled
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.patientRoutes
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.*
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -64,7 +61,7 @@ fun PatientScreen(navController: NavHostController = rememberAnimatedNavControll
                 )
             }
             composable(route = PatientScheduled.route) {
-                Text(text = "RADI2")
+                ScheduledAppointmentsScreen()
             }
             composable(route = PatientInfo.route) {
                 Text(text = "RADI3")

@@ -26,7 +26,7 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import javax.inject.Inject
 
 @HiltViewModel
-class PatientViewModel @Inject constructor(
+class PatientHomeViewModel @Inject constructor(
     patientRepository: PatientRepository,
     private val getServicesUseCase: GetServicesUseCase,
     private val imageRequestUseCase: ImageRequestUseCase,

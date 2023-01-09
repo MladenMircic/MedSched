@@ -8,6 +8,7 @@ interface PatientRepository {
 
     val user: Flow<User?>
 
+    suspend fun getAllScheduled(): List<Scheduled>
     suspend fun getAllServices(): List<Category>
     suspend fun getDoctors(category: String): List<DoctorForPatient>
     suspend fun getAllAppointmentsForDoctorAtDate(
@@ -15,4 +16,5 @@ interface PatientRepository {
     ) : List<Appointment>
     suspend fun getAllServicesForDoctor(doctorId: Int): List<Service>
     suspend fun scheduleAppointment(appointment: Appointment)
+    suspend fun cancelAppointment(appointmentId: Int)
 }

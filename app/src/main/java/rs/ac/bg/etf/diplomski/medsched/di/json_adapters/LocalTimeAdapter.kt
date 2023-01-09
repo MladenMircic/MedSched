@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.commons
+package rs.ac.bg.etf.diplomski.medsched.di.json_adapters
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson

@@ -85,7 +85,9 @@ dependencies {
     implementation 'androidx.navigation:navigation-compose:2.6.0-alpha04'
 
     // Navigation animations dependency
-    implementation "com.google.accompanist:accompanist-navigation-animation:0.28.0"
+    def accompanist_version = "0.28.0"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
 
     // Hilt dependencies
     def hilt_dagger_version = "2.44"
