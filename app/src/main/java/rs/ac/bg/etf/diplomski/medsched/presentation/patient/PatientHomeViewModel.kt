@@ -82,6 +82,9 @@ class PatientHomeViewModel @Inject constructor(
             is PatientEvent.ScheduleAppointment -> {
                 scheduleAppointment()
             }
+            PatientEvent.SetScheduleMessageNull -> {
+                _appointmentState.update { it.copy(scheduledMessageId = null) }
+            }
         }
     }
 

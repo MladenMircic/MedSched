@@ -10,6 +10,7 @@ sealed class PatientEvent {
     data class SetAppointmentExamName(val name: String): PatientEvent()
     data class SetAppointmentTime(val timeIndex: Int): PatientEvent()
     object ScheduleAppointment: PatientEvent()
+    object SetScheduleMessageNull: PatientEvent()
     object SearchForDoctor: PatientEvent()
     object GetAllServices: PatientEvent()
 }

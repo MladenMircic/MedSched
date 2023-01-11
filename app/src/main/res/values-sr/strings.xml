@@ -71,4 +71,21 @@
     <string name="schedule_success">Uspešno zakazano</string>
     <string name="schedule_failure">Neuspelo zakazivanje, pokušajte ponovo</string>
     <string name="cancel_appointment_button">Otkaži</string>
+
+    <!-- Patient profile -->
+    <string name="account_info">Podaci o nalogu</string>
+    <string name="change_email">Izmena emaila</string>
+    <string name="change_password">Izmena lozinke</string>
+    <string name="change_info">Izmena ostalih podataka</string>
+    <string name="new_email">Novi email</string>
+    <string name="old_password">Stara lozinka</string>
+    <string name="new_password">Nova lozinka</string>
+    <string name="confirm_new_password">Potvrdi novu lozinku</string>
+    <string name="confirm">Potvrdi</string>
+
+    <!-- Patient profile messages -->
+    <string name="email_update_success">Email update success</string>
+    <string name="email_update_failure">Email update failed</string>
+    <string name="password_update_success">Password update success</string>
+    <string name="password_update_failure">Password update failure</string>
 </resources>

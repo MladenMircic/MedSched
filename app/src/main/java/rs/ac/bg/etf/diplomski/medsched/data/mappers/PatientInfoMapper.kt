@@ -2,8 +2,12 @@ package rs.ac.bg.etf.diplomski.medsched.data.mappers
 
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.EmailChangeRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.PasswordChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.PasswordChangeRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,6 +29,23 @@ class PatientInfoMapper @Inject constructor() {
             doctorId = appointment.doctorId,
             patientId = appointment.patientId,
             examName = appointment.examName
+        )
+    }
+
+    fun toEmailChangeRequestDto(
+        emailChangeRequest: EmailChangeRequest
+    ): EmailChangeRequestDto {
+        return EmailChangeRequestDto(
+            email = emailChangeRequest.email
+        )
+    }
+
+    fun toPasswordChangeRequestDto(
+        passwordChangeRequest: PasswordChangeRequest
+    ): PasswordChangeRequestDto {
+        return PasswordChangeRequestDto(
+            oldPassword = passwordChangeRequest.oldPassword,
+            newPassword = passwordChangeRequest.newPassword
         )
     }
 }

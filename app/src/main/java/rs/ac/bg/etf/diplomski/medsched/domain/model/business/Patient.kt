@@ -11,4 +11,8 @@ data class Patient(
     val ssn: String = "",
 ) : User {
     override val type: UserType = UserType.PATIENT
+
+    companion object {
+        val EMPTY_PATIENT = Patient(email = "", password = "")
+    }
 }

@@ -10,6 +10,9 @@ import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.PasswordChangeRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.response.PasswordChangeResponse
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,5 +57,16 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun cancelAppointment(appointmentId: Int) {
         patientApi.cancelAppointment(appointmentId)
     }
+
+    override suspend fun updateEmail(emailChangeRequest: EmailChangeRequest) {
+        patientApi.updateEmail(patientInfoMapper.toEmailChangeRequestDto(emailChangeRequest))
+    }
+
+    override suspend fun updatePassword(
+        passwordChangeRequest: PasswordChangeRequest
+    ): PasswordChangeResponse =
+        patientApi.updatePassword(
+            patientInfoMapper.toPasswordChangeRequestDto(passwordChangeRequest)
+        ).toPasswordChangeResponse()
 
 }

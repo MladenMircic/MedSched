@@ -34,7 +34,10 @@ fun HorizontalDotLoader(color: Color) {
 }
 
 @Composable
-fun CircleDotLoader(color: Color) {
+fun CircleDotLoader(
+    modifier: Modifier = Modifier,
+    color: Color
+) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(
         R.raw.circle_dot_loading)
     )
@@ -52,7 +55,8 @@ fun CircleDotLoader(color: Color) {
     LottieAnimation(
         composition = composition,
         progress = { progress },
-        dynamicProperties = dynamicProperties
+        dynamicProperties = dynamicProperties,
+        modifier = modifier
     )
 }
 
@@ -84,6 +88,30 @@ fun PulseRefreshLoading(
     LottieAnimation(
         composition = composition,
         progress = { animationProgress },
+        dynamicProperties = dynamicProperties,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun EditAnimation(
+    modifier: Modifier = Modifier,
+    color: Color,
+    progress: Float
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(
+        R.raw.fab_edit)
+    )
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            keyPath = arrayOf("**"),
+            property = LottieProperty.COLOR_FILTER,
+            value = SimpleColorFilter(color.toArgb())
+        )
+    )
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
         dynamicProperties = dynamicProperties,
         modifier = modifier
     )

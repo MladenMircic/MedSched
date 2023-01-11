@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -36,6 +38,7 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientScheduledView
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.PulseRefreshLoading
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -58,12 +61,14 @@ fun ScheduledAppointmentsScreen(
 
                 val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
 
-                if (lastItem.offset + lastItem.size > viewportHeight) {
+                if (lastItem.offset + lastItem.size / 2 > viewportHeight) {
                     fullyVisibleItemsInfo.removeLast()
                 }
 
                 val firstItemIfLeft = fullyVisibleItemsInfo.firstOrNull()
-                if (firstItemIfLeft != null && firstItemIfLeft.offset < layoutInfo.viewportStartOffset) {
+                if (firstItemIfLeft != null &&
+                    firstItemIfLeft.offset < layoutInfo.viewportStartOffset
+                ) {
                     fullyVisibleItemsInfo.removeFirst()
                 }
 
@@ -81,23 +86,32 @@ fun ScheduledAppointmentsScreen(
         refreshThreshold = trigger
     )
     val animatedOffset by animateIntAsState(
-        targetValue = if (scheduledState.isRefreshing)
+        targetValue = if (scheduledState.isRefreshing || pullState.progress * triggerPx >= triggerPx)
             triggerPx.roundToInt()
         else (pullState.progress * triggerPx).roundToInt(),
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
     )
+    val willRefresh by remember {
+        derivedStateOf {
+            pullState.progress * triggerPx >= triggerPx
+        }
+    }
+    val hapticFeedback = LocalHapticFeedback.current
+    LaunchedEffect(key1 = willRefresh) {
+        if (willRefresh) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
     ) {
         Box(modifier = Modifier.pullRefresh(pullState)) {
             Box(
-                Modifier
-                    .background(color = MaterialTheme.colors.secondary)
-
+                modifier = Modifier.background(color = MaterialTheme.colors.secondary)
             ) {
                 PulseRefreshLoading(
-                    progress = pullState.progress * 0.45f,
+                    progress = min(pullState.progress * 0.45f, 0.5f),
                     automatic = scheduledState.isRefreshing,
                     color = MaterialTheme.colors.textOnSecondary,
                     modifier = Modifier
@@ -105,11 +119,12 @@ fun ScheduledAppointmentsScreen(
                         .align(Alignment.TopCenter)
                         .offset(y = (-60).dp)
                 )
-                Box(modifier = Modifier
-                    .offset { IntOffset(x = 0, y = animatedOffset) }
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .fillMaxSize()
-                    .background(MaterialTheme.colors.surface)
+                Box(
+                    modifier = Modifier
+                        .offset { IntOffset(x = 0, y = animatedOffset) }
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.primary)
                 ) {
                     Column(
                         modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 25.dp)
@@ -193,13 +208,11 @@ fun ScheduledAppointmentCard(
             visible = revealed,
             enter = fadeIn(
                 animationSpec = tween(
-                    durationMillis = 500,
-                    delayMillis = 100
+                    durationMillis = 500
                 )
             ) + slideInHorizontally(
                 animationSpec = tween(
                     durationMillis = 500,
-                    delayMillis = 100,
                     easing = EaseOut
                 ),
                 initialOffsetX = { -it / 2 }

@@ -8,8 +8,12 @@ import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BottomBarNavDestination
+
+// Patient home screen destinations
 
 interface PatientHomeDestinations {
     val route: String
@@ -22,6 +26,8 @@ object PatientHomeStart: PatientHomeDestinations {
 object DoctorDetails: PatientHomeDestinations {
     override val route: String = "doctor_details"
 }
+
+// Bottom bar destinations
 
 object PatientHome: BottomBarNavDestination {
     override val title: Int = R.string.navbar_home
@@ -45,3 +51,34 @@ object PatientInfo: BottomBarNavDestination {
 }
 
 val patientRoutes = listOf(PatientHome, PatientScheduled, PatientInfo)
+
+// Patient profile destinations
+
+interface PatientProfileDestinations {
+    val route: String
+}
+
+object MainProfile: PatientProfileDestinations {
+    override val route: String = "main_profile"
+}
+
+object EditProfile: PatientProfileDestinations {
+    override val route: String = "edit_profile"
+    val arguments = listOf(
+        navArgument("editType") {
+            type = NavType.StringType
+        }
+    )
+}
+
+object ChangeEmail: PatientProfileDestinations {
+    override val route: String = "change_email"
+}
+
+object ChangePassword: PatientProfileDestinations {
+    override val route: String = "change_password"
+}
+
+object ChangeInfo: PatientProfileDestinations {
+    override val route: String = "change_info"
+}

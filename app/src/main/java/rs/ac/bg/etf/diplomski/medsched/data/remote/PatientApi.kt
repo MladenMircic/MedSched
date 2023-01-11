@@ -4,10 +4,9 @@ import retrofit2.http.*
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.CategoryDto
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.DoctorForPatientDto
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.ScheduledDto
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.ServiceDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.EmailChangeRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.PasswordChangeRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.*
 
 interface PatientApi {
 
@@ -33,4 +32,12 @@ interface PatientApi {
 
     @DELETE("/${Constants.PATIENT_ENDPOINTS}/cancelAppointment/{appointmentId}")
     suspend fun cancelAppointment(@Path("appointmentId") appointmentId: Int)
+
+    @POST("/${Constants.PATIENT_ENDPOINTS}/updateEmail")
+    suspend fun updateEmail(@Body emailChangeRequestDto: EmailChangeRequestDto)
+
+    @POST("/${Constants.PATIENT_ENDPOINTS}/updatePassword")
+    suspend fun updatePassword(
+        @Body passwordChangeRequestDto: PasswordChangeRequestDto
+    ) : PasswordChangeResponseDto
 }

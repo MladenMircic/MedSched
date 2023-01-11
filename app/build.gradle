@@ -87,7 +87,6 @@ dependencies {
     // Navigation animations dependency
     def accompanist_version = "0.28.0"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
 
     // Hilt dependencies
     def hilt_dagger_version = "2.44"
@@ -133,4 +132,6 @@ dependencies {
 
     def lottie_version = "5.2.0"
     implementation "com.airbnb.android:lottie-compose:$lottie_version"
+
+    implementation "com.leinardi.android:speed-dial.compose:2.0.0-alpha01"
 }

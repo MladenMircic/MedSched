@@ -71,4 +71,21 @@
     <string name="schedule_success">Successfully scheduled</string>
     <string name="schedule_failure">Scheduling failed, please try again</string>
     <string name="cancel_appointment_button">Cancel</string>
+    
+    <!-- Patient profile -->
+    <string name="account_info">Account info</string>
+    <string name="change_email">Change email</string>
+    <string name="change_password">Change password</string>
+    <string name="change_info">Change info</string>
+    <string name="new_email">New email</string>
+    <string name="old_password">Old password</string>
+    <string name="new_password">New password</string>
+    <string name="confirm_new_password">Confirm new password</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Patient profile messages -->
+    <string name="email_update_success">Email update success</string>
+    <string name="email_update_failure">Email update failed</string>
+    <string name="password_update_success">Password update success</string>
+    <string name="password_update_failure">Password update failure</string>
 </resources>

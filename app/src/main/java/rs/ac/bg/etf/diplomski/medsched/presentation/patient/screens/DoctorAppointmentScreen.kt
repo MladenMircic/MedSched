@@ -78,6 +78,7 @@ fun DoctorAppointmentScreen(
                 context.getString(it),
                 Toast.LENGTH_SHORT
             ).show()
+            patientHomeViewModel.onEvent(PatientEvent.SetScheduleMessageNull)
         }
     }
 
