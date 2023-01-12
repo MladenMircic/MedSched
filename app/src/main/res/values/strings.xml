@@ -88,4 +88,5 @@
     <string name="email_update_failure">Email update failed</string>
     <string name="password_update_success">Password update success</string>
     <string name="password_update_failure">Password update failure</string>
+    <string name="logout">Logout</string>
 </resources>

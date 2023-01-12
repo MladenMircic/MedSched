@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -24,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -93,13 +93,30 @@ fun ScheduledAppointmentsScreen(
     )
     val willRefresh by remember {
         derivedStateOf {
-            pullState.progress * triggerPx >= triggerPx
+            pullState.progress >= 1f
         }
     }
     val hapticFeedback = LocalHapticFeedback.current
+
     LaunchedEffect(key1 = willRefresh) {
         if (willRefresh) {
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+    LaunchedEffect(key1 = fullyVisibleIndices) {
+        fullyVisibleIndices.forEach { index ->
+            patientScheduledViewModel.triggerRevealForIndex(index)
+            delay(100L)
+        }
+    }
+    LaunchedEffect(key1 = scheduledState.revealNew) {
+        if (scheduledState.revealNew) {
+            delay(700L)
+            fullyVisibleIndices.forEach { index ->
+                patientScheduledViewModel.triggerRevealForIndex(index)
+                delay(100L)
+            }
+            patientScheduledViewModel.setRevealNew(false)
         }
     }
 
@@ -145,10 +162,12 @@ fun ScheduledAppointmentsScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                         ) {
-                            itemsIndexed(scheduledState.scheduledList) { index, scheduled ->
+                            itemsIndexed(
+                                scheduledState.scheduledList,
+                                key = { index, _ -> index }
+                            ) { index, scheduled ->
                                 ScheduledAppointmentCard(
                                     scheduledAppointment = scheduled,
-                                    isVisible = fullyVisibleIndices.contains(index),
                                     waitForDelete = scheduledState.deletingIndex == index,
                                     toDelete = scheduledState.lastDeleted == index,
                                     revealed = scheduledState.alreadyRevealed[index],
@@ -183,7 +202,6 @@ fun ScheduledAppointmentsScreen(
 fun ScheduledAppointmentCard(
     modifier: Modifier = Modifier,
     scheduledAppointment: Scheduled,
-    isVisible: Boolean,
     waitForDelete: Boolean,
     toDelete: Boolean,
     revealed: Boolean,
@@ -191,11 +209,6 @@ fun ScheduledAppointmentCard(
     onCancelAppointment: () -> Unit,
     onDeleteAppointment: () -> Unit
 ) {
-    LaunchedEffect(isVisible) {
-        if (isVisible && !revealed) {
-            toggleRevealItem()
-        }
-    }
     LaunchedEffect(toDelete) {
         if (toDelete) {
             toggleRevealItem()
@@ -276,14 +289,17 @@ fun ScheduledAppointmentCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.CalendarToday,
-                                contentDescription = "Calendar icon"
+                                painter = painterResource(id = R.drawable.calendar_month),
+                                contentDescription = "Calendar icon",
+                                tint = Color.Black,
+                                modifier = Modifier.size(25.dp)
                             )
                             Spacer(modifier = Modifier.padding(start = 4.dp))
                             Text(
                                 text = scheduledAppointment.dateAsString(),
                                 fontFamily = Quicksand,
-                                fontSize = 16.sp
+                                fontSize = 16.sp,
+                                color = Color.Black
                             )
                         }
                         Row(
@@ -293,13 +309,16 @@ fun ScheduledAppointmentCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Schedule,
-                                contentDescription = "Time icon"
+                                contentDescription = "Time icon",
+                                tint = Color.Black,
+                                modifier = Modifier.size(25.dp)
                             )
                             Spacer(modifier = Modifier.padding(start = 4.dp))
                             Text(
                                 text = scheduledAppointment.timeAsString(),
                                 fontFamily = Quicksand,
-                                fontSize = 16.sp
+                                fontSize = 16.sp,
+                                color = Color.Black
                             )
                         }
                     }

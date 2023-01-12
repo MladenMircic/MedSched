@@ -67,7 +67,10 @@ fun PatientProfileScreen(
                 )
             }
         ) {
-            MainProfileScreen(patient = user as Patient?)
+            MainProfileScreen(
+                patient = user as Patient?,
+                onLogoutClick = { patientProfileViewModel.logout() }
+            )
         }
         composable(
             route = "${EditProfile.route}/{editType}",

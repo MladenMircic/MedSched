@@ -9,5 +9,6 @@ data class DoctorForPatient(
     val lastName: String,
     val phone: String,
     val service: String,
+    val specialization: String,
     var imageRequest: ImageRequest? = null
 )

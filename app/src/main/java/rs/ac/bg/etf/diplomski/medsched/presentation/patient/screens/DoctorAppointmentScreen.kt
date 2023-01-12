@@ -1,7 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
@@ -71,248 +70,286 @@ fun DoctorAppointmentScreen(
         showScreen = true
     }
 
+    val scaffoldState = rememberScaffoldState()
     LaunchedEffect(key1 = appointmentState.scheduledMessageId) {
         appointmentState.scheduledMessageId?.let {
-            Toast.makeText(
-                context,
-                context.getString(it),
-                Toast.LENGTH_SHORT
-            ).show()
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = context.getString(it)
+            )
             patientHomeViewModel.onEvent(PatientEvent.SetScheduleMessageNull)
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.secondary)
+    Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = { scaffoldState.snackbarHostState }
     ) {
-        AnimatedVisibility(
-            visible = showScreen,
-            enter = fadeIn(
-                animationSpec = tween(
-                    durationMillis = 300,
-                    easing = EaseOutCubic
-                )
-            ) + slideInVertically(
-                initialOffsetY = { -it / 2 },
-                animationSpec = tween(
-                    durationMillis = 600,
-                    easing = EaseOutCubic
-                )
-            ),
-            exit = fadeOut(
-                animationSpec = tween(
-                    durationMillis = 300,
-                    easing = EaseOutCubic
-                )
-            ) + slideOutVertically(
-                targetOffsetY = { -it / 2 },
-                animationSpec = tween(
-                    durationMillis = 600,
-                    easing = EaseOutCubic
-                )
-            ),
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.4f)
+                .fillMaxSize()
+                .background(MaterialTheme.colors.secondary)
+                .padding(it)
         ) {
-            Surface(color = MaterialTheme.colors.secondary) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    AsyncImage(
-                        model = doctor.imageRequest,
-                        contentDescription = "Doctor Image",
-                        modifier = Modifier.size(DOCTOR_IMAGE_SIZE)
+            AnimatedVisibility(
+                visible = showScreen,
+                enter = fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = EaseOutCubic
                     )
-                    Text(
-                        text = "${doctor.firstName} ${doctor.lastName}",
-                        fontFamily = Quicksand,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 30.sp,
-                        color = MaterialTheme.colors.textOnSecondary
+                ) + slideInVertically(
+                    initialOffsetY = { offset -> -offset / 2 },
+                    animationSpec = tween(
+                        durationMillis = 600,
+                        easing = EaseOutCubic
                     )
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = EaseOutCubic
+                    )
+                ) + slideOutVertically(
+                    targetOffsetY = { offset -> -offset / 2 },
+                    animationSpec = tween(
+                        durationMillis = 600,
+                        easing = EaseOutCubic
+                    )
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.4f)
+            ) {
+                Surface(color = MaterialTheme.colors.secondary) {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 30.dp)
+                        ) {
+                            AsyncImage(
+                                model = doctor.imageRequest,
+                                contentDescription = "Doctor Image",
+                                modifier = Modifier.size(DOCTOR_IMAGE_SIZE)
+                            )
+                            Text(
+                                text = "${doctor.firstName} ${doctor.lastName}",
+                                fontFamily = Quicksand,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 30.sp,
+                                color = MaterialTheme.colors.textOnSecondary
+                            )
+                            Text(
+                                text = doctor.specialization,
+                                fontFamily = Quicksand,
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colors.textOnSecondary
+                            )
+                        }
+                        SnackbarHost(
+                            hostState = scaffoldState.snackbarHostState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(Alignment.Bottom)
+                                .align(Alignment.BottomCenter)
+                        ) { data ->
+                            Snackbar(
+                                shape = RoundedCornerShape(10.dp),
+                                backgroundColor = MaterialTheme.colors.primary,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = data.message,
+                                    fontFamily = Quicksand,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colors.textOnPrimary
+                                )
+                            }
+                        }
+                    }
                 }
             }
-        }
-        AnimatedVisibility(
-            visible = showScreen,
-            enter = fadeIn(
-                animationSpec = tween(
-                    durationMillis = 200,
-                    easing = EaseOutCubic
-                )
-            ) + slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(
-                    durationMillis = 500,
-                    easing = EaseOutCubic
-                )
-            ),
-            exit = fadeOut(
-                animationSpec = tween(
-                    durationMillis = 300,
-                    easing = EaseOutCubic
-                )
-            ) + slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(
-                    durationMillis = 600,
-                    easing = EaseOutCubic
-                )
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colors.secondary)
-                .weight(0.6f)
-        ) {
-            Surface(
-                color = MaterialTheme.colors.primary,
-                shape = RoundedShape60
-                    .copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
+            AnimatedVisibility(
+                visible = showScreen,
+                enter = fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 200,
+                        easing = EaseOutCubic
+                    )
+                ) + slideInVertically(
+                    initialOffsetY = { offset -> offset },
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        easing = EaseOutCubic
+                    )
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = EaseOutCubic
+                    )
+                ) + slideOutVertically(
+                    targetOffsetY = { offset -> offset },
+                    animationSpec = tween(
+                        durationMillis = 600,
+                        easing = EaseOutCubic
+                    )
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MaterialTheme.colors.secondary)
+                    .weight(0.6f)
             ) {
-                LazyVerticalGrid(
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    columns = GridCells.Fixed(3)
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    shape = RoundedShape60
+                        .copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
                 ) {
-                    item(
-                        span = { GridItemSpan(3) }
+                    LazyVerticalGrid(
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        columns = GridCells.Fixed(3)
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.schedule_appointment),
-                            fontFamily = Quicksand,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 28.sp,
-                            color = MaterialTheme.colors.textOnPrimary,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    item(
-                        span = { GridItemSpan(3) }
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxWidth()
+                        item(
+                            span = { GridItemSpan(3) }
                         ) {
-                            ExposedDropdownMenuBox(
-                                expanded = examNameDropdownExpanded,
-                                onExpandedChange = {
-                                    examNameDropdownExpanded = !examNameDropdownExpanded
-                                },
-                                modifier = Modifier.fillMaxWidth(0.8f)
+                            Text(
+                                text = stringResource(id = R.string.schedule_appointment),
+                                fontFamily = Quicksand,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 28.sp,
+                                color = MaterialTheme.colors.textOnPrimary,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        item(
+                            span = { GridItemSpan(3) }
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                OutlinedTextField(
-                                    label = { Text(text = stringResource(id = R.string.exam_name)) },
-                                    readOnly = true,
-                                    value = appointmentState.currentExamName,
-                                    onValueChange = {},
-                                    trailingIcon = {
-                                        ExposedDropdownMenuDefaults.TrailingIcon(
-                                            expanded = examNameDropdownExpanded
-                                        )
-                                    },
-                                    shape = RoundedShape20,
-                                    colors = defaultButtonColors()
-                                )
-                                ExposedDropdownMenu(
+                                ExposedDropdownMenuBox(
                                     expanded = examNameDropdownExpanded,
-                                    onDismissRequest = { examNameDropdownExpanded = false },
-                                    modifier = Modifier
-                                        .background(color = MaterialTheme.colors.secondary)
+                                    onExpandedChange = {
+                                        examNameDropdownExpanded = !examNameDropdownExpanded
+                                    },
+                                    modifier = Modifier.fillMaxWidth(0.8f)
                                 ) {
-                                    appointmentState.examNameList.forEach { examName ->
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                examNameDropdownExpanded = false
-                                                patientHomeViewModel.onEvent(
-                                                    PatientEvent.SetAppointmentExamName(examName)
+                                    OutlinedTextField(
+                                        label = { Text(text = stringResource(id = R.string.exam_name)) },
+                                        readOnly = true,
+                                        value = appointmentState.currentExamName,
+                                        onValueChange = {},
+                                        trailingIcon = {
+                                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                                expanded = examNameDropdownExpanded
+                                            )
+                                        },
+                                        shape = RoundedShape20,
+                                        colors = defaultButtonColors()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = examNameDropdownExpanded,
+                                        onDismissRequest = { examNameDropdownExpanded = false },
+                                        modifier = Modifier
+                                            .background(color = MaterialTheme.colors.secondary)
+                                    ) {
+                                        appointmentState.examNameList.forEach { examName ->
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    examNameDropdownExpanded = false
+                                                    patientHomeViewModel.onEvent(
+                                                        PatientEvent.SetAppointmentExamName(examName)
+                                                    )
+                                                }
+                                            ) {
+                                                Text(
+                                                    text = examName,
+                                                    fontFamily = Quicksand,
+                                                    fontSize = 18.sp,
+                                                    color = MaterialTheme.colors.textOnSecondary
                                                 )
                                             }
-                                        ) {
-                                            Text(
-                                                text = examName,
-                                                fontFamily = Quicksand,
-                                                fontSize = 18.sp,
-                                                color = MaterialTheme.colors.textOnSecondary
-                                            )
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    item(
-                        span = { GridItemSpan(3) }
-                    ) {
-                        DateTimeCalendar(
-                            today = LocalDate.now(),
-                            onSelectionChanged = {
-                                 patientHomeViewModel.onEvent(
-                                     PatientEvent.SetAppointmentDate(it.firstOrNull())
-                                 )
-                                patientHomeViewModel.fetchScheduledAppointments()
-                            },
-                            dayContent = { DayContent(dayState = it) },
-                        )
-                    }
-                    item(
-                        span = { GridItemSpan(3) }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.appointment_time),
-                            fontFamily = Quicksand,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp,
-                            color = MaterialTheme.colors.textOnPrimary
-                        )
-                    }
-                    itemsIndexed(appointmentState.availableTimes) { index, time ->
-                        AppointmentTimeCard(
-                            isSelected = appointmentState.selectedTime == index,
-                            time = time.toString(),
-                            onSelect = {
-                                patientHomeViewModel.onEvent(PatientEvent.SetAppointmentTime(index))
-                            }
-                        )
-                    }
-                    item(
-                        span = { GridItemSpan(3) }
-                    ) { 
-                        Button(
-                            shape = RoundedShape20,
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.selectable
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(BOOK_APPOINTMENT_BUTTON_HEIGHT),
-                            onClick = { patientHomeViewModel.onEvent(PatientEvent.ScheduleAppointment) }
+                        item(
+                            span = { GridItemSpan(3) }
+                        ) {
+                            DateTimeCalendar(
+                                today = LocalDate.now(),
+                                onSelectionChanged = { selection ->
+                                    patientHomeViewModel.onEvent(
+                                        PatientEvent.SetAppointmentDate(selection.firstOrNull())
+                                    )
+                                    patientHomeViewModel.fetchScheduledAppointments()
+                                },
+                                dayContent = { dayState -> DayContent(dayState = dayState) },
+                            )
+                        }
+                        item(
+                            span = { GridItemSpan(3) }
                         ) {
                             Text(
-                                text = stringResource(id = R.string.schedule_appointment_button),
-                                fontSize = 20.sp,
+                                text = stringResource(id = R.string.appointment_time),
+                                fontFamily = Quicksand,
                                 fontWeight = FontWeight.Bold,
-                                color = BackgroundPrimaryLight,
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(start = 10.dp, bottom = 8.dp)
+                                fontSize = 24.sp,
+                                color = MaterialTheme.colors.textOnPrimary
                             )
+                        }
+                        itemsIndexed(appointmentState.availableTimes) { index, time ->
+                            AppointmentTimeCard(
+                                isSelected = appointmentState.selectedTime == index,
+                                time = time.toString(),
+                                onSelect = {
+                                    patientHomeViewModel.onEvent(PatientEvent.SetAppointmentTime(index))
+                                }
+                            )
+                        }
+                        item(
+                            span = { GridItemSpan(3) }
+                        ) {
+                            Button(
+                                shape = RoundedShape20,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.selectable
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(BOOK_APPOINTMENT_BUTTON_HEIGHT),
+                                onClick = { patientHomeViewModel.onEvent(PatientEvent.ScheduleAppointment) }
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.schedule_appointment_button),
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = BackgroundPrimaryLight,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(start = 10.dp, bottom = 8.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    BackHandler(enabled = true) {
-        showScreen = false
-        onBackPressed()
+        BackHandler(enabled = true) {
+            showScreen = false
+            onBackPressed()
+        }
     }
 }
 

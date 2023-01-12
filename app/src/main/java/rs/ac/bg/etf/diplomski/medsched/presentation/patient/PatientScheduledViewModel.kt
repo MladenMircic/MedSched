@@ -36,11 +36,11 @@ class PatientScheduledViewModel @Inject constructor(
         _scheduledState.update {
             it.copy(isRefreshing = true)
         }
-        getAppointments(visibility = true)
+        getAppointments()
     }
 
-    private fun getAppointments(visibility: Boolean = false) = viewModelScope.launch {
-        delay(1000L)
+    private fun getAppointments() = viewModelScope.launch {
+        delay(800L)
         val response = getAllScheduledUseCase()
 
         response.collect { resource ->
@@ -53,8 +53,9 @@ class PatientScheduledViewModel @Inject constructor(
                     }
                     _scheduledState.update { it.copy(
                         scheduledList = resource.data,
-                        alreadyRevealed = resource.data.map { visibility },
-                        isRefreshing = false
+                        alreadyRevealed = resource.data.map { false },
+                        isRefreshing = false,
+                        revealNew = true
                     ) }
                 }
                 is Resource.Error -> {
@@ -74,6 +75,22 @@ class PatientScheduledViewModel @Inject constructor(
                     revealed[index] = !revealed[index]
                 }
             )
+        }
+    }
+
+    fun triggerRevealForIndex(index: Int) {
+        _scheduledState.update {
+            it.copy(
+                alreadyRevealed = it.alreadyRevealed.toMutableList().also { revealed ->
+                    revealed[index] = true
+                }
+            )
+        }
+    }
+
+    fun setRevealNew(revealNew: Boolean) {
+        _scheduledState.update {
+            it.copy(revealNew = revealNew)
         }
     }
 

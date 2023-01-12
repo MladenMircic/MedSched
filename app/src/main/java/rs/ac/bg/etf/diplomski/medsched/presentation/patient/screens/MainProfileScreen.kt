@@ -2,16 +2,12 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +23,8 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
 @Composable
 fun MainProfileScreen(
-    patient: Patient?
+    patient: Patient?,
+    onLogoutClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -40,7 +37,29 @@ fun MainProfileScreen(
                 .fillMaxWidth()
                 .weight(0.1f)
         ) {
-
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp)
+            ) {
+                TextButton(onClick = onLogoutClick) {
+                    Text(
+                        text = stringResource(id = R.string.logout),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colors.textOnSecondary,
+                        modifier = Modifier.padding(bottom = 3.dp, end = 8.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Logout,
+                        contentDescription = "Logout button icon",
+                        tint = MaterialTheme.colors.textOnSecondary
+                    )
+                }
+            }
         }
 
         Surface(
@@ -54,6 +73,7 @@ fun MainProfileScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 32.dp, vertical = 16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = stringResource(id = R.string.account_info),

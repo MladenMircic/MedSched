@@ -3,7 +3,10 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.composables
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -28,6 +31,7 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.Regist
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.BackgroundPrimaryLight
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape20
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.selectable
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CustomOutlinedTextField
 
 @Composable
@@ -180,6 +184,8 @@ fun RegisterForm(
             Button(
                 onClick = onRegisterButtonClick,
                 shape = RoundedShape20,
+                enabled = !registerState.isLoading,
+                contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.selectable
                 ),
@@ -188,22 +194,21 @@ fun RegisterForm(
                     .height(LOGIN_BUTTON_HEIGHT)
             ) {
                 if (registerState.isLoading) {
-                    CircularProgressIndicator(
+                    CircleDotLoader(
+                        color = BackgroundPrimaryLight,
+                        modifier = Modifier.size(150.dp)
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.register_button_text),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
                         color = BackgroundPrimaryLight,
                         modifier = Modifier
-                            .size(30.dp)
                             .align(Alignment.CenterVertically)
+                            .padding(start = 10.dp, bottom = 8.dp)
                     )
                 }
-                Text(
-                    text = stringResource(id = R.string.register_button_text),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = BackgroundPrimaryLight,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 10.dp, bottom = 8.dp)
-                )
             }
         }
     }

@@ -13,6 +13,7 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.PasswordChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication.LogoutUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.UpdateEmailUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.UpdatePasswordUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.EditProfileEvent
@@ -24,7 +25,8 @@ class EditProfileViewModel @Inject constructor(
     getUserUseCase: GetUserUseCase,
     private val updateEmailUseCase: UpdateEmailUseCase,
     private val updatePasswordUseCase: UpdatePasswordUseCase,
-    private val updateUserUseCase: UpdateUserUseCase
+    private val updateUserUseCase: UpdateUserUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val userFlow = getUserUseCase.userFlow
@@ -80,7 +82,7 @@ class EditProfileViewModel @Inject constructor(
                     it.copy(confirmNewPassword = editProfileEvent.text)
                 }
             }
-            EditProfileEvent.ConfirmNewPassword -> {
+            is EditProfileEvent.ConfirmNewPassword -> {
                 val editProfileState = _editProfileState.value
                 val oldPasswordResult = FormValidation().validate(editProfileState.oldPassword)
                 val newPasswordResult = PasswordValidation.validate(

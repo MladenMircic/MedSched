@@ -5,6 +5,7 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Scheduled
 data class ScheduledState(
     val scheduledList: List<Scheduled> = listOf(),
     val alreadyRevealed: List<Boolean> = listOf(),
+    val revealNew: Boolean = false,
     val message: String? = null,
     val deletingIndex: Int? = null,
     val lastDeleted: Int? = null,
