@@ -183,6 +183,8 @@ fun ScheduledAppointmentsScreen(
                                     onDeleteAppointment = {
                                         patientScheduledViewModel.deleteCancelledAppointment()
                                     },
+                                    getDoctorSpecializationId =
+                                        patientScheduledViewModel::specializationIdToNameId,
                                     modifier = Modifier.animateItemPlacement(
                                         animationSpec = tween(
                                             durationMillis = 500
@@ -207,7 +209,8 @@ fun ScheduledAppointmentCard(
     revealed: Boolean,
     toggleRevealItem: () -> Unit,
     onCancelAppointment: () -> Unit,
-    onDeleteAppointment: () -> Unit
+    onDeleteAppointment: () -> Unit,
+    getDoctorSpecializationId: (Int) -> Int
 ) {
     LaunchedEffect(toDelete) {
         if (toDelete) {
@@ -260,7 +263,9 @@ fun ScheduledAppointmentCard(
                                 color = Color.Black
                             )
                             Text(
-                                text = scheduledAppointment.doctorSpecialization,
+                                text = stringResource(id = getDoctorSpecializationId(
+                                    scheduledAppointment.doctorSpecializationId
+                                )),
                                 fontFamily = Quicksand,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 16.sp,

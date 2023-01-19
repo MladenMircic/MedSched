@@ -225,7 +225,8 @@ fun PatientStart(
                 patientState = patientState,
                 onCategorySelected = {
                     patientHomeViewModel.onEvent(PatientEvent.SelectService(it))
-                }
+                },
+                getCategoryNameId = patientHomeViewModel::categoryIdToNameId
             )
             Spacer(modifier = Modifier.padding(top = 16.dp))
             DoctorsList(
@@ -233,7 +234,8 @@ fun PatientStart(
                 onDoctorSelected = {
                     patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(it))
                     toggleBottomBar()
-                }
+                },
+                getSpecializationNameId = patientHomeViewModel::specializationIdToNameId
             )
         }
     }
@@ -267,7 +269,8 @@ suspend fun LazyListState.animateScrollAndCentralizeItem(index: Int) {
 @Composable
 fun CategoriesList(
     patientState: PatientState,
-    onCategorySelected: (Int) -> Unit
+    onCategorySelected: (Int) -> Unit,
+    getCategoryNameId: (Int) -> Int?
 ) {
     val context = LocalContext.current
     val rememberLazyListState = rememberLazyListState()
@@ -312,7 +315,7 @@ fun CategoriesList(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    if (service.name == "All") {
+                    if (index == 0) {
                         Image(
                             painter = painterResource(id = R.drawable.all_organs),
                             contentDescription = "Service icon",
@@ -342,8 +345,11 @@ fun CategoriesList(
                                 .padding(bottom = 10.dp)
                         )
                     }
+                    val categoryNameId = getCategoryNameId(service.id)
                     Text(
-                        text = service.name,
+                        text = if (categoryNameId != null)
+                            stringResource(id = categoryNameId)
+                        else "",
                         fontFamily = Quicksand,
                         fontWeight = FontWeight.SemiBold,
                         color = if (patientState.selectedService == index)
@@ -359,7 +365,8 @@ fun CategoriesList(
 @Composable
 fun DoctorsList(
     patientState: PatientState,
-    onDoctorSelected: (Int) -> Unit
+    onDoctorSelected: (Int) -> Unit,
+    getSpecializationNameId: (Int) -> Int
 ) {
     Text(
         text = stringResource(id = R.string.doctors_list),
@@ -418,7 +425,9 @@ fun DoctorsList(
                                 color = MaterialTheme.colors.textOnSecondary
                             )
                             Text(
-                                text = doctor.specialization,
+                                text = stringResource(
+                                    id = getSpecializationNameId(doctor.specializationId)
+                                ),
                                 fontFamily = Quicksand,
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colors.textOnSecondary

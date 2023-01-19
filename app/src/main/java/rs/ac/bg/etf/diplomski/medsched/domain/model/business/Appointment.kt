@@ -9,5 +9,5 @@ data class Appointment(
     val time: LocalTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time,
     val doctorId: Int,
     val patientId: Int,
-    val examName: String
+    val examId: Int
 )

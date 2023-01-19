@@ -7,8 +7,8 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
 
 data class AppointmentState(
     val serviceList: List<Service> = listOf(),
-    val examNameList: List<String> = listOf(),
-    val currentExamName: String = "",
+    val examNameIdList: List<Int> = listOf(),
+    val currentExamNameId: Int? = null,
     val selectedDate: LocalDate = LocalDate.now(),
     val availableTimes: List<LocalTime> = listOf(),
     val selectedTime: Int = -1,

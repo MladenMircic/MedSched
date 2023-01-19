@@ -7,13 +7,13 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Service
 data class ServiceDto(
     val id: Int,
     val name: String,
-    val category: String
+    val categoryId: Int
 ) {
     fun toService(): Service {
         return Service(
             id = id,
             name = name,
-            category = category
+            categoryId = categoryId
         )
     }
 }

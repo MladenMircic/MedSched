@@ -91,4 +91,24 @@
     <string name="info_update_success">Podaci o pacijentu su uspešno ažurirani</string>
     <string name="info_update_failure">Greška prilikom ažuriranja podataka o pacijentu</string>
     <string name="logout">Izlogujte se</string>
+
+    <!-- Clinic general names -->
+
+    <!-- Categories -->
+    <string name="category_brain">Mozak</string>
+    <string name="category_glands">Žlezde</string>
+    <string name="category_heart">Srce</string>
+    <string name="category_kidneys">Bubrezi</string>
+    <string name="category_stomach">Stomak</string>
+
+    <!-- Specializations -->
+    <string name="spec_gastroenterologist">Gastroenterolog</string>
+
+    <!-- Services -->
+    <string name="service_all">Sve</string>
+    <string name="service_specialist">Specijalistički pregled</string>
+    <string name="service_abdominal_ultrasound">Ultrazvuk abdomena</string>
+    <string name="service_gastroscopy">Gastroskopija</string>
+    <string name="service_colonoscopy">Kolonoskopija</string>
+    <string name="service_heart_ultrasound">Ultrazvuk srca</string>
 </resources>

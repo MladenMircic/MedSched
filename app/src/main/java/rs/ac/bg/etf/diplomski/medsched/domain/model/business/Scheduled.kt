@@ -5,7 +5,7 @@ import java.util.*
 
 data class Scheduled(
     val doctorName: String,
-    val doctorSpecialization: String,
+    val doctorSpecializationId: Int,
     var doctorImageRequest: ImageRequest? = null,
     val appointment: Appointment
 ) {

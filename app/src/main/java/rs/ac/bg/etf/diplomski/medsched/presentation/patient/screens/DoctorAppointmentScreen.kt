@@ -144,7 +144,11 @@ fun DoctorAppointmentScreen(
                                 color = MaterialTheme.colors.textOnSecondary
                             )
                             Text(
-                                text = doctor.specialization,
+                                text = stringResource(
+                                    id = patientHomeViewModel.specializationIdToNameId(
+                                        doctor.specializationId
+                                    )
+                                ),
                                 fontFamily = Quicksand,
                                 fontSize = 20.sp,
                                 color = MaterialTheme.colors.textOnSecondary
@@ -246,7 +250,9 @@ fun DoctorAppointmentScreen(
                                     OutlinedTextField(
                                         label = { Text(text = stringResource(id = R.string.exam_name)) },
                                         readOnly = true,
-                                        value = appointmentState.currentExamName,
+                                        value = if (appointmentState.currentExamNameId != null)
+                                            stringResource(id = appointmentState.currentExamNameId!!)
+                                        else "",
                                         onValueChange = {},
                                         trailingIcon = {
                                             ExposedDropdownMenuDefaults.TrailingIcon(
@@ -262,17 +268,17 @@ fun DoctorAppointmentScreen(
                                         modifier = Modifier
                                             .background(color = MaterialTheme.colors.secondary)
                                     ) {
-                                        appointmentState.examNameList.forEach { examName ->
+                                        appointmentState.examNameIdList.forEach { examNameId ->
                                             DropdownMenuItem(
                                                 onClick = {
                                                     examNameDropdownExpanded = false
                                                     patientHomeViewModel.onEvent(
-                                                        PatientEvent.SetAppointmentExamName(examName)
+                                                        PatientEvent.SetAppointmentExamNameId(examNameId)
                                                     )
                                                 }
                                             ) {
                                                 Text(
-                                                    text = examName,
+                                                    text = stringResource(id = examNameId),
                                                     fontFamily = Quicksand,
                                                     fontSize = 18.sp,
                                                     color = MaterialTheme.colors.textOnSecondary
@@ -471,8 +477,6 @@ data class KotlinDayState<T : SelectionState>(
 
 private fun SelectionState.isDateSelected(date: LocalDate) = isDateSelected(date.toJavaLocalDate())
 private fun SelectionState.onDateSelected(date: LocalDate) = onDateSelected(date.toJavaLocalDate())
-
-// Time grid composable
 
 @Composable
 fun AppointmentTimeCard(

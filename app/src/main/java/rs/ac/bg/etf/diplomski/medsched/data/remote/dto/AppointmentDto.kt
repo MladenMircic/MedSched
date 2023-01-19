@@ -12,7 +12,7 @@ data class AppointmentDto(
     val time: LocalTime,
     val doctorId: Int,
     val patientId: Int,
-    val examName: String
+    val examId: Int
 ) {
 
     fun toAppointment(): Appointment {
@@ -22,7 +22,7 @@ data class AppointmentDto(
             time = time,
             doctorId = doctorId,
             patientId = patientId,
-            examName = examName
+            examId = examId
         )
     }
 }

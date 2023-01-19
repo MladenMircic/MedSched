@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.CancelAppointmentUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllScheduledUseCase
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class PatientScheduledViewModel @Inject constructor(
     private val imageRequestUseCase: ImageRequestUseCase,
     private val getAllScheduledUseCase: GetAllScheduledUseCase,
-    private val cancelAppointmentUseCase: CancelAppointmentUseCase
+    private val cancelAppointmentUseCase: CancelAppointmentUseCase,
+    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase
 ) : ViewModel() {
 
     private val _scheduledState = MutableStateFlow(ScheduledState())
@@ -133,4 +135,7 @@ class PatientScheduledViewModel @Inject constructor(
             }
         }
     }
+
+    fun specializationIdToNameId(specializationId: Int): Int =
+        clinicIdToNameMapUseCase.specializationIdToNameId(specializationId)
 }

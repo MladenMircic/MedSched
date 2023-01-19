@@ -7,7 +7,7 @@ sealed class PatientEvent {
     data class SearchTextChange(val text: String): PatientEvent()
     data class SelectDoctor(val index: Int?): PatientEvent()
     data class SetAppointmentDate(val date: LocalDate?): PatientEvent()
-    data class SetAppointmentExamName(val name: String): PatientEvent()
+    data class SetAppointmentExamNameId(val nameId: Int): PatientEvent()
     data class SetAppointmentTime(val timeIndex: Int): PatientEvent()
     object ScheduleAppointment: PatientEvent()
     object SetScheduleMessageNull: PatientEvent()

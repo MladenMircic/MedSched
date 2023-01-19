@@ -8,7 +8,7 @@ data class DoctorForPatient(
     val firstName: String,
     val lastName: String,
     val phone: String,
-    val service: String,
-    val specialization: String,
+    val serviceId: Int,
+    val specializationId: Int,
     var imageRequest: ImageRequest? = null
 )

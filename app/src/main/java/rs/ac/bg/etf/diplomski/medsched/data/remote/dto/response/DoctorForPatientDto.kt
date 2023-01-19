@@ -8,8 +8,8 @@ data class DoctorForPatientDto(
     val firstName: String,
     val lastName: String,
     val phone: String,
-    val service: String,
-    val specialization: String
+    val serviceId: Int,
+    val specializationId: Int
 ) {
     fun toDoctorForPatient(): DoctorForPatient {
         return DoctorForPatient(
@@ -18,8 +18,8 @@ data class DoctorForPatientDto(
             firstName = firstName,
             lastName = lastName,
             phone = phone,
-            service = service,
-            specialization = specialization
+            serviceId = serviceId,
+            specializationId = specializationId
         )
     }
 }

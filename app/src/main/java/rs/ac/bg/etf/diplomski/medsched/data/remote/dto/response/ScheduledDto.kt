@@ -7,13 +7,13 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Scheduled
 @JsonClass(generateAdapter = true)
 data class ScheduledDto(
     val doctorName: String,
-    val doctorSpecialization: String,
+    val doctorSpecializationId: Int,
     val appointment: Appointment
 ) {
     fun toScheduled(): Scheduled {
         return Scheduled(
             doctorName = doctorName,
-            doctorSpecialization = doctorSpecialization,
+            doctorSpecializationId = doctorSpecializationId,
             appointment = appointment
         )
     }

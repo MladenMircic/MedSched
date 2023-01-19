@@ -91,4 +91,24 @@
     <string name="info_update_success">Info update successful</string>
     <string name="info_update_failure">Info update failed</string>
     <string name="logout">Logout</string>
+
+    <!-- Clinic general names -->
+
+    <!-- Categories -->
+    <string name="category_brain">Brain</string>
+    <string name="category_glands">Glands</string>
+    <string name="category_heart">Heart</string>
+    <string name="category_kidneys">Kidneys</string>
+    <string name="category_stomach">Stomach</string>
+
+    <!-- Specializations -->
+    <string name="spec_gastroenterologist">Gastroenterologist</string>
+    
+    <!-- Services -->
+    <string name="service_all">All</string>
+    <string name="service_specialist">Specialist exam</string>
+    <string name="service_abdominal_ultrasound">Abdominal ultrasound</string>
+    <string name="service_gastroscopy">Gastroscopy</string>
+    <string name="service_colonoscopy">Colonoscopy</string>
+    <string name="service_heart_ultrasound">Heart ultrasound</string>
 </resources>

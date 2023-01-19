@@ -19,6 +19,7 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
@@ -34,7 +35,8 @@ class PatientHomeViewModel @Inject constructor(
     private val getDoctorsUseCase: GetDoctorsUseCase,
     private val getScheduledAppointmentsUseCase: GetScheduledAppointmentsUseCase,
     private val getServicesForDoctorUseCase: GetServicesForDoctorUseCase,
-    private val scheduleAppointmentUseCase: ScheduleAppointmentUseCase
+    private val scheduleAppointmentUseCase: ScheduleAppointmentUseCase,
+    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase
 ): ViewModel() {
 
     val userFlow = patientRepository.user
@@ -62,8 +64,8 @@ class PatientHomeViewModel @Inject constructor(
             is PatientEvent.SearchForDoctor -> {
 
             }
-            is PatientEvent.SetAppointmentExamName -> {
-                _appointmentState.update { it.copy(currentExamName = patientEvent.name) }
+            is PatientEvent.SetAppointmentExamNameId -> {
+                _appointmentState.update { it.copy(currentExamNameId = patientEvent.nameId) }
             }
             is PatientEvent.SetAppointmentDate -> {
                 _appointmentState.update {
@@ -90,69 +92,8 @@ class PatientHomeViewModel @Inject constructor(
         }
     }
 
-    private fun getAllServices() = viewModelScope.launch {
-        val response = getServicesUseCase()
-
-        response.collect { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    resource.data.let {
-                        _patientState.update { patientState ->
-                            patientState.copy(categoryList = resource.data!!.toMutableList().also {
-                                it.add(0, Category(name = "All"))
-                            })
-                        }
-                    }
-                    for (service in resource.data!!) {
-                        service.imageRequest = withContext(Dispatchers.IO) {
-                            imageRequestUseCase("/services/${service.name}.png")
-                        }
-                    }
-                }
-                is Resource.Error -> {
-
-                }
-                is Resource.Loading -> {
-
-                }
-            }
-        }
-    }
-
     fun getSelectedDoctor(): DoctorForPatient =
         _patientState.value.doctorList[_patientState.value.selectedDoctor ?: 0]
-
-    fun getDoctors() = viewModelScope.launch {
-        val patientState = _patientState.value
-        val serviceCategory: String = if (patientState.selectedService != null)
-            patientState.categoryList[patientState.selectedService].name
-        else ""
-        val response = getDoctorsUseCase(serviceCategory)
-
-        response.collect { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    for (doctor in resource.data!!) {
-                        doctor.imageRequest = withContext(Dispatchers.IO) {
-                            imageRequestUseCase("/doctors/Doctor.png")
-                        }
-                    }
-                    _patientState.update {
-                        it.copy(
-                            doctorList = resource.data,
-                            doctorsLoading = false
-                        )
-                    }
-                }
-                is Resource.Error -> {
-
-                }
-                is Resource.Loading -> {
-                    _patientState.update { it.copy(doctorsLoading = true) }
-                }
-            }
-        }
-    }
 
     fun fetchScheduledAppointments() = viewModelScope.launch {
         val response = getScheduledAppointmentsUseCase(
@@ -198,13 +139,83 @@ class PatientHomeViewModel @Inject constructor(
                 _appointmentState.update { state ->
                     state.copy(
                         serviceList = serviceList,
-                        examNameList = serviceList.map { it.name },
-                        currentExamName = serviceList[0].name
+                        examNameIdList = serviceList.map {
+                            clinicIdToNameMapUseCase.serviceIdToNameId(it.id)
+                        },
+                        currentExamNameId = clinicIdToNameMapUseCase
+                            .serviceIdToNameId(serviceList[0].id)
                     )
                 }
             }
             is Resource.Error -> TODO()
             is Resource.Loading -> TODO()
+        }
+    }
+
+    fun categoryIdToNameId(categoryId: Int): Int? =
+        clinicIdToNameMapUseCase.categoryIdToNameId(categoryId)
+
+    fun specializationIdToNameId(specializationId: Int): Int =
+        clinicIdToNameMapUseCase.specializationIdToNameId(specializationId)
+
+    private fun getDoctors() = viewModelScope.launch {
+        val patientState = _patientState.value
+        val serviceCategory: String = if (patientState.selectedService != null)
+            "${patientState.categoryList[patientState.selectedService].id}"
+        else ""
+        val response = getDoctorsUseCase(serviceCategory)
+
+        response.collect { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    for (doctor in resource.data!!) {
+                        doctor.imageRequest = withContext(Dispatchers.IO) {
+                            imageRequestUseCase("/doctors/Doctor.png")
+                        }
+                    }
+                    _patientState.update {
+                        it.copy(
+                            doctorList = resource.data,
+                            doctorsLoading = false
+                        )
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+                is Resource.Loading -> {
+                    _patientState.update { it.copy(doctorsLoading = true) }
+                }
+            }
+        }
+    }
+
+    private fun getAllServices() = viewModelScope.launch {
+        val response = getServicesUseCase()
+
+        response.collect { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    resource.data.let {
+                        _patientState.update { patientState ->
+                            patientState.copy(categoryList = resource.data!!.toMutableList().also {
+                                it.add(0, Category(id = 0, name = "All"))
+                            })
+                        }
+                    }
+                    for (service in resource.data!!) {
+                        service.imageRequest = withContext(Dispatchers.IO) {
+                            imageRequestUseCase("/services/${service.name}.png")
+                        }
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+                is Resource.Loading -> {
+
+                }
+            }
         }
     }
 
@@ -217,7 +228,9 @@ class PatientHomeViewModel @Inject constructor(
                 time = selectedTime,
                 doctorId = getSelectedDoctor().id,
                 patientId = user!!.id,
-                examName = appointmentInfo.currentExamName
+                examId = appointmentInfo.serviceList[
+                        appointmentInfo.examNameIdList.indexOf(appointmentInfo.currentExamNameId)
+                ].id
             ))
 
             response.collect { resource ->

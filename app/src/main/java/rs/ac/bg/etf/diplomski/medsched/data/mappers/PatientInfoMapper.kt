@@ -30,7 +30,7 @@ class PatientInfoMapper @Inject constructor() {
             time = appointment.time,
             doctorId = appointment.doctorId,
             patientId = appointment.patientId,
-            examName = appointment.examName
+            examId = appointment.examId
         )
     }
 
