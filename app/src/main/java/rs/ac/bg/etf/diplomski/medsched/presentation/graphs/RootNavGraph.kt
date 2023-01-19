@@ -1,6 +1,8 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.graphs
 
-import android.util.Log
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,10 +28,15 @@ fun RootNavigationGraph(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
+    val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+
+        }
+    }
+
     // If user has been auto logged out, and was not in the app
     // when he comes back to app switch to authentication screen
     LaunchedEffect(key1 = token) {
-        Log.d("TESTIRANJE", "$token")
         token?.let {
             if (currentDestination?.hierarchy?.any { it.route == Graph.AUTHENTICATION } == false
                 && token == "") {

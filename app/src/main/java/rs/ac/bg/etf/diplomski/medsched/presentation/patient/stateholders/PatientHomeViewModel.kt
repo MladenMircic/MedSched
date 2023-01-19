@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.patient
+package rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +15,7 @@ import kotlinx.datetime.LocalTime
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
@@ -53,6 +54,7 @@ class PatientHomeViewModel @Inject constructor(
         when (patientEvent) {
             is PatientEvent.SelectService -> {
                 _patientState.update { it.copy(selectedService = patientEvent.index) }
+                getDoctors()
             }
             is PatientEvent.SearchTextChange -> {
                 _patientState.update { it.copy(searchKeyWord = patientEvent.text) }
@@ -95,7 +97,11 @@ class PatientHomeViewModel @Inject constructor(
             when (resource) {
                 is Resource.Success -> {
                     resource.data.let {
-                        _patientState.update { it.copy(categoryList = resource.data!!) }
+                        _patientState.update { patientState ->
+                            patientState.copy(categoryList = resource.data!!.toMutableList().also {
+                                it.add(0, Category(name = "All"))
+                            })
+                        }
                     }
                     for (service in resource.data!!) {
                         service.imageRequest = withContext(Dispatchers.IO) {

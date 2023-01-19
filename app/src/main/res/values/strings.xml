@@ -84,9 +84,11 @@
     <string name="confirm">Confirm</string>
 
     <!-- Patient profile messages -->
-    <string name="email_update_success">Email update success</string>
+    <string name="email_update_success">Email update successful</string>
     <string name="email_update_failure">Email update failed</string>
-    <string name="password_update_success">Password update success</string>
-    <string name="password_update_failure">Password update failure</string>
+    <string name="password_update_success">Password update successful</string>
+    <string name="password_update_failure">Password update failed</string>
+    <string name="info_update_success">Info update successful</string>
+    <string name="info_update_failure">Info update failed</string>
     <string name="logout">Logout</string>
 </resources>

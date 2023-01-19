@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,21 +33,25 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.SubcomposeAsyncImage
+import coil.compose.*
+import coil.imageLoader
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
+import rs.ac.bg.etf.diplomski.medsched.commons.Constants.SERVICE_ICONS_URL
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.HorizontalDotLoader
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -263,7 +269,7 @@ fun CategoriesList(
     patientState: PatientState,
     onCategorySelected: (Int) -> Unit
 ) {
-
+    val context = LocalContext.current
     val rememberLazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
@@ -306,21 +312,36 @@ fun CategoriesList(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    SubcomposeAsyncImage(
-                        model = service.imageRequest,
-                        contentDescription = "Service icon",
-                        loading = {
-                            CircularProgressIndicator(color = Color.Black)
-                        },
-                        colorFilter = ColorFilter.tint(
-                            color = if (patientState.selectedService == index)
-                                Color.White
-                            else Color.Black
-                        ),
-                        modifier = Modifier
-                            .size(CARD_IMAGE_SIZE)
-                            .padding(bottom = 10.dp)
-                    )
+                    if (service.name == "All") {
+                        Image(
+                            painter = painterResource(id = R.drawable.all_organs),
+                            contentDescription = "Service icon",
+                            colorFilter = ColorFilter.tint(
+                                color = if (patientState.selectedService == index)
+                                    Color.White
+                                else Color.Black
+                            ),
+                            modifier = Modifier
+                                .size(CARD_IMAGE_SIZE)
+                                .padding(bottom = 10.dp)
+                        )
+                    } else {
+                        SubcomposeAsyncImage(
+                            model = service.imageRequest,
+                            contentDescription = "Service icon",
+                            loading = {
+                                CircularProgressIndicator(color = Color.Black)
+                            },
+                            colorFilter = ColorFilter.tint(
+                                color = if (patientState.selectedService == index)
+                                    Color.White
+                                else Color.Black
+                            ),
+                            modifier = Modifier
+                                .size(CARD_IMAGE_SIZE)
+                                .padding(bottom = 10.dp)
+                        )
+                    }
                     Text(
                         text = service.name,
                         fontFamily = Quicksand,
@@ -394,6 +415,12 @@ fun DoctorsList(
                                 fontFamily = Quicksand,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
+                                color = MaterialTheme.colors.textOnSecondary
+                            )
+                            Text(
+                                text = doctor.specialization,
+                                fontFamily = Quicksand,
+                                fontSize = 16.sp,
                                 color = MaterialTheme.colors.textOnSecondary
                             )
                         }

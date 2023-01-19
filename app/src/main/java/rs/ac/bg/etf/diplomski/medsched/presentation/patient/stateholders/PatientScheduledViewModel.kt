@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.presentation.patient
+package rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

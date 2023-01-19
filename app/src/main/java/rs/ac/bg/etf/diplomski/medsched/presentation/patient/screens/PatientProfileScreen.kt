@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientProfileViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
 @OptIn(ExperimentalAnimationApi::class)

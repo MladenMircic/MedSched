@@ -1,10 +1,10 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,8 +39,8 @@ object PatientHome: BottomBarNavDestination {
 object PatientScheduled: BottomBarNavDestination {
     override val title: Int = R.string.navbar_scheduled
     override val route: String = "patient_scheduled"
-    override val imageUnselected: ImageVector = Icons.Outlined.CalendarToday
-    override val imageSelected: ImageVector = Icons.Filled.CalendarToday
+    override val imageUnselected: ImageVector = Icons.Outlined.CalendarMonth
+    override val imageSelected: ImageVector = Icons.Filled.CalendarMonth
 }
 
 object PatientInfo: BottomBarNavDestination {

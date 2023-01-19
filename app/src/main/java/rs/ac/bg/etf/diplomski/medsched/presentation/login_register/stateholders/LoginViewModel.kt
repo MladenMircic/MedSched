@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.FormValidation
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ValidateUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication.LoginAuthUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.events.LoginEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.states.LoginState
@@ -44,8 +44,8 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun validateLoginForm(): Boolean {
-        val emailResult = FormValidation().validate(_loginState.value.email)
-        val passwordResult = FormValidation().validate(_loginState.value.password)
+        val emailResult = ValidateUseCase().validate(_loginState.value.email)
+        val passwordResult = ValidateUseCase().validate(_loginState.value.password)
         val hasError = listOf(
             emailResult,
             passwordResult

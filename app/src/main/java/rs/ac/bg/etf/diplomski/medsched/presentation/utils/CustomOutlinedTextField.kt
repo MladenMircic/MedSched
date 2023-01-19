@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
+import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Quicksand
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.RoundedShape20
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textFieldText
 
@@ -93,6 +94,7 @@ fun CustomOutlinedTextField(
             Text(
                 text = errorMessage,
                 color = MaterialTheme.colors.error,
+                fontFamily = Quicksand,
                 modifier = modifier
                     .padding(start = 8.dp)
                     .offset(y = (-8).dp)

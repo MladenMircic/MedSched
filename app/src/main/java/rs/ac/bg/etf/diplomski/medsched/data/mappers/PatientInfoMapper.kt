@@ -3,10 +3,12 @@ package rs.ac.bg.etf.diplomski.medsched.data.mappers
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.EmailChangeRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.InfoChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.PasswordChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.InfoChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.PasswordChangeRequest
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,6 +48,15 @@ class PatientInfoMapper @Inject constructor() {
         return PasswordChangeRequestDto(
             oldPassword = passwordChangeRequest.oldPassword,
             newPassword = passwordChangeRequest.newPassword
+        )
+    }
+
+    fun toInfoChangeRequestDto(infoChangeRequest: InfoChangeRequest): InfoChangeRequestDto {
+        return InfoChangeRequestDto(
+            firstName = infoChangeRequest.firstName,
+            lastName = infoChangeRequest.lastName,
+            phone = infoChangeRequest.phone,
+            ssn = infoChangeRequest.ssn
         )
     }
 }

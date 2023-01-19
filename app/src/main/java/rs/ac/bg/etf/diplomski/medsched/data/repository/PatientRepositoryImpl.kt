@@ -11,6 +11,7 @@ import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.InfoChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.PasswordChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.response.PasswordChangeResponse
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
@@ -68,5 +69,9 @@ class PatientRepositoryImpl @Inject constructor(
         patientApi.updatePassword(
             patientInfoMapper.toPasswordChangeRequestDto(passwordChangeRequest)
         ).toPasswordChangeResponse()
+
+    override suspend fun updateInfo(infoChangeRequest: InfoChangeRequest) {
+        patientApi.updateInfo(patientInfoMapper.toInfoChangeRequestDto(infoChangeRequest))
+    }
 
 }

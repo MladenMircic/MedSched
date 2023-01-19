@@ -3,7 +3,8 @@ package rs.ac.bg.etf.diplomski.medsched.domain.use_case
 import android.util.Patterns
 import rs.ac.bg.etf.diplomski.medsched.R
 
-open class FormValidation {
+open class ValidateUseCase {
+
     open fun validate(text: String): ValidationResult {
         if (text.isBlank()) {
             return ValidationResult(
@@ -15,7 +16,7 @@ open class FormValidation {
     }
 }
 
-object EmailValidation: FormValidation() {
+object EmailValidation: ValidateUseCase() {
 
     override fun validate(text: String): ValidationResult {
         val isBlankValidation = super.validate(text)
@@ -31,7 +32,7 @@ object EmailValidation: FormValidation() {
     }
 }
 
-object PasswordValidation: FormValidation() {
+object PasswordValidation: ValidateUseCase() {
 
     override fun validate(text: String): ValidationResult {
         val isBlankValidation = super.validate(text)
@@ -49,7 +50,7 @@ object PasswordValidation: FormValidation() {
     }
 }
 
-object ConfirmPasswordEqualsValidation: FormValidation() {
+object ConfirmPasswordEqualsValidation: ValidateUseCase() {
 
     fun validate(text: String, compareText: String): ValidationResult {
         val isBlankValidation = super.validate(text)
@@ -65,7 +66,7 @@ object ConfirmPasswordEqualsValidation: FormValidation() {
     }
 }
 
-object PhoneValidation: FormValidation() {
+object PhoneValidation: ValidateUseCase() {
 
     override fun validate(text: String): ValidationResult {
         val isBlankValidation = super.validate(text)
@@ -81,13 +82,13 @@ object PhoneValidation: FormValidation() {
     }
 }
 
-object LBOValidation: FormValidation() {
+object SSNValidation: ValidateUseCase() {
 
     override fun validate(text: String): ValidationResult {
         val isBlankValidation = super.validate(text)
         if (!isBlankValidation.success) return isBlankValidation
 
-        if (!text.all { it.isDigit() } && text.length != 11) {
+        if (!text.all { it.isDigit() } || text.length < 9) {
             return ValidationResult(
                 success = false,
                 errorId = R.string.ssn_error

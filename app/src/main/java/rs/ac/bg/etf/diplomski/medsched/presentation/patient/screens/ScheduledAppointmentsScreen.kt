@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -23,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -34,7 +34,7 @@ import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.delay
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Scheduled
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientScheduledViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientScheduledViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.PulseRefreshLoading
@@ -86,7 +86,7 @@ fun ScheduledAppointmentsScreen(
         refreshThreshold = trigger
     )
     val animatedOffset by animateIntAsState(
-        targetValue = if (scheduledState.isRefreshing || pullState.progress * triggerPx >= triggerPx)
+        targetValue = if (scheduledState.isRefreshing || pullState.progress >= 1f)
             triggerPx.roundToInt()
         else (pullState.progress * triggerPx).roundToInt(),
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
@@ -289,10 +289,9 @@ fun ScheduledAppointmentCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.calendar_month),
+                                imageVector = Icons.Filled.CalendarMonth,
                                 contentDescription = "Calendar icon",
-                                tint = Color.Black,
-                                modifier = Modifier.size(25.dp)
+                                tint = Color.Black
                             )
                             Spacer(modifier = Modifier.padding(start = 4.dp))
                             Text(
@@ -310,8 +309,7 @@ fun ScheduledAppointmentCard(
                             Icon(
                                 imageVector = Icons.Filled.Schedule,
                                 contentDescription = "Time icon",
-                                tint = Color.Black,
-                                modifier = Modifier.size(25.dp)
+                                tint = Color.Black
                             )
                             Spacer(modifier = Modifier.padding(start = 4.dp))
                             Text(

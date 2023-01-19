@@ -44,8 +44,8 @@ import rs.ac.bg.etf.diplomski.medsched.commons.BOOK_APPOINTMENT_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.commons.DOCTOR_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import java.time.format.TextStyle
 import java.util.*

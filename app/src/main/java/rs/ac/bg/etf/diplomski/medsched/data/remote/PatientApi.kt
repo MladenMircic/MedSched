@@ -5,6 +5,7 @@ import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.EmailChangeRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.InfoChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.PasswordChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.*
 
@@ -40,4 +41,9 @@ interface PatientApi {
     suspend fun updatePassword(
         @Body passwordChangeRequestDto: PasswordChangeRequestDto
     ) : PasswordChangeResponseDto
+
+    @POST("/${Constants.PATIENT_ENDPOINTS}/updateInfo")
+    suspend fun updateInfo(
+        @Body infoChangeRequestDto: InfoChangeRequestDto
+    )
 }

@@ -84,9 +84,11 @@
     <string name="confirm">Potvrdi</string>
 
     <!-- Patient profile messages -->
-    <string name="email_update_success">Email update success</string>
-    <string name="email_update_failure">Email update failed</string>
-    <string name="password_update_success">Password update success</string>
-    <string name="password_update_failure">Password update failure</string>
+    <string name="email_update_success">Email je uspešno ažuriran</string>
+    <string name="email_update_failure">Greška prilikom ažuriranja email-a</string>
+    <string name="password_update_success">Lozinka je uspešno ažurirana</string>
+    <string name="password_update_failure">Greška prilikom ažuriranja lozinke</string>
+    <string name="info_update_success">Podaci o pacijentu su uspešno ažurirani</string>
+    <string name="info_update_failure">Greška prilikom ažuriranja podataka o pacijentu</string>
     <string name="logout">Izlogujte se</string>
 </resources>

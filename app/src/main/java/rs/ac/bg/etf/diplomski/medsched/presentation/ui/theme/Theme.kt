@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
     primary = BackgroundPrimaryDark,
@@ -39,7 +40,10 @@ fun MedSchedTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
     MaterialTheme(
         colors = colors,
         typography = Typography,
-        shapes = Shapes,
-        content = content
-    )
+        shapes = Shapes
+    ) {
+        val systemUiController = rememberSystemUiController()
+        systemUiController.setStatusBarColor(color = MaterialTheme.colors.secondary)
+        content()
+    }
 }

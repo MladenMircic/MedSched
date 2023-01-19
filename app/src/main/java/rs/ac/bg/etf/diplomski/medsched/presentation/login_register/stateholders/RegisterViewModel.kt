@@ -59,14 +59,14 @@ class RegisterViewModel @Inject constructor(
     private fun validateRegisterForm(): Boolean {
         val stateVal = _registerState.value
         val emailResult = EmailValidation.validate(stateVal.email)
-        val firstNameResult = FormValidation().validate(stateVal.firstName)
-        val lastNameResult = FormValidation().validate(stateVal.lastName)
+        val firstNameResult = ValidateUseCase().validate(stateVal.firstName)
+        val lastNameResult = ValidateUseCase().validate(stateVal.lastName)
         val passwordResult = PasswordValidation.validate(stateVal.password)
         val confirmPasswordResult = ConfirmPasswordEqualsValidation.validate(
             stateVal.confirmPassword, stateVal.password
         )
         val phoneResult = PhoneValidation.validate(stateVal.phone)
-        val ssnResult = LBOValidation.validate(stateVal.ssn)
+        val ssnResult = SSNValidation.validate(stateVal.ssn)
 
         val hasError = listOf(
             emailResult,
