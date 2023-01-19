@@ -1,6 +1,5 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -18,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,16 +35,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.*
-import coil.imageLoader
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
-import rs.ac.bg.etf.diplomski.medsched.commons.Constants.SERVICE_ICONS_URL
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
@@ -51,10 +49,9 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
-import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.HorizontalDotLoader
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun PatientHomeScreen(
     patientHomeViewModel: PatientHomeViewModel = hiltViewModel(),
@@ -62,6 +59,7 @@ fun PatientHomeScreen(
 ) {
     val doctorDetailsNavController = rememberAnimatedNavController()
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     AnimatedNavHost(
         navController = doctorDetailsNavController,
@@ -76,6 +74,10 @@ fun PatientHomeScreen(
                 patientHomeViewModel = patientHomeViewModel,
                 navigateToDoctorDetails = {
                     doctorDetailsNavController.navigate(DoctorDetails.route)
+                },
+                searchDoctors = {
+                    keyboardController?.hide()
+                    patientHomeViewModel.onEvent(PatientEvent.SearchForDoctor)
                 },
                 toggleBottomBar = toggleBottomBar
             )
@@ -105,6 +107,7 @@ fun PatientHomeScreen(
 fun PatientStart(
     patientHomeViewModel: PatientHomeViewModel,
     navigateToDoctorDetails: () -> Unit,
+    searchDoctors: () -> Unit,
     toggleBottomBar: () -> Unit
 ) {
     val user by patientHomeViewModel.userFlow.collectAsState(initial = null)
@@ -195,9 +198,7 @@ fun PatientStart(
                             imeAction = ImeAction.Search
                         ),
                         keyboardActions = KeyboardActions(
-                            onSearch = {
-                                // TODO implement doctor search
-                            }
+                            onSearch = { searchDoctors() }
                         ),
                         colors = defaultButtonColors(),
                         modifier = Modifier
@@ -205,7 +206,7 @@ fun PatientStart(
                             .height(60.dp)
                     )
                     Button(
-                        onClick = {},
+                        onClick = searchDoctors,
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.textFieldOutline
                         ),
@@ -383,7 +384,7 @@ fun DoctorsList(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            itemsIndexed(patientState.doctorList) { index, doctor ->
+            itemsIndexed(patientState.currentDoctorList) { index, doctor ->
                 Card(
                     shape = RoundedShape20,
                     backgroundColor = MaterialTheme.colors.secondary,

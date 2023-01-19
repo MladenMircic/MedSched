@@ -49,20 +49,31 @@ class PatientHomeViewModel @Inject constructor(
 
     init {
         getAllServices()
-        getDoctors()
+        getDoctorsForPatient()
     }
 
     fun onEvent(patientEvent: PatientEvent) {
         when (patientEvent) {
             is PatientEvent.SelectService -> {
                 _patientState.update { it.copy(selectedService = patientEvent.index) }
-                getDoctors()
+                getDoctorsForPatient()
             }
             is PatientEvent.SearchTextChange -> {
                 _patientState.update { it.copy(searchKeyWord = patientEvent.text) }
             }
             is PatientEvent.SearchForDoctor -> {
-
+                _patientState.update { it.copy(doctorsLoading = true) }
+                val patientState = _patientState.value
+                val allDoctorList = patientState.allDoctorList
+                _patientState.update {
+                    it.copy(
+                        currentDoctorList = allDoctorList.filter { doctor ->
+                            "${doctor.firstName} ${doctor.lastName}"
+                                .contains(patientState.searchKeyWord, ignoreCase = true)
+                        },
+                        doctorsLoading = false
+                    )
+                }
             }
             is PatientEvent.SetAppointmentExamNameId -> {
                 _appointmentState.update { it.copy(currentExamNameId = patientEvent.nameId) }
@@ -93,7 +104,7 @@ class PatientHomeViewModel @Inject constructor(
     }
 
     fun getSelectedDoctor(): DoctorForPatient =
-        _patientState.value.doctorList[_patientState.value.selectedDoctor ?: 0]
+        _patientState.value.allDoctorList[_patientState.value.selectedDoctor ?: 0]
 
     fun fetchScheduledAppointments() = viewModelScope.launch {
         val response = getScheduledAppointmentsUseCase(
@@ -158,7 +169,7 @@ class PatientHomeViewModel @Inject constructor(
     fun specializationIdToNameId(specializationId: Int): Int =
         clinicIdToNameMapUseCase.specializationIdToNameId(specializationId)
 
-    private fun getDoctors() = viewModelScope.launch {
+    private fun getDoctorsForPatient() = viewModelScope.launch {
         val patientState = _patientState.value
         val serviceCategory: String = if (patientState.selectedService != null)
             "${patientState.categoryList[patientState.selectedService].id}"
@@ -175,7 +186,8 @@ class PatientHomeViewModel @Inject constructor(
                     }
                     _patientState.update {
                         it.copy(
-                            doctorList = resource.data,
+                            allDoctorList = resource.data,
+                            currentDoctorList = resource.data,
                             doctorsLoading = false
                         )
                     }
