@@ -6,6 +6,7 @@ import okio.IOException
 import retrofit2.HttpException
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Scheduled
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Inject
@@ -23,4 +24,7 @@ class GetAllScheduledUseCase @Inject constructor(
             emit(Resource.Error(R.string.no_connection))
         }
     }
+
+    suspend fun fetchScheduledAppointments(): List<Appointment> =
+        patientRepository.getAllScheduled().map { it.appointment }
 }

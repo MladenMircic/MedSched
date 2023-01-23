@@ -11,6 +11,7 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.response.PasswordChangeRespo
 interface PatientRepository {
 
     val user: Flow<User?>
+    val appointments: Flow<List<Appointment>?>
 
     suspend fun getAllScheduled(): List<Scheduled>
     suspend fun getAllServices(): List<Category>

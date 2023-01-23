@@ -111,4 +111,14 @@
     <string name="service_gastroscopy">Gastroscopy</string>
     <string name="service_colonoscopy">Colonoscopy</string>
     <string name="service_heart_ultrasound">Heart ultrasound</string>
+
+    <!-- Dialog text -->
+    <string name="confirm_dialog_title">Confirm dialog</string>
+    <string name="confirm_dialog_text">Are you sure you want to delete this appointment?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Notification data -->
+    <string name="cancelled_appointments_title">Cancelled appointments</string>
+    <string name="cancelled_appointments_text">You have cancelled appointments</string>
 </resources>

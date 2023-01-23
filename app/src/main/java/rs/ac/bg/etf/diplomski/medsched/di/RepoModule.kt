@@ -18,8 +18,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
-import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.LocalDateAdapter
-import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.LocalTimeAdapter
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper
@@ -27,6 +25,8 @@ import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
 import rs.ac.bg.etf.diplomski.medsched.data.repository.LoginRegisterRepositoryImpl
 import rs.ac.bg.etf.diplomski.medsched.data.repository.PatientRepositoryImpl
+import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.LocalDateAdapter
+import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.LocalTimeAdapter
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.LoginRegisterRepository
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
@@ -63,7 +63,8 @@ object RepoModule {
             ),
             migrations = listOf(
                 SharedPreferencesMigration(context, PreferenceKeys.USER_TOKEN_PREFERENCE),
-                SharedPreferencesMigration(context, PreferenceKeys.USER_INFO_PREFERENCE)
+                SharedPreferencesMigration(context, PreferenceKeys.USER_INFO_PREFERENCE),
+                SharedPreferencesMigration(context, PreferenceKeys.APPOINTMENT_FETCH_PREFERENCE)
             ),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
             produceFile = {

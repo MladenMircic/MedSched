@@ -6,8 +6,10 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
+import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys.Companion.APPOINTMENT_FETCH_KEY
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
+import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.toList
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
@@ -30,6 +32,11 @@ class PatientRepositoryImpl @Inject constructor(
         moshi.adapter(User::class.java).fromJson(
             preferences[PreferenceKeys.USER_INFO_KEY] ?: ""
         )
+    }
+
+    override val appointments: Flow<List<Appointment>?> = dataStore.data.map { preferences ->
+        val appointmentJsonList = preferences[APPOINTMENT_FETCH_KEY] ?: "[]"
+        moshi.toList(appointmentJsonList)
     }
 
     override suspend fun getAllScheduled(): List<Scheduled> =

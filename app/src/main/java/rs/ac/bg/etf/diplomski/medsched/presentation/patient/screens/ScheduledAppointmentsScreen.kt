@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -111,7 +112,6 @@ fun ScheduledAppointmentsScreen(
     }
     LaunchedEffect(key1 = scheduledState.revealNew) {
         if (scheduledState.revealNew) {
-            delay(700L)
             fullyVisibleIndices.forEach { index ->
                 patientScheduledViewModel.triggerRevealForIndex(index)
                 delay(100L)
@@ -119,6 +119,9 @@ fun ScheduledAppointmentsScreen(
             patientScheduledViewModel.setRevealNew(false)
         }
     }
+
+    var confirmDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var scheduleIndexToDelete by rememberSaveable { mutableStateOf(-1) }
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
@@ -157,7 +160,6 @@ fun ScheduledAppointmentsScreen(
                         LazyColumn(
                             state = lazyListState,
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
                             contentPadding = PaddingValues(vertical = 20.dp),
                             modifier = Modifier
                                 .fillMaxSize()
@@ -166,37 +168,103 @@ fun ScheduledAppointmentsScreen(
                                 scheduledState.scheduledList,
                                 key = { index, _ -> index }
                             ) { index, scheduled ->
-                                ScheduledAppointmentCard(
-                                    scheduledAppointment = scheduled,
-                                    waitForDelete = scheduledState.deletingIndex == index,
-                                    toDelete = scheduledState.lastDeleted == index,
-                                    revealed = scheduledState.alreadyRevealed[index],
-                                    toggleRevealItem = {
-                                        patientScheduledViewModel.toggleRevealed(index)
-                                    },
-                                    onCancelAppointment = {
-                                        patientScheduledViewModel.cancelAppointment(
-                                            deleteIndex = index,
-                                            appointmentId = scheduled.appointment.id
-                                        )
-                                    },
-                                    onDeleteAppointment = {
-                                        patientScheduledViewModel.deleteCancelledAppointment()
-                                    },
-                                    getDoctorSpecializationId =
-                                        patientScheduledViewModel::specializationIdToNameId,
-                                    modifier = Modifier.animateItemPlacement(
+                                AnimatedVisibility(
+                                    visible = !scheduledState.deletedList.contains(scheduled),
+                                    exit = shrinkVertically(
                                         animationSpec = tween(
-                                            durationMillis = 500
-                                        )
+                                            durationMillis = 300,
+                                            easing = EaseOutCubic
+                                        ),
+                                        shrinkTowards = Alignment.Top
                                     )
-                                )
+                                ) {
+                                    ScheduledAppointmentCard(
+                                        scheduledAppointment = scheduled,
+                                        waitForDelete = scheduledState.scheduleIndexToDelete == index,
+                                        toDelete = scheduledState.lastDeleted == index,
+                                        revealed = scheduledState.alreadyRevealed[index],
+                                        toggleRevealItem = {
+                                            patientScheduledViewModel.toggleRevealed(index)
+                                        },
+                                        onCancelAppointment = {
+                                            scheduleIndexToDelete = index
+                                            confirmDialogOpen = true
+                                        },
+                                        onDeleteAppointment = {
+                                            patientScheduledViewModel
+                                                .markAppointmentDeleted(scheduled)
+                                        },
+                                        getDoctorSpecializationId =
+                                            patientScheduledViewModel::specializationIdToNameId,
+                                        modifier = Modifier
+                                            .padding(top = 4.dp)
+                                            .animateItemPlacement(
+                                                animationSpec = tween(
+                                                    durationMillis = 500
+                                                )
+                                            )
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    if (confirmDialogOpen) {
+        AlertDialog(
+            onDismissRequest = {
+                confirmDialogOpen = false
+            },
+            title = {
+                Text(
+                    text = stringResource(id = R.string.confirm_dialog_title),
+                    fontFamily = Quicksand,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.textOnPrimary
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.confirm_dialog_text),
+                    fontFamily = Quicksand,
+                    color = MaterialTheme.colors.textOnPrimary
+                )
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDialogOpen = false }) {
+                    Text(
+                        text = stringResource(id = R.string.no),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colors.selectable
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmDialogOpen = false
+                        patientScheduledViewModel.cancelAppointment(
+                            deleteIndex = scheduleIndexToDelete
+                        )
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.yes),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colors.selectable
+                    )
+                }
+            },
+            shape = RoundedCornerShape(10.dp),
+            backgroundColor = MaterialTheme.colors.primary
+        )
     }
 }
 
@@ -215,7 +283,7 @@ fun ScheduledAppointmentCard(
     LaunchedEffect(toDelete) {
         if (toDelete) {
             toggleRevealItem()
-            delay(500L)
+            delay(400L)
             onDeleteAppointment()
         }
     }
@@ -242,7 +310,7 @@ fun ScheduledAppointmentCard(
                     durationMillis = 500,
                     easing = EaseOut
                 ),
-                targetOffsetX = { it }
+                targetOffsetX = { it / 2 }
             )
         ) {
             Card(
@@ -263,9 +331,11 @@ fun ScheduledAppointmentCard(
                                 color = Color.Black
                             )
                             Text(
-                                text = stringResource(id = getDoctorSpecializationId(
-                                    scheduledAppointment.doctorSpecializationId
-                                )),
+                                text = stringResource(
+                                    id = getDoctorSpecializationId(
+                                        scheduledAppointment.doctorSpecializationId
+                                    )
+                                ),
                                 fontFamily = Quicksand,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 16.sp,

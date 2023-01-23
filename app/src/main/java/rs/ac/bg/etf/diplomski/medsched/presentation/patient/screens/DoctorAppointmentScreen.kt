@@ -35,7 +35,11 @@ import io.github.boguszpawlowski.composecalendar.rememberSelectableCalendarState
 import io.github.boguszpawlowski.composecalendar.selection.DynamicSelectionState
 import io.github.boguszpawlowski.composecalendar.selection.SelectionMode
 import io.github.boguszpawlowski.composecalendar.selection.SelectionState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
@@ -63,6 +67,10 @@ fun DoctorAppointmentScreen(
     var showScreen by rememberSaveable { mutableStateOf(false) }
     var examNameDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
+    val coroutineScope = rememberCoroutineScope()
+    var snackBarJob by remember { mutableStateOf<Job?>(null) }
+    val mutex by remember { mutableStateOf(Mutex()) }
+
     LaunchedEffect(true) {
         patientHomeViewModel.fetchServicesForDoctor()
         patientHomeViewModel.fetchScheduledAppointments()
@@ -73,9 +81,18 @@ fun DoctorAppointmentScreen(
     val scaffoldState = rememberScaffoldState()
     LaunchedEffect(key1 = appointmentState.scheduledMessageId) {
         appointmentState.scheduledMessageId?.let {
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = context.getString(it)
-            )
+            coroutineScope.launch {
+                mutex.withLock {
+                    snackBarJob = coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = context.getString(it),
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }
+                    delay(1200L)
+                    snackBarJob!!.cancel()
+                }
+            }
             patientHomeViewModel.onEvent(PatientEvent.SetScheduleMessageNull)
         }
     }
@@ -331,6 +348,7 @@ fun DoctorAppointmentScreen(
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.selectable
                                 ),
+                                enabled = appointmentState.selectedTime != -1,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(BOOK_APPOINTMENT_BUTTON_HEIGHT),
@@ -354,6 +372,7 @@ fun DoctorAppointmentScreen(
 
         BackHandler(enabled = true) {
             showScreen = false
+            snackBarJob?.cancel()
             onBackPressed()
         }
     }
@@ -366,21 +385,32 @@ fun DoctorAppointmentScreen(
 fun BoxScope.DayContent(
     dayState: KotlinDayState<DynamicSelectionState>,
 ) {
+    val selectable = dayState.date >= LocalDate.now()
     val isSelected = dayState.selectionState.isDateSelected(dayState.date)
-    Card(
-        backgroundColor = if (isSelected)
-            MaterialTheme.colors.selectable
-        else MaterialTheme.colors.calendarField,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(2.dp)
-            .clip(RoundedCornerShape(10.dp))
+    var modifier = Modifier
+        .fillMaxWidth()
+        .padding(2.dp)
+        .clip(RoundedCornerShape(10.dp))
+    if (selectable) {
+        modifier = modifier
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
                 dayState.selectionState.onDateSelected(dayState.date)
             }
+    }
+
+    val cardColor: Color = if (isSelected)
+        MaterialTheme.colors.selectable
+    else if (selectable)
+        MaterialTheme.colors.calendarField
+    else
+        MaterialTheme.colors.calendarField.copy(alpha = 0.4f)
+
+    Card(
+        backgroundColor = cardColor,
+        modifier = modifier
     ) {
         Text(
             text = dayState.date.dayOfMonth.toString(),
