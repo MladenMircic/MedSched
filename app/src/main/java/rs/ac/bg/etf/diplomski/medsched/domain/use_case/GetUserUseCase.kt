@@ -4,7 +4,7 @@ import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Inject
 
 class GetUserUseCase @Inject constructor(
-    private val patientRepository: PatientRepository
+    patientRepository: PatientRepository
 ) {
     val userFlow = patientRepository.user
 }

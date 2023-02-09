@@ -1,9 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.background
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.ListenableWorker
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,5 +35,22 @@ class BackgroundTaskDispatcher @Inject constructor(
                 .setInitialDelay(delay, timeUnit)
                 .build()
         ).enqueue()
+    }
+
+    inline fun <reified Worker: ListenableWorker> doPeriodicBackgroundTaskWithConstraints(
+        duration: Duration,
+        constraints: Constraints,
+        workName: String,
+        workPolicy: ExistingPeriodicWorkPolicy
+    ) {
+        val appointmentFetchWork = PeriodicWorkRequestBuilder<Worker>(duration)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            workName,
+            workPolicy,
+            appointmentFetchWork
+        )
     }
 }

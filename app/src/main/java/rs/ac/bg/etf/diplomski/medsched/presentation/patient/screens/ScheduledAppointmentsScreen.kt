@@ -34,7 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.delay
 import rs.ac.bg.etf.diplomski.medsched.R
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Scheduled
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentWithDoctor
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientScheduledViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
@@ -48,6 +48,11 @@ fun ScheduledAppointmentsScreen(
     patientScheduledViewModel: PatientScheduledViewModel = hiltViewModel()
 ) {
     val scheduledState by patientScheduledViewModel.scheduledState.collectAsState()
+    val appointmentWithDoctorList by patientScheduledViewModel.appointmentsWithDoctorFlow
+        .collectAsState(
+            initial = listOf()
+        )
+
     val lazyListState = rememberLazyListState()
     val fullyVisibleIndices: List<Int> by remember {
         derivedStateOf {
@@ -105,9 +110,11 @@ fun ScheduledAppointmentsScreen(
         }
     }
     LaunchedEffect(key1 = fullyVisibleIndices) {
-        fullyVisibleIndices.forEach { index ->
-            patientScheduledViewModel.triggerRevealForIndex(index)
-            delay(100L)
+        if (!scheduledState.isRefreshing) {
+            fullyVisibleIndices.forEach { index ->
+                patientScheduledViewModel.triggerRevealForIndex(index)
+                delay(100L)
+            }
         }
     }
     LaunchedEffect(key1 = scheduledState.revealNew) {
@@ -121,7 +128,7 @@ fun ScheduledAppointmentsScreen(
     }
 
     var confirmDialogOpen by rememberSaveable { mutableStateOf(false) }
-    var scheduleIndexToDelete by rememberSaveable { mutableStateOf(-1) }
+    var appointmentToDelete by remember { mutableStateOf<AppointmentWithDoctor?>(null) }
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
@@ -165,11 +172,11 @@ fun ScheduledAppointmentsScreen(
                                 .fillMaxSize()
                         ) {
                             itemsIndexed(
-                                scheduledState.scheduledList,
+                                appointmentWithDoctorList,
                                 key = { index, _ -> index }
-                            ) { index, scheduled ->
+                            ) { index, appointmentWithDoctor ->
                                 AnimatedVisibility(
-                                    visible = !scheduledState.deletedList.contains(scheduled),
+                                    visible = !scheduledState.deletedList.contains(appointmentWithDoctor),
                                     exit = shrinkVertically(
                                         animationSpec = tween(
                                             durationMillis = 300,
@@ -178,24 +185,33 @@ fun ScheduledAppointmentsScreen(
                                         shrinkTowards = Alignment.Top
                                     )
                                 ) {
+                                    patientScheduledViewModel
+                                        .fetchDoctorImageForAppointment(appointmentWithDoctor)
+
                                     ScheduledAppointmentCard(
-                                        scheduledAppointment = scheduled,
-                                        waitForDelete = scheduledState.scheduleIndexToDelete == index,
-                                        toDelete = scheduledState.lastDeleted == index,
-                                        revealed = scheduledState.alreadyRevealed[index],
+                                        appointmentWithDoctorAppointment = appointmentWithDoctor,
+                                        waitForDelete = scheduledState.appointmentToDelete ==
+                                                appointmentWithDoctor,
+                                        toDelete = scheduledState.lastAppointmentDeleted ==
+                                                appointmentWithDoctor,
+                                        revealed = if (scheduledState.alreadyRevealed.size > index)
+                                            scheduledState.alreadyRevealed[index]
+                                        else false,
                                         toggleRevealItem = {
                                             patientScheduledViewModel.toggleRevealed(index)
                                         },
                                         onCancelAppointment = {
-                                            scheduleIndexToDelete = index
+                                            appointmentToDelete = appointmentWithDoctor
                                             confirmDialogOpen = true
                                         },
                                         onDeleteAppointment = {
                                             patientScheduledViewModel
-                                                .markAppointmentDeleted(scheduled)
+                                                .markAppointmentDeleted(appointmentWithDoctor)
                                         },
                                         getDoctorSpecializationId =
                                             patientScheduledViewModel::specializationIdToNameId,
+                                        getServiceId =
+                                            patientScheduledViewModel::serviceIdToNameId,
                                         modifier = Modifier
                                             .padding(top = 4.dp)
                                             .animateItemPlacement(
@@ -249,7 +265,7 @@ fun ScheduledAppointmentsScreen(
                     onClick = {
                         confirmDialogOpen = false
                         patientScheduledViewModel.cancelAppointment(
-                            deleteIndex = scheduleIndexToDelete
+                            appointmentToDelete = appointmentToDelete!!
                         )
                     }
                 ) {
@@ -271,14 +287,15 @@ fun ScheduledAppointmentsScreen(
 @Composable
 fun ScheduledAppointmentCard(
     modifier: Modifier = Modifier,
-    scheduledAppointment: Scheduled,
+    appointmentWithDoctorAppointment: AppointmentWithDoctor,
     waitForDelete: Boolean,
     toDelete: Boolean,
     revealed: Boolean,
     toggleRevealItem: () -> Unit,
     onCancelAppointment: () -> Unit,
     onDeleteAppointment: () -> Unit,
-    getDoctorSpecializationId: (Int) -> Int
+    getDoctorSpecializationId: (Int) -> Int,
+    getServiceId: (Int) -> Int
 ) {
     LaunchedEffect(toDelete) {
         if (toDelete) {
@@ -316,7 +333,7 @@ fun ScheduledAppointmentCard(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(240.dp),
                 backgroundColor = Blue85,
                 shape = RoundedShape20
             ) {
@@ -324,7 +341,7 @@ fun ScheduledAppointmentCard(
                     Row(modifier = Modifier.padding(16.dp)) {
                         Column {
                             Text(
-                                text = scheduledAppointment.doctorName,
+                                text = appointmentWithDoctorAppointment.doctorName,
                                 fontFamily = Quicksand,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
@@ -333,7 +350,7 @@ fun ScheduledAppointmentCard(
                             Text(
                                 text = stringResource(
                                     id = getDoctorSpecializationId(
-                                        scheduledAppointment.doctorSpecializationId
+                                        appointmentWithDoctorAppointment.doctorSpecializationId
                                     )
                                 ),
                                 fontFamily = Quicksand,
@@ -344,7 +361,7 @@ fun ScheduledAppointmentCard(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         SubcomposeAsyncImage(
-                            model = scheduledAppointment.doctorImageRequest,
+                            model = appointmentWithDoctorAppointment.doctorImageRequest,
                             contentDescription = "Doctor image",
                             loading = {
                                 CircularProgressIndicator(color = Color.Black)
@@ -353,6 +370,15 @@ fun ScheduledAppointmentCard(
                                 .size(60.dp)
                         )
                     }
+                    Text(
+                        text = stringResource(
+                            id = getServiceId(appointmentWithDoctorAppointment.appointment.examId)
+                        ),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                     Divider(
                         color = Color.Black.copy(alpha = 0.3f),
                         thickness = 1.dp,
@@ -370,7 +396,7 @@ fun ScheduledAppointmentCard(
                             )
                             Spacer(modifier = Modifier.padding(start = 4.dp))
                             Text(
-                                text = scheduledAppointment.dateAsString(),
+                                text = appointmentWithDoctorAppointment.dateAsString(),
                                 fontFamily = Quicksand,
                                 fontSize = 16.sp,
                                 color = Color.Black
@@ -388,7 +414,7 @@ fun ScheduledAppointmentCard(
                             )
                             Spacer(modifier = Modifier.padding(start = 4.dp))
                             Text(
-                                text = scheduledAppointment.timeAsString(),
+                                text = appointmentWithDoctorAppointment.timeAsString(),
                                 fontFamily = Quicksand,
                                 fontSize = 16.sp,
                                 color = Color.Black

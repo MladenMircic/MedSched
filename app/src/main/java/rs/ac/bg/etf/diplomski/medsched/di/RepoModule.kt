@@ -19,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
+import rs.ac.bg.etf.diplomski.medsched.data.local.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
@@ -50,9 +51,10 @@ object RepoModule {
         dataStore: DataStore<Preferences>,
         moshi: Moshi,
         patientApi: PatientApi,
-        patientInfoMapper: PatientInfoMapper
+        patientInfoMapper: PatientInfoMapper,
+        patientDao: PatientDao
     ): PatientRepository =
-        PatientRepositoryImpl(dataStore, moshi, patientApi, patientInfoMapper)
+        PatientRepositoryImpl(dataStore, moshi, patientApi, patientInfoMapper, patientDao)
 
     @Singleton
     @Provides

@@ -5,76 +5,63 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Scheduled
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentWithDoctor
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.CancelAppointmentUseCase
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllScheduledUseCase
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.SaveAppointmentsUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllAppointmentsUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.ScheduledState
 import javax.inject.Inject
 
 @HiltViewModel
 class PatientScheduledViewModel @Inject constructor(
     private val imageRequestUseCase: ImageRequestUseCase,
-    private val getAllScheduledUseCase: GetAllScheduledUseCase,
+    private val getAllAppointmentsUseCase: GetAllAppointmentsUseCase,
     private val cancelAppointmentUseCase: CancelAppointmentUseCase,
     private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase,
-    private val saveAppointmentsUseCase: SaveAppointmentsUseCase
 ) : ViewModel() {
 
     private val _scheduledState = MutableStateFlow(ScheduledState())
     val scheduledState = _scheduledState.asStateFlow()
 
+    val appointmentsWithDoctorFlow: Flow<List<AppointmentWithDoctor>> =
+        getAllAppointmentsUseCase.appointmentWithDoctorFlow
+
     init {
-        getAppointments()
+        viewModelScope.launch {
+            appointmentsWithDoctorFlow.collectLatest { appointmentWithDoctorList ->
+                _scheduledState.update {
+                    it.copy(
+                        alreadyRevealed = appointmentWithDoctorList.map { false },
+                        deletedList = listOf(),
+                        isRefreshing = false,
+                        revealNew = true
+                    )
+                }
+            }
+        }
     }
 
     fun refreshAppointments() {
         _scheduledState.update {
             it.copy(
-                alreadyRevealed = it.alreadyRevealed.map { false }
+                alreadyRevealed = it.alreadyRevealed.map { false },
+                isRefreshing = true
             )
         }
-        getAppointments()
+        viewModelScope.launch {
+            delay(1000L)
+            getAllAppointmentsUseCase.fetchAllAppointmentsAndInsertToDb()
+        }
     }
 
-    private fun getAppointments() = viewModelScope.launch {
-        val response = getAllScheduledUseCase()
-
-        response.collect { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    resource.data!!.forEach { scheduled ->
-                        scheduled.doctorImageRequest = withContext(Dispatchers.IO) {
-                            imageRequestUseCase("/doctors/Doctor.png")
-                        }
-                    }
-                    saveAppointmentsUseCase(resource.data.map { it.appointment })
-                    delay(800L)
-                    _scheduledState.update { it.copy(
-                        scheduledList = resource.data,
-                        alreadyRevealed = resource.data.map { false },
-                        deletedList = listOf(),
-                        isRefreshing = false,
-                        revealNew = true
-                    ) }
-                }
-                is Resource.Error -> {
-
-                }
-                is Resource.Loading -> {
-                    _scheduledState.update {
-                        it.copy(isRefreshing = true)
-                    }
-                }
-            }
+    fun fetchDoctorImageForAppointment(appointmentWithDoctor: AppointmentWithDoctor) = viewModelScope.launch {
+        appointmentWithDoctor.doctorImageRequest = withContext(Dispatchers.IO) {
+            imageRequestUseCase("/doctors/Doctor.png")
         }
     }
 
@@ -89,6 +76,8 @@ class PatientScheduledViewModel @Inject constructor(
     }
 
     fun triggerRevealForIndex(index: Int) {
+        if (_scheduledState.value.alreadyRevealed.size <= index) return
+
         _scheduledState.update {
             it.copy(
                 alreadyRevealed = it.alreadyRevealed.toMutableList().also { revealed ->
@@ -104,40 +93,40 @@ class PatientScheduledViewModel @Inject constructor(
         }
     }
 
-    fun markAppointmentDeleted(scheduled: Scheduled) {
+    fun markAppointmentDeleted(appointmentWithDoctor: AppointmentWithDoctor) {
         _scheduledState.update {
             it.copy(
                 deletedList = it.deletedList.toMutableList().also { deletedList ->
-                    deletedList.add(scheduled)
+                    deletedList.add(appointmentWithDoctor)
                 },
-                lastDeleted = null
+                lastAppointmentDeleted = null
             )
         }
     }
 
-    fun cancelAppointment(deleteIndex: Int) = viewModelScope.launch {
-
-        val response = cancelAppointmentUseCase(
-            _scheduledState.value.scheduledList[deleteIndex].appointment.id
-        )
+    fun cancelAppointment(appointmentToDelete: AppointmentWithDoctor) = viewModelScope.launch {
+        val response = cancelAppointmentUseCase(appointmentToDelete.appointment.id)
         response.collect { resource ->
             when (resource) {
                 is Resource.Success -> {
                     _scheduledState.update { it.copy(
-                        scheduleIndexToDelete = null,
-                        lastDeleted = deleteIndex
+                        appointmentToDelete = null,
+                        lastAppointmentDeleted = appointmentToDelete
                     ) }
                 }
                 is Resource.Error -> {
 
                 }
                 is Resource.Loading -> {
-                    _scheduledState.update { it.copy(scheduleIndexToDelete = deleteIndex) }
+                    _scheduledState.update { it.copy(appointmentToDelete = appointmentToDelete) }
                 }
             }
         }
     }
 
     fun specializationIdToNameId(specializationId: Int): Int =
-        clinicIdToNameMapUseCase.specializationIdToNameId(specializationId)
+        clinicIdToNameMapUseCase.specializationIdToNameId(specializationId = specializationId)
+
+    fun serviceIdToNameId(serviceId: Int): Int =
+        clinicIdToNameMapUseCase.serviceIdToNameId(serviceId = serviceId)
 }

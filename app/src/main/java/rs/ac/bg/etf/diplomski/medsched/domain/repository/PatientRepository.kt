@@ -12,8 +12,9 @@ interface PatientRepository {
 
     val user: Flow<User?>
     val appointments: Flow<List<Appointment>?>
+    val appointmentWithDoctorFlow: Flow<List<AppointmentWithDoctor>>
 
-    suspend fun getAllScheduled(): List<Scheduled>
+    suspend fun fetchAndInsertIntoDbAppointmentsWithDoctor()
     suspend fun getAllServices(): List<Category>
     suspend fun getDoctors(category: String): List<DoctorForPatient>
     suspend fun getAllAppointmentsForDoctorAtDate(

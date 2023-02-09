@@ -19,20 +19,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHANNEL_DESCRIPTION
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHANNEL_ID
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHANNEL_NAME
-import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_FETCH_TASK_NAME
 import rs.ac.bg.etf.diplomski.medsched.commons.NotificationUtil
-import rs.ac.bg.etf.diplomski.medsched.domain.background.AppointmentFetchWorker
 import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.graphs.RootNavigationGraph
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.MedSchedTheme
-import java.time.Duration
-import javax.inject.Inject
 
 @OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject lateinit var workManager: WorkManager
     lateinit var rootViewModel: RootViewModel
 
     private val requestPermissionLauncher =
@@ -57,20 +52,6 @@ class MainActivity : ComponentActivity() {
             APPOINTMENT_CANCEL_CHANNEL_ID,
             APPOINTMENT_CANCEL_CHANNEL_NAME,
             APPOINTMENT_CANCEL_CHANNEL_DESCRIPTION
-        )
-
-        val appointmentFetchWork = PeriodicWorkRequestBuilder<AppointmentFetchWorker>(
-            Duration.ofSeconds(5),
-        ).setConstraints(
-            Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-        ).build()
-
-        workManager.enqueueUniquePeriodicWork(
-            APPOINTMENT_FETCH_TASK_NAME,
-            ExistingPeriodicWorkPolicy.REPLACE,
-            appointmentFetchWork
         )
 
         setContent {

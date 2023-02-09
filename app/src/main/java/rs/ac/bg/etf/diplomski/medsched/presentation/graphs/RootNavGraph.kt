@@ -1,8 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.graphs
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +16,7 @@ import com.google.accompanist.navigation.animation.composable
 import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.PatientScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RootNavigationGraph(
@@ -27,12 +27,6 @@ fun RootNavigationGraph(
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
-
-    val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-
-        }
-    }
 
     // If user has been auto logged out, and was not in the app
     // when he comes back to app switch to authentication screen
@@ -60,6 +54,9 @@ fun RootNavigationGraph(
             rootViewModel = rootViewModel
         )
         composable(route = Graph.PATIENT) {
+            LaunchedEffect(true) {
+                rootViewModel.triggerPeriodicSyncIfPatient()
+            }
             PatientScreen()
         }
     }

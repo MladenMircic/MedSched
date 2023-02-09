@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys.Companion.APPOINTMENT_FETCH_KEY
+import rs.ac.bg.etf.diplomski.medsched.data.local.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
 import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.toList
@@ -25,7 +26,8 @@ class PatientRepositoryImpl @Inject constructor(
     dataStore: DataStore<Preferences>,
     private val moshi: Moshi,
     private val patientApi: PatientApi,
-    private val patientInfoMapper: PatientInfoMapper
+    private val patientInfoMapper: PatientInfoMapper,
+    private val patientDao: PatientDao
 ) : PatientRepository {
 
     override val user: Flow<User?> = dataStore.data.map { preferences ->
@@ -39,8 +41,19 @@ class PatientRepositoryImpl @Inject constructor(
         moshi.toList(appointmentJsonList)
     }
 
-    override suspend fun getAllScheduled(): List<Scheduled> =
-        patientApi.getAllScheduled().map { it.toScheduled() }
+    override val appointmentWithDoctorFlow: Flow<List<AppointmentWithDoctor>> =
+        patientDao.getAllAppointmentEntities().map { appointmentEntityList ->
+            appointmentEntityList.map { it.toAppointmentWithDoctor() }
+        }
+
+    override suspend fun fetchAndInsertIntoDbAppointmentsWithDoctor() {
+        patientDao.deleteAllAppointmentEntities()
+        val appointmentWithDoctorList =
+            patientApi.getAllAppointmentsWithDoctor().map { it.toScheduled() }
+        for (appointment in appointmentWithDoctorList) {
+            patientDao.insertAppointmentEntity(appointment.toAppointmentEntity())
+        }
+    }
 
     override suspend fun getAllServices(): List<Category> =
         patientApi.getAllServices().map { it.toService() }

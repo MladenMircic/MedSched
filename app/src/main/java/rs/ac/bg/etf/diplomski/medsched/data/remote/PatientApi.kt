@@ -12,7 +12,7 @@ import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.*
 interface PatientApi {
 
     @GET("/${Constants.PATIENT_ENDPOINTS}/allScheduled")
-    suspend fun getAllScheduled(): List<ScheduledDto>
+    suspend fun getAllAppointmentsWithDoctor(): List<AppointmentWithDoctorDto>
 
     @GET("/${Constants.PATIENT_ENDPOINTS}/allCategories")
     suspend fun getAllServices(): List<CategoryDto>
