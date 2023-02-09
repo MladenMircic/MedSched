@@ -55,11 +55,13 @@ class PatientScheduledViewModel @Inject constructor(
         }
         viewModelScope.launch {
             delay(1000L)
-            getAllAppointmentsUseCase.fetchAllAppointmentsAndInsertToDb()
+            getAllAppointmentsUseCase.fetchAllAppointmentsAndSaveInLocal()
         }
     }
 
-    fun fetchDoctorImageForAppointment(appointmentWithDoctor: AppointmentWithDoctor) = viewModelScope.launch {
+    fun fetchDoctorImageForAppointment(
+        appointmentWithDoctor: AppointmentWithDoctor
+    ) = viewModelScope.launch {
         appointmentWithDoctor.doctorImageRequest = withContext(Dispatchers.IO) {
             imageRequestUseCase("/doctors/Doctor.png")
         }

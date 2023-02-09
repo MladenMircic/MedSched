@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.AppointmentEntity
 
 @Database(entities = [AppointmentEntity::class], version = 1, exportSchema = false)

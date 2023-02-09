@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_FETCH_TASK_NAME
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
-import rs.ac.bg.etf.diplomski.medsched.domain.background.AppointmentFetchWorker
+import rs.ac.bg.etf.diplomski.medsched.domain.background.AppointmentAvailabilityCheckWorker
 import rs.ac.bg.etf.diplomski.medsched.domain.background.AutoLogoutWorker
 import rs.ac.bg.etf.diplomski.medsched.domain.background.BackgroundTaskDispatcher
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
@@ -47,7 +47,7 @@ class RootViewModel @Inject constructor(
         userFlow.collect { user ->
             if (user is Patient) {
                 backgroundTaskDispatcher
-                    .doPeriodicBackgroundTaskWithConstraints<AppointmentFetchWorker>(
+                    .doPeriodicBackgroundTaskWithConstraints<AppointmentAvailabilityCheckWorker>(
                         duration = Duration.ofMinutes(15),
                         constraints = Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)

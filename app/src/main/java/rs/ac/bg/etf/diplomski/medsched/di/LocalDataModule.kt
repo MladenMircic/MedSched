@@ -7,7 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import rs.ac.bg.etf.diplomski.medsched.data.local.ClinicDatabase
-import rs.ac.bg.etf.diplomski.medsched.data.local.PatientDao
+import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import javax.inject.Singleton
 
 @Module

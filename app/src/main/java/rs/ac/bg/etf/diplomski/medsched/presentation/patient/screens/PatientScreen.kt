@@ -192,7 +192,10 @@ fun PatientScreen(navController: NavHostController = rememberAnimatedNavControll
                     bottomBarVisible = !bottomBarVisible
                 })
             }
-            composable(route = PatientScheduled.route) {
+            composable(
+                route = PatientScheduled.route,
+                deepLinks = PatientScheduled.deepLinks
+            ) {
                 LaunchedEffect(true) {
                     speedDialVisible = false
                     overlayVisible = false

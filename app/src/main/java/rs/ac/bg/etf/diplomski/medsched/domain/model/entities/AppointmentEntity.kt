@@ -18,7 +18,8 @@ data class AppointmentEntity(
     @ColumnInfo(name = "doctor_name") val doctorName: String,
     @ColumnInfo(name = "doctor_specialization_id") val doctorSpecializationId: Int,
     @ColumnInfo(name = "patient_id") val patientId: Int,
-    @ColumnInfo(name = "exam_id") val examId: Int
+    @ColumnInfo(name = "exam_id") val examId: Int,
+    val confirmed: Boolean
 ) {
     fun toAppointmentWithDoctor(): AppointmentWithDoctor {
         return AppointmentWithDoctor(
@@ -30,7 +31,8 @@ data class AppointmentEntity(
                 time = time,
                 doctorId = doctorId,
                 patientId = patientId,
-                examId = examId
+                examId = examId,
+                confirmed = confirmed
             )
         )
     }

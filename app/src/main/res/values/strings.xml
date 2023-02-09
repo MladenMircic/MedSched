@@ -71,6 +71,9 @@
     <string name="schedule_success">Successfully scheduled</string>
     <string name="schedule_failure">Scheduling failed, please try again</string>
     <string name="cancel_appointment_button">Cancel</string>
+    <string name="dismiss_appointment_button">Dismiss</string>
+    <string name="confirmed_appointment">Confirmed</string>
+    <string name="cancelled_appointment">Cancelled</string>
     
     <!-- Patient profile -->
     <string name="account_info">Account info</string>
@@ -119,6 +122,6 @@
     <string name="no">No</string>
 
     <!-- Notification data -->
-    <string name="cancelled_appointments_title">Cancelled appointments</string>
-    <string name="cancelled_appointments_text">You have cancelled appointments</string>
+    <string name="cancelled_appointments_notification_title">Cancelled appointments</string>
+    <string name="cancelled_appointments_notification_text">You have cancelled appointments</string>
 </resources>

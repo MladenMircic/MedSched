@@ -6,11 +6,9 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
-import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys.Companion.APPOINTMENT_FETCH_KEY
-import rs.ac.bg.etf.diplomski.medsched.data.local.PatientDao
+import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
-import rs.ac.bg.etf.diplomski.medsched.di.json_adapters.toList
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
@@ -36,24 +34,25 @@ class PatientRepositoryImpl @Inject constructor(
         )
     }
 
-    override val appointments: Flow<List<Appointment>?> = dataStore.data.map { preferences ->
-        val appointmentJsonList = preferences[APPOINTMENT_FETCH_KEY] ?: "[]"
-        moshi.toList(appointmentJsonList)
-    }
-
     override val appointmentWithDoctorFlow: Flow<List<AppointmentWithDoctor>> =
-        patientDao.getAllAppointmentEntities().map { appointmentEntityList ->
+        patientDao.getAllAppointmentEntitiesFlow().map { appointmentEntityList ->
             appointmentEntityList.map { it.toAppointmentWithDoctor() }
         }
 
     override suspend fun fetchAndInsertIntoDbAppointmentsWithDoctor() {
         patientDao.deleteAllAppointmentEntities()
         val appointmentWithDoctorList =
-            patientApi.getAllAppointmentsWithDoctor().map { it.toScheduled() }
+            patientApi.getAllAppointmentsWithDoctor().map { it.toAppointmentWithDoctor() }
         for (appointment in appointmentWithDoctorList) {
             patientDao.insertAppointmentEntity(appointment.toAppointmentEntity())
         }
     }
+
+    override suspend fun getAppointmentsWithDoctorFromRemote(): List<AppointmentWithDoctor> =
+        patientApi.getAllAppointmentsWithDoctor().map { it.toAppointmentWithDoctor() }
+
+    override suspend fun getAppointmentsWithDoctorFromLocal(): List<AppointmentWithDoctor> =
+        patientDao.getAllAppointmentEntities().map { it.toAppointmentWithDoctor() }
 
     override suspend fun getAllServices(): List<Category> =
         patientApi.getAllServices().map { it.toService() }
@@ -72,7 +71,10 @@ class PatientRepositoryImpl @Inject constructor(
         patientApi.getServicesForDoctor(doctorId).map { it.toService() }
 
     override suspend fun scheduleAppointment(appointment: Appointment) {
-        patientApi.scheduleAppointment(patientInfoMapper.toAppointmentDto(appointment))
+        val appointmentWithDoctor = patientApi
+                .scheduleAppointment(patientInfoMapper.toAppointmentDto(appointment))
+                .toAppointmentWithDoctor()
+        patientDao.insertAppointmentEntity(appointmentWithDoctor.toAppointmentEntity())
     }
 
     override suspend fun cancelAppointment(appointmentId: Int) {

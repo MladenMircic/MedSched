@@ -16,7 +16,8 @@ data class AppointmentWithDoctor(
             appointment.date.month.name.lowercase()
                 .replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                },
+                }
+                .substring(0, 3),
             appointment.date.dayOfMonth,
             appointment.date.year
         )
@@ -39,7 +40,8 @@ data class AppointmentWithDoctor(
             doctorName = doctorName,
             doctorSpecializationId = doctorSpecializationId,
             patientId = appointment.patientId,
-            examId = appointment.examId
+            examId = appointment.examId,
+            confirmed = appointment.confirmed
         )
     }
 }

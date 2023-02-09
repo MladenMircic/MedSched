@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.commons
 
+import android.app.PendingIntent
 import android.content.Context
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -25,16 +26,20 @@ class NotificationUtil {
 
         fun createNotification(
             context: Context,
+            pendingIntent: PendingIntent,
             channelId: String,
             notificationId: Int,
             title: String,
             message: String
         ) {
             val notification = NotificationCompat.Builder(context, channelId)
+                .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.caduceus)
                 .setContentTitle(title)
                 .setContentText(message).setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVibrate(LongArray(0)).build()
+                .setVibrate(LongArray(0))
+                .setAutoCancel(true)
+                .build()
             NotificationManagerCompat.from(context).notify(notificationId, notification)
         }
     }

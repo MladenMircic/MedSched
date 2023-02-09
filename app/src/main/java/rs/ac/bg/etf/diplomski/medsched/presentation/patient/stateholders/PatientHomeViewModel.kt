@@ -241,8 +241,9 @@ class PatientHomeViewModel @Inject constructor(
                 doctorId = getSelectedDoctor().id,
                 patientId = user!!.id,
                 examId = appointmentInfo.serviceList[
-                        appointmentInfo.examNameIdList.indexOf(appointmentInfo.currentExamNameId)
-                ].id
+                    appointmentInfo.examNameIdList.indexOf(appointmentInfo.currentExamNameId)
+                ].id,
+                confirmed = true
             ))
 
             response.collect { resource ->

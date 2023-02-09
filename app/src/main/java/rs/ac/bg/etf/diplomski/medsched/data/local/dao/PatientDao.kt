@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.data.local
+package rs.ac.bg.etf.diplomski.medsched.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -10,7 +10,10 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.AppointmentEntity
 interface PatientDao {
 
     @Query("SELECT * FROM AppointmentEntity")
-    fun getAllAppointmentEntities(): Flow<List<AppointmentEntity>>
+    fun getAllAppointmentEntitiesFlow(): Flow<List<AppointmentEntity>>
+
+    @Query("SELECT * FROM AppointmentEntity")
+    suspend fun getAllAppointmentEntities(): List<AppointmentEntity>
 
     @Query("DELETE FROM AppointmentEntity")
     suspend fun deleteAllAppointmentEntities()

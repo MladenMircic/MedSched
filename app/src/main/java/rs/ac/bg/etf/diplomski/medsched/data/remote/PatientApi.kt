@@ -2,7 +2,6 @@ package rs.ac.bg.etf.diplomski.medsched.data.remote
 
 import retrofit2.http.*
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.EmailChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.InfoChangeRequestDto
@@ -29,7 +28,7 @@ interface PatientApi {
     ): List<AppointmentDto>
 
     @POST("/${Constants.PATIENT_ENDPOINTS}/scheduleAppointment")
-    suspend fun scheduleAppointment(@Body appointmentDto: AppointmentDto)
+    suspend fun scheduleAppointment(@Body appointmentDto: AppointmentDto): AppointmentWithDoctorDto
 
     @DELETE("/${Constants.PATIENT_ENDPOINTS}/cancelAppointment/{appointmentId}")
     suspend fun cancelAppointment(@Path("appointmentId") appointmentId: Int)

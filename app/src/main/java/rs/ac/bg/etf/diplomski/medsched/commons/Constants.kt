@@ -15,4 +15,5 @@ object Constants {
         "Channel for notifying user about cancelled appointments"
 
     const val APPOINTMENT_CANCEL_NOTIFICATION_ID = 1
+    const val PATIENT_SCHEDULED_DEEPLINK = "https://patient-scheduled.com"
 }

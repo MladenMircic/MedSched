@@ -10,7 +10,9 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import rs.ac.bg.etf.diplomski.medsched.R
+import rs.ac.bg.etf.diplomski.medsched.commons.Constants.PATIENT_SCHEDULED_DEEPLINK
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BottomBarNavDestination
 
 // Patient home screen destinations
@@ -41,6 +43,9 @@ object PatientScheduled: BottomBarNavDestination {
     override val route: String = "patient_scheduled"
     override val imageUnselected: ImageVector = Icons.Outlined.CalendarMonth
     override val imageSelected: ImageVector = Icons.Filled.CalendarMonth
+    val deepLinks = listOf(navDeepLink {
+        uriPattern = PATIENT_SCHEDULED_DEEPLINK
+    })
 }
 
 object PatientInfo: BottomBarNavDestination {

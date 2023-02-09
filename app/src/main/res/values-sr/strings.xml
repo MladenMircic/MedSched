@@ -71,6 +71,9 @@
     <string name="schedule_success">Uspešno zakazano</string>
     <string name="schedule_failure">Neuspelo zakazivanje, pokušajte ponovo</string>
     <string name="cancel_appointment_button">Otkaži</string>
+    <string name="dismiss_appointment_button">Ukloni</string>
+    <string name="confirmed_appointment">Potvrdjen</string>
+    <string name="cancelled_appointment">Otkazan</string>
 
     <!-- Patient profile -->
     <string name="account_info">Podaci o nalogu</string>
@@ -119,6 +122,6 @@
     <string name="no">Ne</string>
 
     <!-- Notification data -->
-    <string name="cancelled_appointments_title">Otkazani termini</string>
-    <string name="cancelled_appointments_text">Imate otkazanih termina</string>
+    <string name="cancelled_appointments_notification_title">Otkazani termini</string>
+    <string name="cancelled_appointments_notification_text">Imate otkazanih termina</string>
 </resources>

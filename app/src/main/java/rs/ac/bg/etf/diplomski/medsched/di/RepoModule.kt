@@ -19,7 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
-import rs.ac.bg.etf.diplomski.medsched.data.local.PatientDao
+import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.UserInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi

@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.EventAvailable
+import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -49,9 +51,7 @@ fun ScheduledAppointmentsScreen(
 ) {
     val scheduledState by patientScheduledViewModel.scheduledState.collectAsState()
     val appointmentWithDoctorList by patientScheduledViewModel.appointmentsWithDoctorFlow
-        .collectAsState(
-            initial = listOf()
-        )
+        .collectAsState(initial = listOf())
 
     val lazyListState = rememberLazyListState()
     val fullyVisibleIndices: List<Int> by remember {
@@ -189,7 +189,7 @@ fun ScheduledAppointmentsScreen(
                                         .fetchDoctorImageForAppointment(appointmentWithDoctor)
 
                                     ScheduledAppointmentCard(
-                                        appointmentWithDoctorAppointment = appointmentWithDoctor,
+                                        appointmentWithDoctor = appointmentWithDoctor,
                                         waitForDelete = scheduledState.appointmentToDelete ==
                                                 appointmentWithDoctor,
                                         toDelete = scheduledState.lastAppointmentDeleted ==
@@ -287,7 +287,7 @@ fun ScheduledAppointmentsScreen(
 @Composable
 fun ScheduledAppointmentCard(
     modifier: Modifier = Modifier,
-    appointmentWithDoctorAppointment: AppointmentWithDoctor,
+    appointmentWithDoctor: AppointmentWithDoctor,
     waitForDelete: Boolean,
     toDelete: Boolean,
     revealed: Boolean,
@@ -341,7 +341,7 @@ fun ScheduledAppointmentCard(
                     Row(modifier = Modifier.padding(16.dp)) {
                         Column {
                             Text(
-                                text = appointmentWithDoctorAppointment.doctorName,
+                                text = appointmentWithDoctor.doctorName,
                                 fontFamily = Quicksand,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
@@ -350,7 +350,7 @@ fun ScheduledAppointmentCard(
                             Text(
                                 text = stringResource(
                                     id = getDoctorSpecializationId(
-                                        appointmentWithDoctorAppointment.doctorSpecializationId
+                                        appointmentWithDoctor.doctorSpecializationId
                                     )
                                 ),
                                 fontFamily = Quicksand,
@@ -361,7 +361,7 @@ fun ScheduledAppointmentCard(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         SubcomposeAsyncImage(
-                            model = appointmentWithDoctorAppointment.doctorImageRequest,
+                            model = appointmentWithDoctor.doctorImageRequest,
                             contentDescription = "Doctor image",
                             loading = {
                                 CircularProgressIndicator(color = Color.Black)
@@ -370,76 +370,113 @@ fun ScheduledAppointmentCard(
                                 .size(60.dp)
                         )
                     }
-                    Text(
-                        text = stringResource(
-                            id = getServiceId(appointmentWithDoctorAppointment.appointment.examId)
-                        ),
-                        fontFamily = Quicksand,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
+                    Row(
                         modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(
+                                id = getServiceId(appointmentWithDoctor.appointment.examId)
+                            ),
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
                     Divider(
                         color = Color.Black.copy(alpha = 0.3f),
                         thickness = 1.dp,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-                    Row(Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp)) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.CalendarMonth,
-                                contentDescription = "Calendar icon",
-                                tint = Color.Black
-                            )
-                            Spacer(modifier = Modifier.padding(start = 4.dp))
-                            Text(
-                                text = appointmentWithDoctorAppointment.dateAsString(),
-                                fontFamily = Quicksand,
-                                fontSize = 16.sp,
-                                color = Color.Black
-                            )
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(start = 10.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Schedule,
-                                contentDescription = "Time icon",
-                                tint = Color.Black
-                            )
-                            Spacer(modifier = Modifier.padding(start = 4.dp))
-                            Text(
-                                text = appointmentWithDoctorAppointment.timeAsString(),
-                                fontFamily = Quicksand,
-                                fontSize = 16.sp,
-                                color = Color.Black
-                            )
-                        }
-                    }
-                    Button(
-                        onClick = onCancelAppointment,
-                        enabled = !waitForDelete,
-                        modifier = Modifier
-                            .fillMaxWidth(0.4f)
-                            .fillMaxHeight()
-                            .padding(16.dp)
-                            .align(Alignment.End),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.selectable
-                        ),
-                        shape = RoundedCornerShape(10.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 10.dp)
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.cancel_appointment_button),
-                            fontFamily = Quicksand,
-                            fontSize = 14.sp,
-                            color = BackgroundPrimaryLight
-                        )
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.CalendarMonth,
+                                    contentDescription = "Calendar icon",
+                                    tint = Color.Black
+                                )
+                                Spacer(modifier = Modifier.padding(start = 4.dp))
+                                Text(
+                                    text = appointmentWithDoctor.dateAsString(),
+                                    fontFamily = Quicksand,
+                                    fontSize = 16.sp,
+                                    color = Color.Black
+                                )
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(top = 6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Schedule,
+                                    contentDescription = "Time icon",
+                                    tint = Color.Black
+                                )
+                                Spacer(modifier = Modifier.padding(start = 4.dp))
+                                Text(
+                                    text = appointmentWithDoctor.timeAsString(),
+                                    fontFamily = Quicksand,
+                                    fontSize = 16.sp,
+                                    color = Color.Black
+                                )
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(top = 6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (appointmentWithDoctor.appointment.confirmed)
+                                        Icons.Filled.EventAvailable
+                                    else Icons.Filled.EventBusy,
+                                    contentDescription = "Availability icon",
+                                    tint = Color.Black
+                                )
+                                Spacer(modifier = Modifier.padding(start = 4.dp))
+                                Text(
+                                    text = if (appointmentWithDoctor.appointment.confirmed)
+                                        stringResource(id = R.string.confirmed_appointment)
+                                    else stringResource(id = R.string.cancelled_appointment),
+                                    fontFamily = Quicksand,
+                                    fontSize = 16.sp,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+                        Button(
+                            onClick = onCancelAppointment,
+                            enabled = !waitForDelete,
+                            modifier = Modifier
+                                .fillMaxWidth(0.4f)
+                                .fillMaxHeight(0.5f),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.selectable
+                            ),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text(
+                                text = if (appointmentWithDoctor.appointment.confirmed)
+                                    stringResource(id = R.string.cancel_appointment_button)
+                                else stringResource(id = R.string.dismiss_appointment_button),
+                                fontFamily = Quicksand,
+                                fontSize = 14.sp,
+                                color = BackgroundPrimaryLight
+                            )
+                        }
                     }
                 }
             }
@@ -448,7 +485,7 @@ fun ScheduledAppointmentCard(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(240.dp)
                 .clip(RoundedShape20)
                 .background(Color.Black.copy(alpha = if (waitForDelete) 0.3f else 0f))
         ) {

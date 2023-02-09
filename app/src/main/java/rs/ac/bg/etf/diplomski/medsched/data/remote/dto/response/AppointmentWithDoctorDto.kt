@@ -10,7 +10,7 @@ data class AppointmentWithDoctorDto(
     val doctorSpecializationId: Int,
     val appointment: Appointment
 ) {
-    fun toScheduled(): AppointmentWithDoctor {
+    fun toAppointmentWithDoctor(): AppointmentWithDoctor {
         return AppointmentWithDoctor(
             doctorName = doctorName,
             doctorSpecializationId = doctorSpecializationId,

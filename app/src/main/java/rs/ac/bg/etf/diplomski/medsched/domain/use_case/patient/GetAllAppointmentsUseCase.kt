@@ -8,7 +8,13 @@ class GetAllAppointmentsUseCase @Inject constructor(
 ) {
     val appointmentWithDoctorFlow = patientRepository.appointmentWithDoctorFlow
 
-    suspend fun fetchAllAppointmentsAndInsertToDb() {
+    suspend fun getAllAppointmentsWithDoctorFromLocal() =
+        patientRepository.getAppointmentsWithDoctorFromLocal()
+
+    suspend fun getAllAppointmentsFromRemote() =
+        patientRepository.getAppointmentsWithDoctorFromRemote()
+
+    suspend fun fetchAllAppointmentsAndSaveInLocal() {
         patientRepository.fetchAndInsertIntoDbAppointmentsWithDoctor()
     }
 }

@@ -10,7 +10,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
@@ -28,7 +30,7 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.MedSchedTheme
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    lateinit var rootViewModel: RootViewModel
+    private lateinit var rootViewModel: RootViewModel
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
@@ -56,6 +58,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MedSchedTheme {
+                // Text placeholder for notification pending intent to work
+                Text(text = "Notification placeholder", color = Color.Transparent)
                 rootViewModel = viewModel()
                 RootNavigationGraph(
                     navController = rememberAnimatedNavController(),

@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.medsched.data.remote.dto
+package rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response
 
 import com.squareup.moshi.JsonClass
 import kotlinx.datetime.LocalDate
@@ -12,7 +12,8 @@ data class AppointmentDto(
     val time: LocalTime,
     val doctorId: Int,
     val patientId: Int,
-    val examId: Int
+    val examId: Int,
+    val confirmed: Boolean
 ) {
 
     fun toAppointment(): Appointment {
@@ -22,7 +23,8 @@ data class AppointmentDto(
             time = time,
             doctorId = doctorId,
             patientId = patientId,
-            examId = examId
+            examId = examId,
+            confirmed = confirmed
         )
     }
 }
