@@ -29,7 +29,7 @@ object DoctorDetails: PatientHomeDestinations {
     override val route: String = "doctor_details"
 }
 
-// Bottom bar destinations
+// Patient bottom bar destinations
 
 object PatientHome: BottomBarNavDestination {
     override val title: Int = R.string.navbar_home
@@ -48,14 +48,14 @@ object PatientScheduled: BottomBarNavDestination {
     })
 }
 
-object PatientInfo: BottomBarNavDestination {
+object PatientAccount: BottomBarNavDestination {
     override val title: Int = R.string.navbar_account
-    override val route: String = "patient_info"
+    override val route: String = "patient_account"
     override val imageUnselected: ImageVector = Icons.Outlined.Person
     override val imageSelected: ImageVector = Icons.Filled.Person
 }
 
-val patientRoutes = listOf(PatientHome, PatientScheduled, PatientInfo)
+val patientRoutes = listOf(PatientHome, PatientScheduled, PatientAccount)
 
 // Patient profile destinations
 
@@ -75,6 +75,8 @@ object EditProfile: PatientProfileDestinations {
         }
     )
 }
+
+// Profile change destinations
 
 object ChangeEmail: PatientProfileDestinations {
     override val route: String = "change_email"

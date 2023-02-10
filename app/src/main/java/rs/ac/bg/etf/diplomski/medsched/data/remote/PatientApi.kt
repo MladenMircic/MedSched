@@ -10,8 +10,8 @@ import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.*
 
 interface PatientApi {
 
-    @GET("/${Constants.PATIENT_ENDPOINTS}/allScheduled")
-    suspend fun getAllAppointmentsWithDoctor(): List<AppointmentWithDoctorDto>
+    @GET("/${Constants.PATIENT_ENDPOINTS}/allAppointmentsForPatient")
+    suspend fun getAllAppointmentsForPatient(): List<AppointmentForPatientDto>
 
     @GET("/${Constants.PATIENT_ENDPOINTS}/allCategories")
     suspend fun getAllServices(): List<CategoryDto>
@@ -28,7 +28,7 @@ interface PatientApi {
     ): List<AppointmentDto>
 
     @POST("/${Constants.PATIENT_ENDPOINTS}/scheduleAppointment")
-    suspend fun scheduleAppointment(@Body appointmentDto: AppointmentDto): AppointmentWithDoctorDto
+    suspend fun scheduleAppointment(@Body appointmentDto: AppointmentDto): AppointmentForPatientDto
 
     @DELETE("/${Constants.PATIENT_ENDPOINTS}/cancelAppointment/{appointmentId}")
     suspend fun cancelAppointment(@Path("appointmentId") appointmentId: Int)

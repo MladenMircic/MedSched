@@ -11,11 +11,11 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.response.PasswordChangeRespo
 interface PatientRepository {
 
     val user: Flow<User?>
-    val appointmentWithDoctorFlow: Flow<List<AppointmentWithDoctor>>
+    val appointmentForPatientFlow: Flow<List<AppointmentForPatient>>
 
-    suspend fun fetchAndInsertIntoDbAppointmentsWithDoctor()
-    suspend fun getAppointmentsWithDoctorFromRemote(): List<AppointmentWithDoctor>
-    suspend fun getAppointmentsWithDoctorFromLocal(): List<AppointmentWithDoctor>
+    suspend fun fetchAllAppointmentsForPatientAndSaveLocal()
+    suspend fun getAppointmentsWithDoctorFromRemote(): List<AppointmentForPatient>
+    suspend fun getAppointmentsWithDoctorFromLocal(): List<AppointmentForPatient>
     suspend fun getAllServices(): List<Category>
     suspend fun getDoctors(category: String): List<DoctorForPatient>
     suspend fun getAllAppointmentsForDoctorAtDate(

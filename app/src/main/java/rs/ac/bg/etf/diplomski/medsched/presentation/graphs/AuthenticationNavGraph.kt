@@ -2,10 +2,15 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.graphs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Doctor
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Authentication
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
@@ -20,7 +25,6 @@ fun NavGraphBuilder.authenticationNavGraph(
     navController: NavHostController,
     rootViewModel: RootViewModel
 ) {
-
     navigation(
         route = Graph.AUTHENTICATION,
         startDestination = Authentication.route
@@ -37,11 +41,17 @@ fun NavGraphBuilder.authenticationNavGraph(
             )
         }
         composable(route = Login.route) {
+            val user: User? by rootViewModel.userFlow.collectAsState(initial = null)
+
             LoginScreen(
                 onLoginSuccess = {
                     rootViewModel.triggerAutoLogout()
                     navController.navigateWithPopInclusive(
-                        toRoute = Graph.PATIENT,
+                        toRoute = when (user) {
+                            is Patient -> Graph.PATIENT
+                            is Doctor -> Graph.DOCTOR
+                            else -> Graph.CLINIC
+                        },
                         popToRoute = Login.route,
                         launchSingle = true
                     )

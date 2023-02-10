@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.doctor.screens.DoctorScreen
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.PatientScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -59,6 +60,9 @@ fun RootNavigationGraph(
             }
             PatientScreen()
         }
+        composable(route = Graph.DOCTOR) {
+            DoctorScreen()
+        }
     }
 }
 
@@ -66,4 +70,6 @@ object Graph {
     const val ROOT = "root_graph"
     const val AUTHENTICATION = "auth_graph"
     const val PATIENT = "patient_graph"
+    const val DOCTOR = "doctor_graph"
+    const val CLINIC = "clinic_graph"
 }

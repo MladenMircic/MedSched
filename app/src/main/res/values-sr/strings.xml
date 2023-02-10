@@ -124,4 +124,10 @@
     <!-- Notification data -->
     <string name="cancelled_appointments_notification_title">Otkazani termini</string>
     <string name="cancelled_appointments_notification_text">Imate otkazanih termina</string>
+    <string name="cancelled_or_new_appointments_notification_title">
+        Novi ili otkazani pregledi
+    </string>
+    <string name="cancelled_or_new_appointments_notification_text">
+        Imate nove ili otkazane preglede
+    </string>
 </resources>

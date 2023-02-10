@@ -1,7 +1,11 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.*
+import coil.compose.SubcomposeAsyncImage
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -151,7 +155,7 @@ fun PatientStart(
                         color = MaterialTheme.colors.textOnPrimary
                     )
                     Text(
-                        text = "${user!!.firstName} ${user!!.lastName}",
+                        text = "${it.firstName} ${it.lastName}",
                         fontFamily = Quicksand,
                         fontWeight = FontWeight.Bold,
                         fontSize = 28.sp,

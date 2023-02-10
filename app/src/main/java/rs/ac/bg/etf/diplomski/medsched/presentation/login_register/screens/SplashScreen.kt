@@ -10,6 +10,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rs.ac.bg.etf.diplomski.medsched.R
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Doctor
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.presentation.graphs.Graph
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.Login
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.stateholders.AuthenticationViewModel
@@ -31,6 +35,8 @@ fun SplashScreen(
     authenticationViewModel: AuthenticationViewModel = hiltViewModel(),
     onJumpDestination: (String) -> Unit
 ) {
+
+    val user: User? by authenticationViewModel.userFlow.collectAsState(initial = null)
 
     val rotation by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
@@ -74,8 +80,12 @@ fun SplashScreen(
             onJumpDestination(
                 if (!logged)
                     Login.route
-                else
+                else if (user is Patient)
                     Graph.PATIENT
+                else if (user is Doctor)
+                    Graph.DOCTOR
+                else
+                    Graph.CLINIC
             )
         }
     }

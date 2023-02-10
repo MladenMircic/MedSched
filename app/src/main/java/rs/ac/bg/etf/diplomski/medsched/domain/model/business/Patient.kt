@@ -6,11 +6,11 @@ data class Patient(
     override val firstName: String = "",
     override val lastName: String = "",
     override val password: String,
-    override val role: Int = -1,
+    override val role: Int = 1,
     val phone: String = "",
     val ssn: String = "",
 ) : User {
-    override val type: UserType = UserType.PATIENT
+    override val type: Role = Role.PATIENT
 
     companion object {
         val EMPTY_PATIENT = Patient(email = "", password = "")

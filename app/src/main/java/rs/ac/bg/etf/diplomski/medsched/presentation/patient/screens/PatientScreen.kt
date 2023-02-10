@@ -179,8 +179,8 @@ fun PatientScreen(navController: NavHostController = rememberAnimatedNavControll
             navController = navController,
             startDestination = PatientHome.route,
             modifier = Modifier.padding(it),
-            enterTransition = { fadeIn(tween(durationMillis = 1)) },
-            exitTransition = { fadeOut(tween(durationMillis = 1)) }
+            enterTransition = { fadeIn(tween(durationMillis = 500)) },
+            exitTransition = { fadeOut(tween(durationMillis = 500)) }
         ) {
             composable(route = PatientHome.route) {
                 LaunchedEffect(true) {
@@ -203,7 +203,7 @@ fun PatientScreen(navController: NavHostController = rememberAnimatedNavControll
                 }
                 ScheduledAppointmentsScreen()
             }
-            composable(route = PatientInfo.route) {
+            composable(route = PatientAccount.route) {
                 LaunchedEffect(key1 = currentProfileDestination) {
                     speedDialVisible = currentProfileDestination == MainProfile
                     bottomBarVisible = currentProfileDestination == MainProfile

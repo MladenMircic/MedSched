@@ -18,8 +18,8 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
-import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PatientHomeViewModel @Inject constructor(
-    patientRepository: PatientRepository,
+    getUserUseCase: GetUserUseCase,
     private val getServicesUseCase: GetServicesUseCase,
     private val imageRequestUseCase: ImageRequestUseCase,
     private val getDoctorsUseCase: GetDoctorsUseCase,
@@ -39,7 +39,7 @@ class PatientHomeViewModel @Inject constructor(
     private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase
 ): ViewModel() {
 
-    val userFlow = patientRepository.user
+    val userFlow = getUserUseCase.userFlow
 
     private val _patientState = MutableStateFlow(PatientState())
     val patientState = _patientState.asStateFlow()
@@ -243,7 +243,8 @@ class PatientHomeViewModel @Inject constructor(
                 examId = appointmentInfo.serviceList[
                     appointmentInfo.examNameIdList.indexOf(appointmentInfo.currentExamNameId)
                 ].id,
-                confirmed = true
+                confirmed = true,
+                cancelledBy = -1
             ))
 
             response.collect { resource ->

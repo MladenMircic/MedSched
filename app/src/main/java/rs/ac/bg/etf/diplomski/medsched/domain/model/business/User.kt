@@ -1,7 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.model.business
 
 sealed interface User {
-    val type: UserType
+    val type: Role
     val id: Int
     val email: String
     val firstName: String
@@ -10,6 +10,6 @@ sealed interface User {
     val role: Int
 }
 
-enum class UserType {
-    PATIENT, DOCTOR, CLINIC
+enum class Role {
+    DOCTOR, PATIENT, CLINIC, EMPTY
 }

@@ -18,20 +18,20 @@ import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHAN
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_NOTIFICATION_ID
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.PATIENT_SCHEDULED_DEEPLINK
 import rs.ac.bg.etf.diplomski.medsched.commons.NotificationUtil
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllAppointmentsUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllAppointmentsForPatientUseCase
 
 
 @HiltWorker
 class AppointmentAvailabilityCheckWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
-    private val getAllAppointmentsUseCase: GetAllAppointmentsUseCase
+    private val getAllAppointmentsForPatientUseCase: GetAllAppointmentsForPatientUseCase
 ): CoroutineWorker(context, workerParameters) {
 
     @RequiresApi(Build.VERSION_CODES.M)
     override suspend fun doWork(): Result {
-        val remoteAppointments = getAllAppointmentsUseCase.getAllAppointmentsFromRemote()
-        val localAppointments = getAllAppointmentsUseCase.getAllAppointmentsWithDoctorFromLocal()
+        val remoteAppointments = getAllAppointmentsForPatientUseCase.getAllAppointmentsFromRemote()
+        val localAppointments = getAllAppointmentsForPatientUseCase.getAllAppointmentsWithDoctorFromLocal()
         for (remoteAppointment in remoteAppointments) {
             val remoteAppointmentInLocal = localAppointments.firstOrNull {
                 it.appointment.id == remoteAppointment.appointment.id
@@ -57,7 +57,7 @@ class AppointmentAvailabilityCheckWorker @AssistedInject constructor(
                 break
             }
         }
-        getAllAppointmentsUseCase.fetchAllAppointmentsAndSaveInLocal()
+        getAllAppointmentsForPatientUseCase.fetchAllAppointmentsAndSaveInLocal()
         return Result.success()
     }
 }

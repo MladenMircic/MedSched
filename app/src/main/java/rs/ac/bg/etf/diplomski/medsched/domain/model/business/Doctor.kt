@@ -9,5 +9,5 @@ data class Doctor(
     override val role: Int = 0,
     val phone: String = ""
 ): User {
-    override val type: UserType = UserType.DOCTOR
+    override val type: Role = Role.DOCTOR
 }

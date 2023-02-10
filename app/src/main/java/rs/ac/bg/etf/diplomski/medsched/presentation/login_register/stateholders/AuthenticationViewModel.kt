@@ -8,14 +8,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication.LoginAuthUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val loginAuthUseCase: LoginAuthUseCase
+    private val loginAuthUseCase: LoginAuthUseCase,
+    getUserUseCase: GetUserUseCase
 ): ViewModel() {
 
+    val userFlow = getUserUseCase.userFlow
     var alreadyLogged by mutableStateOf<Boolean?>(null)
 
     // Authenticate the user if his token is still valid

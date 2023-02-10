@@ -4,20 +4,20 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.AppointmentEntity
+import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.AppointmentForPatientEntity
 
 @Dao
 interface PatientDao {
 
-    @Query("SELECT * FROM AppointmentEntity")
-    fun getAllAppointmentEntitiesFlow(): Flow<List<AppointmentEntity>>
+    @Query("SELECT * FROM AppointmentForPatientEntity")
+    fun getAllAppointmentForPatientEntitiesFlow(): Flow<List<AppointmentForPatientEntity>>
 
-    @Query("SELECT * FROM AppointmentEntity")
-    suspend fun getAllAppointmentEntities(): List<AppointmentEntity>
+    @Query("SELECT * FROM AppointmentForPatientEntity")
+    suspend fun getAllAppointmentForPatientEntities(): List<AppointmentForPatientEntity>
 
-    @Query("DELETE FROM AppointmentEntity")
-    suspend fun deleteAllAppointmentEntities()
+    @Query("DELETE FROM AppointmentForPatientEntity")
+    suspend fun deleteAllAppointmentForPatientEntities()
 
     @Insert
-    suspend fun insertAppointmentEntity(appointmentEntity: AppointmentEntity)
+    suspend fun insertAppointmentForPatientEntity(appointmentForPatientEntity: AppointmentForPatientEntity)
 }

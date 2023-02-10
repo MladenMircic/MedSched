@@ -13,7 +13,8 @@ data class AppointmentDto(
     val doctorId: Int,
     val patientId: Int,
     val examId: Int,
-    val confirmed: Boolean
+    val confirmed: Boolean,
+    val cancelledBy: Int
 ) {
 
     fun toAppointment(): Appointment {
@@ -24,7 +25,8 @@ data class AppointmentDto(
             doctorId = doctorId,
             patientId = patientId,
             examId = examId,
-            confirmed = confirmed
+            confirmed = confirmed,
+            cancelledBy = cancelledBy
         )
     }
 }

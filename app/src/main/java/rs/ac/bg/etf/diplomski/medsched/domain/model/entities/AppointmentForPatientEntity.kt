@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentWithDoctor
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForPatient
 
 @Entity
-data class AppointmentEntity(
+data class AppointmentForPatientEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val date: LocalDate,
     val time: LocalTime,
@@ -19,10 +19,11 @@ data class AppointmentEntity(
     @ColumnInfo(name = "doctor_specialization_id") val doctorSpecializationId: Int,
     @ColumnInfo(name = "patient_id") val patientId: Int,
     @ColumnInfo(name = "exam_id") val examId: Int,
-    val confirmed: Boolean
+    val confirmed: Boolean,
+    @ColumnInfo(name = "cancelled_by") val cancelledBy: Int
 ) {
-    fun toAppointmentWithDoctor(): AppointmentWithDoctor {
-        return AppointmentWithDoctor(
+    fun toAppointmentForPatient(): AppointmentForPatient {
+        return AppointmentForPatient(
             doctorName = doctorName,
             doctorSpecializationId = doctorSpecializationId,
             appointment = Appointment(
@@ -32,7 +33,8 @@ data class AppointmentEntity(
                 doctorId = doctorId,
                 patientId = patientId,
                 examId = examId,
-                confirmed = confirmed
+                confirmed = confirmed,
+                cancelledBy = cancelledBy
             )
         )
     }

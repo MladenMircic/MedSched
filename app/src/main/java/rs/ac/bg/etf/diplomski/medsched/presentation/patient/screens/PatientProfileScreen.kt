@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.EmptyUser
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientProfileViewModel
@@ -24,7 +25,7 @@ fun PatientProfileScreen(
     profileDestination: PatientProfileDestinations = MainProfile,
     setStartProfileDestination: () -> Unit
 ) {
-    val user by patientProfileViewModel.userFlow.collectAsState(initial = Patient.EMPTY_PATIENT)
+    val user by patientProfileViewModel.userFlow.collectAsState(initial = EmptyUser.instance)
     val profileScreenNavController = rememberAnimatedNavController()
     LaunchedEffect(key1 = profileDestination) {
         if (profileDestination != MainProfile) {

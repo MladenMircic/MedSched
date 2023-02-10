@@ -17,11 +17,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
-import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_FETCH_TASK_NAME
+import rs.ac.bg.etf.diplomski.medsched.commons.Constants.DOCTOR_APPOINTMENT_FETCH_TASK_NAME
+import rs.ac.bg.etf.diplomski.medsched.commons.Constants.PATIENT_APPOINTMENT_FETCH_TASK_NAME
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.domain.background.AppointmentAvailabilityCheckWorker
+import rs.ac.bg.etf.diplomski.medsched.domain.background.AppointmentFetchAndCheckDoctorWorker
 import rs.ac.bg.etf.diplomski.medsched.domain.background.AutoLogoutWorker
 import rs.ac.bg.etf.diplomski.medsched.domain.background.BackgroundTaskDispatcher
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Doctor
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
 import java.time.Duration
@@ -37,7 +40,7 @@ class RootViewModel @Inject constructor(
 
     var loggedIn by mutableStateOf(false)
 
-    private val userFlow = getUserUseCase.userFlow
+    val userFlow = getUserUseCase.userFlow
     val tokenFlow = dataStore.data.map { preferences ->
         preferences[PreferenceKeys.USER_TOKEN_KEY]
     }
@@ -52,7 +55,17 @@ class RootViewModel @Inject constructor(
                         constraints = Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build(),
-                        workName = APPOINTMENT_FETCH_TASK_NAME,
+                        workName = PATIENT_APPOINTMENT_FETCH_TASK_NAME,
+                        workPolicy = ExistingPeriodicWorkPolicy.REPLACE
+                    )
+            } else if (user is Doctor) {
+                backgroundTaskDispatcher
+                    .doPeriodicBackgroundTaskWithConstraints<AppointmentFetchAndCheckDoctorWorker>(
+                        duration = Duration.ofMinutes(15),
+                        constraints = Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build(),
+                        workName = DOCTOR_APPOINTMENT_FETCH_TASK_NAME,
                         workPolicy = ExistingPeriodicWorkPolicy.REPLACE
                     )
             }

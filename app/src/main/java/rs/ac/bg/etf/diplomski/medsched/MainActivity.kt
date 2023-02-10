@@ -10,8 +10,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -59,7 +61,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             MedSchedTheme {
                 // Text placeholder for notification pending intent to work
-                Text(text = "Notification placeholder", color = Color.Transparent)
+                Text(
+                    text = "Notification placeholder",
+                    color = Color.Transparent,
+                    modifier = Modifier.fillMaxSize()
+                )
                 rootViewModel = viewModel()
                 RootNavigationGraph(
                     navController = rememberAnimatedNavController(),

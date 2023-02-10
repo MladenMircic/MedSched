@@ -69,7 +69,7 @@ class LoginViewModel @Inject constructor(
             Patient(
                 email = _loginState.value.email,
                 password = _loginState.value.password,
-                role = roleMap[_loginState.value.currentSelectedRole]!!
+                role = _loginState.value.currentSelectedRole?.ordinal ?: 0
             )
         )
         response.collect {
@@ -103,9 +103,4 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-
-    private val roleMap = mapOf(
-        "Doctor" to 0,
-        "Patient" to 1
-    )
 }

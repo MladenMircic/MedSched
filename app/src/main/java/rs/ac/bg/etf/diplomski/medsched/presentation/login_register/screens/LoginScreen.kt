@@ -23,7 +23,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.DEFAULT_FORM_PADDING
 import rs.ac.bg.etf.diplomski.medsched.commons.NEXT_BUTTON_HEIGHT
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.roles
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Role
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.LoginForm
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.UserRoleCard
 import rs.ac.bg.etf.diplomski.medsched.presentation.login_register.InfoForm
@@ -136,18 +136,40 @@ fun LoginScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 36.dp)
+                                    .padding(top = 36.dp)
                             ) {
-                                for (role in roles) {
-                                    UserRoleCard(
-                                        roleName = stringResource(id = role.roleName),
-                                        roleImage = role.roleImage,
-                                        selectedRole = loginState.currentSelectedRole,
-                                        onRoleSelect = {
-                                            loginViewModel.onEvent(LoginEvent.RoleChange(it))
-                                        }
-                                    )
-                                }
+                                UserRoleCard(
+                                    role = Role.PATIENT,
+                                    roleImage = R.drawable.patient_icon,
+                                    selectedRole = loginState.currentSelectedRole,
+                                    onRoleSelect = {
+                                        loginViewModel.onEvent(LoginEvent.RoleChange(it))
+                                    }
+                                )
+                                UserRoleCard(
+                                    role = Role.DOCTOR,
+                                    roleImage = R.drawable.doctor_icon,
+                                    selectedRole = loginState.currentSelectedRole,
+                                    onRoleSelect = {
+                                        loginViewModel.onEvent(LoginEvent.RoleChange(it))
+                                    }
+                                )
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 36.dp)
+                            ) {
+                                UserRoleCard(
+                                    role = Role.CLINIC,
+                                    roleImage = R.drawable.clinic_icon,
+                                    selectedRole = loginState.currentSelectedRole,
+                                    onRoleSelect = {
+                                        loginViewModel.onEvent(LoginEvent.RoleChange(it))
+                                    }
+                                )
                             }
                             Button(
                                 onClick = {
@@ -191,13 +213,16 @@ fun LoginScreen(
                                     .fillMaxWidth()
                                     .padding(vertical = 36.dp)
                             ) {
-                                val selectedRole = roles.first {
-                                    stringResource(id = it.roleName) == loginState.currentSelectedRole
-                                }
                                 UserRoleCard(
-                                    roleName = stringResource(id = selectedRole.roleName),
-                                    roleImage = selectedRole.roleImage,
-                                    selectedRole = stringResource(id = selectedRole.roleName),
+                                    role = loginState.currentSelectedRole!!,
+                                    roleImage = when (loginState.currentSelectedRole) {
+                                        Role.PATIENT -> R.drawable.patient_icon
+                                        Role.DOCTOR -> R.drawable.doctor_icon
+                                        Role.CLINIC -> R.drawable.clinic_icon
+                                        Role.EMPTY -> R.drawable.patient_icon
+                                        null -> R.drawable.patient_icon
+                                    },
+                                    selectedRole = loginState.currentSelectedRole!!,
                                     onRoleSelect = {}
                                 )
                             }

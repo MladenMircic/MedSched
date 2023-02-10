@@ -31,7 +31,8 @@ class PatientInfoMapper @Inject constructor() {
             doctorId = appointment.doctorId,
             patientId = appointment.patientId,
             examId = appointment.examId,
-            confirmed = appointment.confirmed
+            confirmed = appointment.confirmed,
+            cancelledBy = appointment.cancelledBy
         )
     }
 
