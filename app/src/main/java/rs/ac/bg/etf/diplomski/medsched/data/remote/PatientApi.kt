@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.data.remote
 
+import kotlinx.datetime.LocalTime
 import retrofit2.http.*
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
@@ -14,7 +15,7 @@ interface PatientApi {
     suspend fun getAllAppointmentsForPatient(): List<AppointmentForPatientDto>
 
     @GET("/${Constants.PATIENT_ENDPOINTS}/allCategories")
-    suspend fun getAllServices(): List<CategoryDto>
+    suspend fun getAllCategories(): List<CategoryDto>
 
     @GET("/${Constants.PATIENT_ENDPOINTS}/getDoctors")
     suspend fun getDoctors(@Query("category") category: String): List<DoctorForPatientDto>
@@ -25,7 +26,7 @@ interface PatientApi {
     @POST("/${Constants.PATIENT_ENDPOINTS}/scheduledAppointmentsForDoctor")
     suspend fun getScheduledAppointments(
         @Body appointmentsRequestDto: AppointmentsRequestDto
-    ): List<AppointmentDto>
+    ): List<LocalTime>
 
     @POST("/${Constants.PATIENT_ENDPOINTS}/scheduleAppointment")
     suspend fun scheduleAppointment(@Body appointmentDto: AppointmentDto): AppointmentForPatientDto

@@ -11,14 +11,14 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.repository.PatientRepository
 import javax.inject.Inject
 
-class GetServicesUseCase @Inject constructor(
+class GetCategoriesPatientUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
 
     operator fun invoke(): Flow<Resource<List<Category>>> = flow {
         emit(Resource.Loading())
         try {
-            emit(Resource.Success(patientRepository.getAllServices()))
+            emit(Resource.Success(patientRepository.getAllCategories()))
         } catch (e: HttpException) {
             if (e.code() == HTTP_UNAUTHORIZED) {
                 emit(Resource.Error(-1))

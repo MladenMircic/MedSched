@@ -3,8 +3,8 @@ package rs.ac.bg.etf.diplomski.medsched.domain.model.business
 class EmptyUser private constructor(
     override val id: Int = 0,
     override val email: String = "",
-    override val firstName: String = "",
-    override val lastName: String = "",
+    val firstName: String = "",
+    val lastName: String = "",
     override val password: String = "",
     override val role: Int = -1
 ) : User {

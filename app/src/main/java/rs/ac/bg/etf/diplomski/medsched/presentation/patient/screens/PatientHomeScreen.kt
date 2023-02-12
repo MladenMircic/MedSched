@@ -14,11 +14,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -29,12 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,7 +43,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
-import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
+import rs.ac.bg.etf.diplomski.medsched.presentation.composables.SearchField
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
@@ -148,6 +146,7 @@ fun PatientStart(
                 modifier = Modifier.weight(1f)
             ) {
                 user?.let {
+                    val patient = it as Patient
                     Text(
                         text = "${stringResource(id = R.string.welcome)},",
                         fontFamily = Quicksand,
@@ -155,7 +154,7 @@ fun PatientStart(
                         color = MaterialTheme.colors.textOnPrimary
                     )
                     Text(
-                        text = "${it.firstName} ${it.lastName}",
+                        text = "${patient.firstName} ${patient.lastName}",
                         fontFamily = Quicksand,
                         fontWeight = FontWeight.Bold,
                         fontSize = 28.sp,
@@ -179,52 +178,15 @@ fun PatientStart(
                 .fillMaxHeight()
                 .padding(top = 30.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            SearchField(
+                searchKeyWord = patientState.searchKeyWord,
+                onKeyWordChange = {
+                    patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
+                },
+                label = R.string.doctor_search,
+                onSearchSubmit = searchDoctors,
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    OutlinedTextField(
-                        value = patientState.searchKeyWord,
-                        onValueChange = {
-                            patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
-                        },
-                        shape = RoundedShape20,
-                        placeholder = {
-                            Text(
-                                text = stringResource(id = R.string.doctor_search),
-                                fontFamily = Quicksand
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Search
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onSearch = { searchDoctors() }
-                        ),
-                        colors = defaultButtonColors(),
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(60.dp)
-                    )
-                    Button(
-                        onClick = searchDoctors,
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.textFieldOutline
-                        ),
-                        shape = RoundedShape20,
-                        modifier = Modifier
-                            .height(60.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Doctor search button"
-                        )
-                    }
-                }
-            }
+            )
             Spacer(modifier = Modifier.padding(top = 16.dp))
             CategoriesList(
                 patientState = patientState,
@@ -277,7 +239,6 @@ fun CategoriesList(
     onCategorySelected: (Int) -> Unit,
     getCategoryNameId: (Int) -> Int?
 ) {
-    val context = LocalContext.current
     val rememberLazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }

@@ -73,7 +73,7 @@ fun DoctorAppointmentScreen(
 
     LaunchedEffect(true) {
         patientHomeViewModel.fetchServicesForDoctor()
-        patientHomeViewModel.fetchScheduledAppointments()
+        patientHomeViewModel.fetchAvailableHoursForDate()
         delay(200L)
         showScreen = true
     }
@@ -315,7 +315,7 @@ fun DoctorAppointmentScreen(
                                     patientHomeViewModel.onEvent(
                                         PatientEvent.SetAppointmentDate(selection.firstOrNull())
                                     )
-                                    patientHomeViewModel.fetchScheduledAppointments()
+                                    patientHomeViewModel.fetchAvailableHoursForDate()
                                 },
                                 dayContent = { dayState -> DayContent(dayState = dayState) },
                             )
@@ -374,6 +374,7 @@ fun DoctorAppointmentScreen(
             showScreen = false
             snackBarJob?.cancel()
             onBackPressed()
+            patientHomeViewModel.onEvent(PatientEvent.ClearAvailableTimes)
         }
     }
 }
@@ -514,6 +515,7 @@ fun AppointmentTimeCard(
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Card(
         shape = RoundedCornerShape(10.dp),
         backgroundColor = if (isSelected)
@@ -521,7 +523,10 @@ fun AppointmentTimeCard(
         else MaterialTheme.colors.calendarField,
         modifier = Modifier
             .size(50.dp)
-            .clickable {
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
                 onSelect()
             }
     ) {

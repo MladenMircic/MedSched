@@ -9,8 +9,9 @@ sealed class PatientEvent {
     data class SetAppointmentDate(val date: LocalDate?): PatientEvent()
     data class SetAppointmentExamNameId(val nameId: Int): PatientEvent()
     data class SetAppointmentTime(val timeIndex: Int): PatientEvent()
+    object ClearAvailableTimes: PatientEvent()
     object ScheduleAppointment: PatientEvent()
     object SetScheduleMessageNull: PatientEvent()
     object SearchForDoctor: PatientEvent()
-    object GetAllServices: PatientEvent()
+    object GetAllCategories: PatientEvent()
 }

@@ -17,6 +17,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
+import rs.ac.bg.etf.diplomski.medsched.data.remote.ClinicApi
 import rs.ac.bg.etf.diplomski.medsched.data.remote.DoctorApi
 import rs.ac.bg.etf.diplomski.medsched.data.remote.LoginRegisterApi
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
@@ -87,4 +88,9 @@ object NetworkModule {
     @Provides
     fun providesDoctorApi(retrofit: Retrofit): DoctorApi =
         retrofit.create(DoctorApi::class.java)
+
+    @Singleton
+    @Provides
+    fun providesClinicApi(retrofit: Retrofit): ClinicApi =
+        retrofit.create(ClinicApi::class.java)
 }

@@ -30,6 +30,7 @@ import coil.compose.SubcomposeAsyncImage
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CustomDateFormatter
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForDoctor
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Doctor
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
 import rs.ac.bg.etf.diplomski.medsched.presentation.doctor.stateholders.DoctorHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
@@ -61,6 +62,7 @@ fun DoctorHomeScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 user?.let {
+                    val doctor = it as Doctor
                     Text(
                         text = "${stringResource(id = R.string.welcome)},",
                         fontFamily = Quicksand,
@@ -68,7 +70,7 @@ fun DoctorHomeScreen(
                         color = MaterialTheme.colors.textOnPrimary
                     )
                     Text(
-                        text = "Dr ${it.firstName} ${it.lastName}",
+                        text = "Dr ${doctor.firstName} ${doctor.lastName}",
                         fontFamily = Quicksand,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,

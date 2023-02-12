@@ -1,6 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalTime
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
@@ -16,11 +17,11 @@ interface PatientRepository {
     suspend fun fetchAllAppointmentsForPatientAndSaveLocal()
     suspend fun getAppointmentsWithDoctorFromRemote(): List<AppointmentForPatient>
     suspend fun getAppointmentsWithDoctorFromLocal(): List<AppointmentForPatient>
-    suspend fun getAllServices(): List<Category>
+    suspend fun getAllCategories(): List<Category>
     suspend fun getDoctors(category: String): List<DoctorForPatient>
     suspend fun getAllAppointmentsForDoctorAtDate(
         appointmentRequest: AppointmentRequest
-    ) : List<Appointment>
+    ) : List<LocalTime>
     suspend fun getAllServicesForDoctor(doctorId: Int): List<Service>
     suspend fun scheduleAppointment(appointment: Appointment)
     suspend fun cancelAppointment(appointmentId: Int)

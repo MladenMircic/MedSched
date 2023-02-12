@@ -75,6 +75,11 @@
     <string name="confirmed_appointment">Potvrdjen</string>
     <string name="cancelled_appointment">Otkazan</string>
 
+    <!-- Clinic -->
+    <string name="work_days">Radni dani</string>
+    <string name="clinic_doctor_register">Registracija doktora</string>
+    <string name="doctor_register_success">Doktor je uspešno registrovan</string>
+
     <!-- Patient profile -->
     <string name="account_info">Podaci o nalogu</string>
     <string name="change_email">Izmena emaila</string>
@@ -98,6 +103,7 @@
     <!-- Clinic general names -->
 
     <!-- Categories -->
+    <string name="category">Kategorija</string>
     <string name="category_brain">Mozak</string>
     <string name="category_glands">Žlezde</string>
     <string name="category_heart">Srce</string>
@@ -105,6 +111,7 @@
     <string name="category_stomach">Stomak</string>
 
     <!-- Specializations -->
+    <string name="specialization">Specijalizacija</string>
     <string name="spec_gastroenterologist">Gastroenterolog</string>
 
     <!-- Services -->

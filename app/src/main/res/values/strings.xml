@@ -74,6 +74,11 @@
     <string name="dismiss_appointment_button">Dismiss</string>
     <string name="confirmed_appointment">Confirmed</string>
     <string name="cancelled_appointment">Cancelled</string>
+
+    <!-- Clinic -->
+    <string name="work_days">Work days</string>
+    <string name="clinic_doctor_register">Register doctor</string>
+    <string name="doctor_register_success">Doctor registered successfully</string>
     
     <!-- Profile -->
     <string name="account_info">Account info</string>
@@ -98,6 +103,7 @@
     <!-- Clinic general names -->
 
     <!-- Categories -->
+    <string name="category">Category</string>
     <string name="category_brain">Brain</string>
     <string name="category_glands">Glands</string>
     <string name="category_heart">Heart</string>
@@ -105,6 +111,7 @@
     <string name="category_stomach">Stomach</string>
 
     <!-- Specializations -->
+    <string name="specialization">Specialization</string>
     <string name="spec_gastroenterologist">Gastroenterologist</string>
     
     <!-- Services -->

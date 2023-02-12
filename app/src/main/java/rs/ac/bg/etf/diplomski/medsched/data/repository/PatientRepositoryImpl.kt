@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.LocalTime
 import rs.ac.bg.etf.diplomski.medsched.commons.PreferenceKeys
 import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
@@ -59,18 +60,18 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun getAppointmentsWithDoctorFromLocal(): List<AppointmentForPatient> =
         patientDao.getAllAppointmentForPatientEntities().map { it.toAppointmentForPatient() }
 
-    override suspend fun getAllServices(): List<Category> =
-        patientApi.getAllServices().map { it.toService() }
+    override suspend fun getAllCategories(): List<Category> =
+        patientApi.getAllCategories().map { it.toService() }
 
     override suspend fun getDoctors(category: String): List<DoctorForPatient> =
         patientApi.getDoctors(category).map { it.toDoctorForPatient() }
 
     override suspend fun getAllAppointmentsForDoctorAtDate(
         appointmentRequest: AppointmentRequest
-    ): List<Appointment> =
+    ): List<LocalTime> =
         patientApi.getScheduledAppointments(
             patientInfoMapper.toAppointmentRequestDto(appointmentRequest)
-        ).map { it.toAppointment() }
+        )
 
     override suspend fun getAllServicesForDoctor(doctorId: Int): List<Service> =
         patientApi.getServicesForDoctor(doctorId).map { it.toService() }

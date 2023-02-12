@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.clinic.screens.ClinicScreen
 import rs.ac.bg.etf.diplomski.medsched.presentation.doctor.screens.DoctorScreen
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.PatientScreen
 
@@ -62,6 +63,9 @@ fun RootNavigationGraph(
         }
         composable(route = Graph.DOCTOR) {
             DoctorScreen()
+        }
+        composable(route = Graph.CLINIC) {
+            ClinicScreen()
         }
     }
 }
