@@ -74,6 +74,8 @@
     <string name="dismiss_appointment_button">Dismiss</string>
     <string name="confirmed_appointment">Confirmed</string>
     <string name="cancelled_appointment">Cancelled</string>
+    <string name="release_to_refresh">Release to refresh</string>
+    <string name="refreshing">Refreshing</string>
 
     <!-- Clinic -->
     <string name="work_days">Work days</string>

@@ -5,6 +5,8 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -374,7 +376,7 @@ fun DoctorAppointmentScreen(
             showScreen = false
             snackBarJob?.cancel()
             onBackPressed()
-            patientHomeViewModel.onEvent(PatientEvent.ClearAvailableTimes)
+            patientHomeViewModel.onEvent(PatientEvent.ClearAvailableHours)
         }
     }
 }
@@ -516,11 +518,21 @@ fun AppointmentTimeCard(
     onSelect: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val borderWidth by animateDpAsState(
+        targetValue = if (isSelected) 3.dp else 0.dp,
+        animationSpec = tween(durationMillis = 300)
+    )
+    val textSize by animateIntAsState(
+        targetValue = if (isSelected) 16 else 18,
+        animationSpec = tween(durationMillis = 100)
+    )
+
     Card(
         shape = RoundedCornerShape(10.dp),
-        backgroundColor = if (isSelected)
-            MaterialTheme.colors.selectable
-        else MaterialTheme.colors.calendarField,
+        backgroundColor = MaterialTheme.colors.calendarField,
+        border = if (isSelected)
+            BorderStroke(borderWidth, MaterialTheme.colors.textFieldOutline)
+        else null,
         modifier = Modifier
             .size(50.dp)
             .clickable(
@@ -538,7 +550,7 @@ fun AppointmentTimeCard(
                 text = time,
                 fontFamily = Quicksand,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
+                fontSize = textSize.sp,
                 textAlign = TextAlign.Center,
                 color = if (isSelected)
                     Color.White

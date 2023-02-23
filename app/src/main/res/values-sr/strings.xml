@@ -74,6 +74,8 @@
     <string name="dismiss_appointment_button">Ukloni</string>
     <string name="confirmed_appointment">Potvrdjen</string>
     <string name="cancelled_appointment">Otkazan</string>
+    <string name="release_to_refresh">Pustite da osvežite</string>
+    <string name="refreshing">Osvežava se</string>
 
     <!-- Clinic -->
     <string name="work_days">Radni dani</string>

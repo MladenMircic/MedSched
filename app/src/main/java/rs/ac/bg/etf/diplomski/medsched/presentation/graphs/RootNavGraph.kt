@@ -36,8 +36,9 @@ fun RootNavigationGraph(
         token?.let {
             if (currentDestination?.hierarchy?.any { it.route == Graph.AUTHENTICATION } == false
                 && token == "") {
+                val stackFirstDestination = currentDestination.hierarchy.first()
                 navController.navigate(Graph.AUTHENTICATION) {
-                    popUpTo(Graph.PATIENT) {
+                    popUpTo(stackFirstDestination.route ?: Graph.PATIENT) {
                         inclusive = true
                     }
                 }

@@ -17,8 +17,7 @@ import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Clinic
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.WorkDay
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.DoctorRegisterRequest
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.*
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.clinic.GetCategoriesClinicUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.clinic.RegisterDoctorUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.clinic.events.ClinicAddDoctorEvent
@@ -102,17 +101,22 @@ class ClinicAddDoctorViewModel @Inject constructor(
                 _addDoctorState.update { it.copy(selectedWorkDay = clinicAddDoctorEvent.index) }
             }
             is ClinicAddDoctorEvent.RegisterDoctor -> {
-                val addDoctorValue = _addDoctorState.value
-                registerDoctor(DoctorRegisterRequest(
-                    email = addDoctorValue.email,
-                    password = addDoctorValue.password,
-                    firstName = addDoctorValue.firstName,
-                    lastName = addDoctorValue.lastName,
-                    phone = addDoctorValue.phone,
-                    categoryId = addDoctorValue.categoryList[addDoctorValue.selectedCategory!!].id,
-                    specializationId = 1,
-                    workDays = addDoctorValue.selectedWorkDaysList
-                ))
+                if (validateRegisterForm()) {
+                    val addDoctorValue = _addDoctorState.value
+                    registerDoctor(DoctorRegisterRequest(
+                        email = addDoctorValue.email,
+                        password = addDoctorValue.password,
+                        firstName = addDoctorValue.firstName,
+                        lastName = addDoctorValue.lastName,
+                        phone = addDoctorValue.phone,
+                        categoryId = addDoctorValue.categoryList[addDoctorValue.selectedCategory!!].id,
+                        specializationId = 1,
+                        workDays = addDoctorValue.selectedWorkDaysList
+                    ))
+                }
+            }
+            is ClinicAddDoctorEvent.SetHasError -> {
+                _addDoctorState.update { it.copy(hasError = clinicAddDoctorEvent.hasError) }
             }
         }
     }
@@ -156,6 +160,41 @@ class ClinicAddDoctorViewModel @Inject constructor(
                 is Resource.Loading -> {}
             }
         }
+    }
+
+    private fun validateRegisterForm(): Boolean {
+        val stateVal = _addDoctorState.value
+        val emailResult = EmailValidation.validate(stateVal.email)
+        val firstNameResult = ValidateUseCase().validate(stateVal.firstName)
+        val lastNameResult = ValidateUseCase().validate(stateVal.lastName)
+        val passwordResult = PasswordValidation.validate(stateVal.password)
+        val confirmPasswordResult = ConfirmPasswordEqualsValidation.validate(
+            stateVal.confirmPassword, stateVal.password
+        )
+        val phoneResult = PhoneValidation.validate(stateVal.phone)
+        val categorySelectedResult = stateVal.selectedCategory == null
+
+        val hasError = listOf(
+            emailResult,
+            firstNameResult,
+            lastNameResult,
+            passwordResult,
+            confirmPasswordResult,
+            phoneResult
+        ).any { it.errorId != null } || categorySelectedResult
+
+        _addDoctorState.update {
+            it.copy(
+                emailError = emailResult.errorId,
+                firstNameError = firstNameResult.errorId,
+                lastNameError = lastNameResult.errorId,
+                passwordError = passwordResult.errorId,
+                confirmPasswordError = confirmPasswordResult.errorId,
+                phoneError = phoneResult.errorId,
+                hasError = hasError
+            )
+        }
+        return !hasError
     }
 
     fun categoryToNameId(category: Category): Int? =

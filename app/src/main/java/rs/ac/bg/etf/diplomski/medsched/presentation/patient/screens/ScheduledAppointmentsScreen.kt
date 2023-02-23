@@ -1,14 +1,18 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -34,14 +38,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
-import kotlinx.coroutines.delay
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CustomDateFormatter
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForPatient
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.ScheduledAppointmentsEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientScheduledViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CircleDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.PulseRefreshLoading
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animatedItems
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -50,46 +55,19 @@ import kotlin.math.roundToInt
 fun ScheduledAppointmentsScreen(
     patientScheduledViewModel: PatientScheduledViewModel = hiltViewModel()
 ) {
+    var canScroll by rememberSaveable { mutableStateOf(true) }
     val scheduledState by patientScheduledViewModel.scheduledState.collectAsState()
-    val appointmentWithDoctorList by patientScheduledViewModel.appointmentsWithDoctorFlow
-        .collectAsState(initial = listOf())
-
-    val lazyListState = rememberLazyListState()
-    val fullyVisibleIndices: List<Int> by remember {
-        derivedStateOf {
-            val layoutInfo = lazyListState.layoutInfo
-            val visibleItemsInfo = layoutInfo.visibleItemsInfo
-            if (visibleItemsInfo.isEmpty()) {
-                emptyList()
-            } else {
-                val fullyVisibleItemsInfo = visibleItemsInfo.toMutableList()
-
-                val lastItem = fullyVisibleItemsInfo.last()
-
-                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
-
-                if (lastItem.offset + lastItem.size / 2 > viewportHeight) {
-                    fullyVisibleItemsInfo.removeLast()
-                }
-
-                val firstItemIfLeft = fullyVisibleItemsInfo.firstOrNull()
-                if (firstItemIfLeft != null &&
-                    firstItemIfLeft.offset < layoutInfo.viewportStartOffset
-                ) {
-                    fullyVisibleItemsInfo.removeFirst()
-                }
-
-                fullyVisibleItemsInfo.map { it.index }
-            }
-        }
-    }
 
     val density = LocalDensity.current
-    val trigger = remember { 80.dp }
+    val trigger = remember { 100.dp }
     val triggerPx = remember { with(density) { trigger.toPx() } }
     val pullState = rememberPullRefreshState(
         refreshing = scheduledState.isRefreshing,
-        onRefresh = patientScheduledViewModel::refreshAppointments,
+        onRefresh = {
+            patientScheduledViewModel.onEvent(
+                ScheduledAppointmentsEvent.RefreshAppointments
+            )
+        },
         refreshThreshold = trigger
     )
     val animatedOffset by animateIntAsState(
@@ -105,31 +83,16 @@ fun ScheduledAppointmentsScreen(
     }
     val hapticFeedback = LocalHapticFeedback.current
 
+    LaunchedEffect(key1 = scheduledState.isRefreshing) {
+        canScroll = !scheduledState.isRefreshing
+    }
     LaunchedEffect(key1 = willRefresh) {
         if (willRefresh) {
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
-    LaunchedEffect(key1 = fullyVisibleIndices) {
-        if (!scheduledState.isRefreshing) {
-            fullyVisibleIndices.forEach { index ->
-                patientScheduledViewModel.triggerRevealForIndex(index)
-                delay(100L)
-            }
-        }
-    }
-    LaunchedEffect(key1 = scheduledState.revealNew) {
-        if (scheduledState.revealNew) {
-            fullyVisibleIndices.forEach { index ->
-                patientScheduledViewModel.triggerRevealForIndex(index)
-                delay(100L)
-            }
-            patientScheduledViewModel.setRevealNew(false)
-        }
-    }
 
     var confirmDialogOpen by rememberSaveable { mutableStateOf(false) }
-    var appointmentToDelete by remember { mutableStateOf<AppointmentForPatient?>(null) }
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
@@ -147,6 +110,18 @@ fun ScheduledAppointmentsScreen(
                         .align(Alignment.TopCenter)
                         .offset(y = (-60).dp)
                 )
+                Text(
+                    text = if (!scheduledState.isRefreshing)
+                        stringResource(id = R.string.release_to_refresh)
+                    else stringResource(id = R.string.refreshing),
+                    fontFamily = Quicksand,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colors.textOnSecondary,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 70.dp)
+                )
                 Box(
                     modifier = Modifier
                         .offset { IntOffset(x = 0, y = animatedOffset) }
@@ -154,75 +129,69 @@ fun ScheduledAppointmentsScreen(
                         .fillMaxSize()
                         .background(MaterialTheme.colors.primary)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 25.dp)
+                    LazyColumn(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 25.dp),
+                        userScrollEnabled = canScroll,
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.scheduled_appointments),
-                            fontFamily = Quicksand,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 36.sp,
-                            color = MaterialTheme.colors.textOnPrimary
-                        )
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
-                        LazyColumn(
-                            state = lazyListState,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            contentPadding = PaddingValues(vertical = 20.dp),
-                            modifier = Modifier
-                                .fillMaxSize()
+                        item(
+                            key = 0
                         ) {
-                            itemsIndexed(
-                                appointmentWithDoctorList,
-                                key = { index, _ -> index }
-                            ) { index, appointmentForPatient ->
-                                AnimatedVisibility(
-                                    visible = !scheduledState.deletedList.contains(appointmentForPatient),
-                                    exit = shrinkVertically(
-                                        animationSpec = tween(
-                                            durationMillis = 300,
-                                            easing = EaseOutCubic
-                                        ),
-                                        shrinkTowards = Alignment.Top
-                                    )
-                                ) {
-                                    patientScheduledViewModel
-                                        .fetchDoctorImageForAppointment(appointmentForPatient)
+                            Text(
+                                text = stringResource(id = R.string.scheduled_appointments),
+                                fontFamily = Quicksand,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 36.sp,
+                                color = MaterialTheme.colors.textOnPrimary,
+                                modifier = Modifier.animateItemPlacement(
+                                    animationSpec = tween(500)
+                                )
+                            )
+                        }
+                        animatedItems(
+                            items = scheduledState.animatedAppointmentForPatientList,
+                            key = { appointmentForPatient ->
+                                appointmentForPatient.appointment.id
+                            },
+                            enter = fadeIn(tween(500)) +
+                                    slideInHorizontally(
+                                        animationSpec = tween(500),
+                                        initialOffsetX = { -it / 2 }
+                                    ),
+                            exit = fadeOut(tween(500)) +
+                                    slideOutHorizontally(
+                                        animationSpec = tween(500),
+                                        targetOffsetX = { it / 2 }
+                                    ),
+                            exitDuration = 500,
+                            animateItemPlacementSpec = tween(500)
+                        ) { appointmentForPatient ->
+                            patientScheduledViewModel.onEvent(
+                                ScheduledAppointmentsEvent.DoctorImageFetch(
+                                    appointmentForPatient
+                                )
+                            )
 
-                                    AppointmentForPatientCard(
-                                        appointmentForPatient = appointmentForPatient,
-                                        waitForDelete = scheduledState.appointmentToDelete ==
-                                                appointmentForPatient,
-                                        toDelete = scheduledState.lastAppointmentDeleted ==
-                                                appointmentForPatient,
-                                        revealed = if (scheduledState.alreadyRevealed.size > index)
-                                            scheduledState.alreadyRevealed[index]
-                                        else false,
-                                        toggleRevealItem = {
-                                            patientScheduledViewModel.toggleRevealed(index)
-                                        },
-                                        onCancelAppointment = {
-                                            appointmentToDelete = appointmentForPatient
-                                            confirmDialogOpen = true
-                                        },
-                                        onDeleteAppointment = {
-                                            patientScheduledViewModel
-                                                .markAppointmentDeleted(appointmentForPatient)
-                                        },
-                                        getDoctorSpecializationId =
-                                            patientScheduledViewModel::specializationIdToNameId,
-                                        getServiceId =
-                                            patientScheduledViewModel::serviceIdToNameId,
-                                        modifier = Modifier
-                                            .padding(top = 8.dp)
-                                            .animateItemPlacement(
-                                                animationSpec = tween(
-                                                    durationMillis = 500
-                                                )
-                                            )
+                            AppointmentForPatientCard(
+                                appointmentForPatient = appointmentForPatient,
+                                waitForDelete = false,
+                                onCancelAppointment = {
+                                    patientScheduledViewModel.onEvent(
+                                        ScheduledAppointmentsEvent.SetAppointmentToDelete(
+                                            appointmentForPatient
+                                        )
                                     )
-                                }
-                            }
+                                    confirmDialogOpen = true
+                                },
+                                getDoctorSpecializationId =
+                                patientScheduledViewModel::specializationIdToNameId,
+                                getServiceId =
+                                patientScheduledViewModel::serviceIdToNameId,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
                         }
                     }
                 }
@@ -265,9 +234,12 @@ fun ScheduledAppointmentsScreen(
                 TextButton(
                     onClick = {
                         confirmDialogOpen = false
-                        patientScheduledViewModel.cancelAppointment(
-                            appointmentToDelete = appointmentToDelete!!
+                        patientScheduledViewModel.onEvent(
+                            ScheduledAppointmentsEvent.CancelAppointment
                         )
+//                        patientScheduledViewModel.cancelAppointment(
+//                            appointmentToDelete = appointmentToDelete!!
+//                        )
                     }
                 ) {
                     Text(
@@ -290,221 +262,184 @@ fun AppointmentForPatientCard(
     modifier: Modifier = Modifier,
     appointmentForPatient: AppointmentForPatient,
     waitForDelete: Boolean,
-    toDelete: Boolean,
-    revealed: Boolean,
-    toggleRevealItem: () -> Unit,
     onCancelAppointment: () -> Unit,
-    onDeleteAppointment: () -> Unit,
     getDoctorSpecializationId: (Int) -> Int,
     getServiceId: (Int) -> Int
 ) {
-    LaunchedEffect(toDelete) {
-        if (toDelete) {
-            toggleRevealItem()
-            delay(400L)
-            onDeleteAppointment()
-        }
-    }
     Box(modifier = modifier) {
-        AnimatedVisibility(
-            visible = revealed,
-            enter = fadeIn(
-                animationSpec = tween(
-                    durationMillis = 500
-                )
-            ) + slideInHorizontally(
-                animationSpec = tween(
-                    durationMillis = 500,
-                    easing = EaseOut
-                ),
-                initialOffsetX = { -it / 2 }
-            ),
-            exit = fadeOut(
-                animationSpec = tween(
-                    durationMillis = 500
-                )
-            ) + slideOutHorizontally(
-                animationSpec = tween(
-                    durationMillis = 500,
-                    easing = EaseOut
-                ),
-                targetOffsetX = { it / 2 }
-            )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp),
+            backgroundColor = Blue85,
+            shape = RoundedShape20
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(240.dp),
-                backgroundColor = Blue85,
-                shape = RoundedShape20
-            ) {
-                Column {
-                    Row(modifier = Modifier.padding(16.dp)) {
-                        Column {
-                            Text(
-                                text = appointmentForPatient.doctorName,
-                                fontFamily = Quicksand,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = Color.Black
+            Column {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Column {
+                        Text(
+                            text = appointmentForPatient.doctorName,
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = Color.Black
+                        )
+                        Text(
+                            text = stringResource(
+                                id = getDoctorSpecializationId(
+                                    appointmentForPatient.doctorSpecializationId
+                                )
+                            ),
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    SubcomposeAsyncImage(
+                        model = appointmentForPatient.doctorImageRequest,
+                        contentDescription = "Doctor image",
+                        loading = {
+                            CircularProgressIndicator(color = Color.Black)
+                        },
+                        modifier = Modifier
+                            .size(60.dp)
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = getServiceId(appointmentForPatient.appointment.examId)
+                        ),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+                }
+                Divider(
+                    color = Color.Black.copy(alpha = 0.3f),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 10.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.CalendarMonth,
+                                contentDescription = "Calendar icon",
+                                tint = Color.Black
                             )
+                            Spacer(modifier = Modifier.padding(start = 4.dp))
+
+                            val date = appointmentForPatient.appointment.date
                             Text(
-                                text = stringResource(
-                                    id = getDoctorSpecializationId(
-                                        appointmentForPatient.doctorSpecializationId
-                                    )
+                                text = CustomDateFormatter.dateAsString(
+                                    date.dayOfMonth,
+                                    date.month.name,
+                                    date.year
                                 ),
                                 fontFamily = Quicksand,
-                                fontWeight = FontWeight.Normal,
                                 fontSize = 16.sp,
                                 color = Color.Black
                             )
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        SubcomposeAsyncImage(
-                            model = appointmentForPatient.doctorImageRequest,
-                            contentDescription = "Doctor image",
-                            loading = {
-                                CircularProgressIndicator(color = Color.Black)
-                            },
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .size(60.dp)
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(
-                                id = getServiceId(appointmentForPatient.appointment.examId)
-                            ),
-                            fontFamily = Quicksand,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .weight(1f)
-                        )
-                    }
-                    Divider(
-                        color = Color.Black.copy(alpha = 0.3f),
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 10.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f)
+                                .padding(top = 6.dp)
                         ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.CalendarMonth,
-                                    contentDescription = "Calendar icon",
-                                    tint = Color.Black
-                                )
-                                Spacer(modifier = Modifier.padding(start = 4.dp))
+                            Icon(
+                                imageVector = Icons.Filled.Schedule,
+                                contentDescription = "Time icon",
+                                tint = Color.Black
+                            )
+                            Spacer(modifier = Modifier.padding(start = 4.dp))
 
-                                val date = appointmentForPatient.appointment.date
-                                Text(
-                                    text = CustomDateFormatter.dateAsString(
-                                        date.dayOfMonth,
-                                        date.month.name,
-                                        date.year
-                                    ),
-                                    fontFamily = Quicksand,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                            }
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .padding(top = 6.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Schedule,
-                                    contentDescription = "Time icon",
-                                    tint = Color.Black
-                                )
-                                Spacer(modifier = Modifier.padding(start = 4.dp))
-
-                                val time = appointmentForPatient.appointment.time
-                                Text(
-                                    text = CustomDateFormatter.timeAsString(
-                                        time.hour,
-                                        time.minute
-                                    ),
-                                    fontFamily = Quicksand,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                            }
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .padding(top = 6.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (appointmentForPatient.appointment.confirmed)
-                                        Icons.Filled.EventAvailable
-                                    else Icons.Filled.EventBusy,
-                                    contentDescription = "Availability icon",
-                                    tint = Color.Black
-                                )
-                                Spacer(modifier = Modifier.padding(start = 4.dp))
-                                Text(
-                                    text = if (appointmentForPatient.appointment.confirmed)
-                                        stringResource(id = R.string.confirmed_appointment)
-                                    else stringResource(id = R.string.cancelled_appointment),
-                                    fontFamily = Quicksand,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                            }
-                        }
-                        Button(
-                            onClick = onCancelAppointment,
-                            enabled = !waitForDelete,
-                            modifier = Modifier
-                                .fillMaxWidth(0.4f)
-                                .fillMaxHeight(0.5f),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.selectable
-                            ),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
+                            val time = appointmentForPatient.appointment.time
                             Text(
-                                text = if (appointmentForPatient.appointment.confirmed)
-                                    stringResource(id = R.string.cancel_appointment_button)
-                                else stringResource(id = R.string.dismiss_appointment_button),
+                                text = CustomDateFormatter.timeAsString(
+                                    time.hour,
+                                    time.minute
+                                ),
                                 fontFamily = Quicksand,
-                                fontSize = 14.sp,
-                                color = BackgroundPrimaryLight
+                                fontSize = 16.sp,
+                                color = Color.Black
                             )
                         }
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(top = 6.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (appointmentForPatient.appointment.confirmed)
+                                    Icons.Filled.EventAvailable
+                                else Icons.Filled.EventBusy,
+                                contentDescription = "Availability icon",
+                                tint = Color.Black
+                            )
+                            Spacer(modifier = Modifier.padding(start = 4.dp))
+                            Text(
+                                text = if (appointmentForPatient.appointment.confirmed)
+                                    stringResource(id = R.string.confirmed_appointment)
+                                else stringResource(id = R.string.cancelled_appointment),
+                                fontFamily = Quicksand,
+                                fontSize = 16.sp,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                    Button(
+                        onClick = onCancelAppointment,
+                        enabled = !waitForDelete,
+                        modifier = Modifier
+                            .fillMaxWidth(0.4f)
+                            .fillMaxHeight(0.5f),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.selectable
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = if (appointmentForPatient.appointment.confirmed)
+                                stringResource(id = R.string.cancel_appointment_button)
+                            else stringResource(id = R.string.dismiss_appointment_button),
+                            fontFamily = Quicksand,
+                            fontSize = 14.sp,
+                            color = BackgroundPrimaryLight
+                        )
                     }
                 }
             }
         }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-                .clip(RoundedShape20)
-                .background(Color.Black.copy(alpha = if (waitForDelete) 0.3f else 0f))
-        ) {
-            if (waitForDelete) {
-                CircleDotLoader(color = Color.Black)
-            }
+    }
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp)
+            .clip(RoundedShape20)
+            .background(Color.Black.copy(alpha = if (waitForDelete) 0.3f else 0f))
+    ) {
+        if (waitForDelete) {
+            CircleDotLoader(color = Color.Black)
         }
     }
-
 }
+

@@ -99,7 +99,7 @@ class PatientHomeViewModel @Inject constructor(
             PatientEvent.SetScheduleMessageNull -> {
                 _appointmentState.update { it.copy(scheduledMessageId = null) }
             }
-            PatientEvent.ClearAvailableTimes -> {
+            PatientEvent.ClearAvailableHours -> {
                 _appointmentState.update { it.copy(
                     selectedDate = LocalDate.now()
                 ) }

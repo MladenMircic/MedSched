@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,14 +8,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.CancelAppointmentUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllAppointmentsForPatientUseCase
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.ScheduledAppointmentsEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.ScheduledState
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animated
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,28 +30,54 @@ class PatientScheduledViewModel @Inject constructor(
     private val _scheduledState = MutableStateFlow(ScheduledState())
     val scheduledState = _scheduledState.asStateFlow()
 
-    val appointmentsWithDoctorFlow: Flow<List<AppointmentForPatient>> =
+    private val appointmentsWithDoctorFlow: Flow<List<AppointmentForPatient>> =
         getAllAppointmentsForPatientUseCase.appointmentWithDoctorFlow
 
     init {
         viewModelScope.launch {
             appointmentsWithDoctorFlow.collectLatest { appointmentWithDoctorList ->
-                _scheduledState.update {
-                    it.copy(
-                        alreadyRevealed = appointmentWithDoctorList.map { false },
-                        deletedList = listOf(),
-                        isRefreshing = false,
-                        revealNew = true
+                _scheduledState.value.animatedAppointmentForPatientList.clear(true)
+                delay(500L)
+                _scheduledState.update { state ->
+                    state.copy(
+                        animatedAppointmentForPatientList = mutableStateListOf<AppointmentForPatient>()
+                            .also {
+                                it.addAll(appointmentWithDoctorList)
+                            }.animated,
+                        isRefreshing = false
                     )
                 }
             }
         }
     }
 
-    fun refreshAppointments() {
+    fun onEvent(scheduledAppointmentsEvent: ScheduledAppointmentsEvent) {
+        when (scheduledAppointmentsEvent) {
+            is ScheduledAppointmentsEvent.DoctorImageFetch -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    scheduledAppointmentsEvent.appointmentForPatient.doctorImageRequest =
+                        imageRequestUseCase("/doctors/Doctor.png")
+                }
+            }
+            is ScheduledAppointmentsEvent.SetAppointmentToDelete -> {
+                _scheduledState.update {
+                    it.copy(
+                        appointmentToDelete = scheduledAppointmentsEvent.appointmentForPatient
+                    )
+                }
+            }
+            is ScheduledAppointmentsEvent.RefreshAppointments -> {
+                refreshAppointments()
+            }
+            is ScheduledAppointmentsEvent.CancelAppointment -> {
+                cancelAppointment()
+            }
+        }
+    }
+
+    private fun refreshAppointments() {
         _scheduledState.update {
             it.copy(
-                alreadyRevealed = it.alreadyRevealed.map { false },
                 isRefreshing = true
             )
         }
@@ -61,7 +89,6 @@ class PatientScheduledViewModel @Inject constructor(
                     is Resource.Success -> {
                         _scheduledState.update {
                             it.copy(
-                                alreadyRevealed = it.alreadyRevealed.map { false },
                                 isRefreshing = false
                             )
                         }
@@ -73,69 +100,28 @@ class PatientScheduledViewModel @Inject constructor(
         }
     }
 
-    fun fetchDoctorImageForAppointment(
-        appointmentForPatient: AppointmentForPatient
-    ) = viewModelScope.launch {
-        appointmentForPatient.doctorImageRequest = withContext(Dispatchers.IO) {
-            imageRequestUseCase("/doctors/Doctor.png")
-        }
-    }
-
-    fun toggleRevealed(index: Int) {
-        _scheduledState.update {
-            it.copy(
-                alreadyRevealed = it.alreadyRevealed.toMutableList().also { revealed ->
-                    revealed[index] = !revealed[index]
-                }
-            )
-        }
-    }
-
-    fun triggerRevealForIndex(index: Int) {
-        if (_scheduledState.value.alreadyRevealed.size <= index) return
-
-        _scheduledState.update {
-            it.copy(
-                alreadyRevealed = it.alreadyRevealed.toMutableList().also { revealed ->
-                    revealed[index] = true
-                }
-            )
-        }
-    }
-
-    fun setRevealNew(revealNew: Boolean) {
-        _scheduledState.update {
-            it.copy(revealNew = revealNew)
-        }
-    }
-
-    fun markAppointmentDeleted(appointmentForPatient: AppointmentForPatient) {
-        _scheduledState.update {
-            it.copy(
-                deletedList = it.deletedList.toMutableList().also { deletedList ->
-                    deletedList.add(appointmentForPatient)
-                },
-                lastAppointmentDeleted = null
-            )
-        }
-    }
-
-    fun cancelAppointment(appointmentToDelete: AppointmentForPatient) = viewModelScope.launch {
-        val response = cancelAppointmentUseCase(appointmentToDelete.appointment.id)
+    private fun cancelAppointment() = viewModelScope.launch {
+        val response = cancelAppointmentUseCase(
+            _scheduledState.value.appointmentToDelete!!.appointment.id
+        )
         response.collect { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    _scheduledState.update { it.copy(
-                        appointmentToDelete = null,
-                        lastAppointmentDeleted = appointmentToDelete
-                    ) }
+                    _scheduledState.value.animatedAppointmentForPatientList.remove(
+                        _scheduledState.value.appointmentToDelete!!
+                    )
+                    _scheduledState.update { state ->
+                        state.copy(
+                            animatedAppointmentForPatientList = state.animatedAppointmentForPatientList
+                                .also {
+                                    it.remove(state.appointmentToDelete!!)
+                                },
+                            appointmentToDelete = null
+                        )
+                    }
                 }
-                is Resource.Error -> {
-
-                }
-                is Resource.Loading -> {
-                    _scheduledState.update { it.copy(appointmentToDelete = appointmentToDelete) }
-                }
+                is Resource.Error -> {}
+                is Resource.Loading -> {}
             }
         }
     }

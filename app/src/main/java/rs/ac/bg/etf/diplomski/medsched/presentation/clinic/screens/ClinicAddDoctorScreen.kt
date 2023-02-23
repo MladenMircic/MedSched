@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.medsched.presentation.clinic.screens
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -67,9 +68,22 @@ fun ClinicAddDoctorScreen(
         }
     }
 
+    val scrollState = rememberScrollState()
+    LaunchedEffect(key1 = addDoctorState.hasError) {
+        if (addDoctorState.hasError) {
+            scrollState.animateScrollTo(
+                value = 0,
+                animationSpec = tween(
+                    durationMillis = 500
+                )
+            )
+            clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetHasError(false))
+        }
+    }
+
     Column(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,6 +106,8 @@ fun ClinicAddDoctorScreen(
                 onValueChange = {
                     clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetEmailField(it))
                 },
+                showError = addDoctorState.emailError != null,
+                errorMessage = addDoctorState.emailError?.let { stringResource(id = it) } ?: "",
                 leadingIconImageVector = Icons.Default.Email,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
@@ -108,6 +124,8 @@ fun ClinicAddDoctorScreen(
                 onValueChange = {
                     clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetFirstNameField(it))
                 },
+                showError = addDoctorState.firstNameError != null,
+                errorMessage = addDoctorState.firstNameError?.let { stringResource(id = it) } ?: "",
                 leadingIconImageVector = Icons.Default.Person,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -124,6 +142,8 @@ fun ClinicAddDoctorScreen(
                 onValueChange = {
                     clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetLastNameField(it))
                 },
+                showError = addDoctorState.lastNameError != null,
+                errorMessage = addDoctorState.lastNameError?.let { stringResource(id = it) } ?: "",
                 leadingIconImageVector = Icons.Default.Person,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -142,6 +162,8 @@ fun ClinicAddDoctorScreen(
                 onValueChange = {
                     clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetPasswordField(it))
                 },
+                showError = addDoctorState.passwordError != null,
+                errorMessage = addDoctorState.passwordError?.let { stringResource(id = it) } ?: "",
                 leadingIconImageVector = Icons.Default.Password,
                 isPasswordField = true,
                 isPasswordVisible = passwordVisible,
@@ -163,6 +185,8 @@ fun ClinicAddDoctorScreen(
                 onValueChange = {
                     clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetConfirmPasswordField(it))
                 },
+                showError = addDoctorState.confirmPasswordError != null,
+                errorMessage = addDoctorState.confirmPasswordError?.let { stringResource(id = it) } ?: "",
                 leadingIconImageVector = Icons.Default.Password,
                 isPasswordField = true,
                 isPasswordVisible = confirmPasswordVisible,
@@ -182,6 +206,8 @@ fun ClinicAddDoctorScreen(
                 onValueChange = {
                     clinicAddDoctorViewModel.onEvent(ClinicAddDoctorEvent.SetPhoneField(it))
                 },
+                showError = addDoctorState.phoneError != null,
+                errorMessage = addDoctorState.phoneError?.let { stringResource(id = it) } ?: "",
                 leadingIconImageVector = Icons.Default.Phone,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,

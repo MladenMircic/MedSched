@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication.LogoutUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.clinic.GetCategoriesClinicUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.clinic.events.ClinicHomeEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.clinic.states.ClinicHomeState
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ClinicHomeViewModel @Inject constructor(
     getUserUseCase: GetUserUseCase,
-    private val getCategoriesClinicUseCase: GetCategoriesClinicUseCase
+    private val getCategoriesClinicUseCase: GetCategoriesClinicUseCase,
+    private val logoutUseCase: LogoutUseCase
 ): ViewModel() {
 
     val userFlow = getUserUseCase.userFlow
@@ -39,6 +41,9 @@ class ClinicHomeViewModel @Inject constructor(
             }
             is ClinicHomeEvent.SearchForDoctor -> {
 
+            }
+            is ClinicHomeEvent.Logout -> {
+                viewModelScope.launch { logoutUseCase() }
             }
         }
     }

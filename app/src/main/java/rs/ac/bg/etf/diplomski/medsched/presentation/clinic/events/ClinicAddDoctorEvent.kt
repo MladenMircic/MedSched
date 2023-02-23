@@ -10,5 +10,6 @@ sealed class ClinicAddDoctorEvent {
     data class SetCategoryField(val index: Int): ClinicAddDoctorEvent()
     data class SetSpecializationField(val index: Int): ClinicAddDoctorEvent()
     data class SetSelectedWorkDay(val index: Int): ClinicAddDoctorEvent()
+    data class SetHasError(val hasError: Boolean): ClinicAddDoctorEvent()
     object RegisterDoctor: ClinicAddDoctorEvent()
 }
