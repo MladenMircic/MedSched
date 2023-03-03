@@ -19,10 +19,11 @@ interface PatientRepository {
     suspend fun getAppointmentsWithDoctorFromLocal(): List<AppointmentForPatient>
     suspend fun getAllCategories(): List<Category>
     suspend fun getDoctors(category: String): List<DoctorForPatient>
+    suspend fun getClinics(category: String): List<ClinicForPatient>
     suspend fun getAllAppointmentsForDoctorAtDate(
         appointmentRequest: AppointmentRequest
     ) : List<LocalTime>
-    suspend fun getAllServicesForDoctor(doctorId: Int): List<Service>
+    suspend fun getAllServicesForDoctor(doctorId: String): List<Service>
     suspend fun scheduleAppointment(appointment: Appointment)
     suspend fun cancelAppointment(appointmentId: Int)
     suspend fun updateEmail(emailChangeRequest: EmailChangeRequest)

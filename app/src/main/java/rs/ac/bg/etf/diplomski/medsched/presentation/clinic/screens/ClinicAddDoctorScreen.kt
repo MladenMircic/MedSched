@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,8 +42,8 @@ import rs.ac.bg.etf.diplomski.medsched.commons.BOOK_APPOINTMENT_BUTTON_HEIGHT
 import rs.ac.bg.etf.diplomski.medsched.presentation.clinic.events.ClinicAddDoctorEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.clinic.stateholders.ClinicAddDoctorViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonColors
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.AppointmentTimeCard
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BorderAnimatedItem
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.CustomOutlinedTextField
 import java.util.*
 
@@ -374,14 +375,22 @@ fun ClinicAddDoctorScreen(
                 modifier = Modifier.height(200.dp)
             ) {
                 itemsIndexed(items = workHours) { index, workHour ->
-                    AppointmentTimeCard(
-                        time = workHour.toString(),
+                    BorderAnimatedItem(
                         isSelected = currentlySelected[index],
+                        borderColor = MaterialTheme.colors.textFieldOutline,
                         onSelect = {
                             currentlySelected[index] =
                                 clinicAddDoctorViewModel.toggleHourForWorkDay(workHour)
                         }
-                    )
+                    ) {
+                        Text(
+                            text = workHour.toString(),
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
 

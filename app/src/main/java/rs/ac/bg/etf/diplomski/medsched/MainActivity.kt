@@ -19,7 +19,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.*
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
+import rs.ac.bg.etf.diplomski.medsched.commons.Constants
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHANNEL_DESCRIPTION
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHANNEL_ID
 import rs.ac.bg.etf.diplomski.medsched.commons.Constants.APPOINTMENT_CANCEL_CHANNEL_NAME
@@ -57,6 +59,9 @@ class MainActivity : ComponentActivity() {
             APPOINTMENT_CANCEL_CHANNEL_NAME,
             APPOINTMENT_CANCEL_CHANNEL_DESCRIPTION
         )
+
+        OneSignal.initWithContext(this)
+        OneSignal.setAppId(Constants.ONESIGNAL_APP_ID)
 
         setContent {
             MedSchedTheme {

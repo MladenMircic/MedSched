@@ -62,7 +62,10 @@
     <string name="welcome">Dobrodošli</string>
     <string name="categories_list">Kategorije</string>
     <string name="doctors_list">Doktori</string>
+    <string name="clinics_list">Klinike</string>
     <string name="doctor_search">Pretražite doktore</string>
+    <string name="show_clinics">Prikaži klinike</string>
+    <string name="show_doctors">Prikaži doktore</string>
     <string name="schedule_appointment">Zakaži pregled</string>
     <string name="scheduled_appointments">Zakazani pregledi</string>
     <string name="schedule_appointment_button">Zakaži</string>
@@ -74,6 +77,7 @@
     <string name="dismiss_appointment_button">Ukloni</string>
     <string name="confirmed_appointment">Potvrdjen</string>
     <string name="cancelled_appointment">Otkazan</string>
+    <string name="no_available_appointments">Nema zakazanih pregleda</string>
     <string name="release_to_refresh">Pustite da osvežite</string>
     <string name="refreshing">Osvežava se</string>
 

@@ -62,6 +62,9 @@
     <string name="welcome">Welcome</string>
     <string name="categories_list">Categories</string>
     <string name="doctors_list">Doctors</string>
+    <string name="clinics_list">Clinics</string>
+    <string name="show_clinics">Show clinics</string>
+    <string name="show_doctors">Show doctors</string>
     <string name="doctor_search">Search for doctors</string>
     <string name="schedule_appointment">Schedule an appointment</string>
     <string name="scheduled_appointments">Scheduled appointments</string>
@@ -74,6 +77,7 @@
     <string name="dismiss_appointment_button">Dismiss</string>
     <string name="confirmed_appointment">Confirmed</string>
     <string name="cancelled_appointment">Cancelled</string>
+    <string name="no_available_appointments">No available appointments</string>
     <string name="release_to_refresh">Release to refresh</string>
     <string name="refreshing">Refreshing</string>
 

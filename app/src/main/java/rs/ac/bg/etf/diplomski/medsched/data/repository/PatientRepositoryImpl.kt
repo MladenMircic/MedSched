@@ -66,6 +66,9 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun getDoctors(category: String): List<DoctorForPatient> =
         patientApi.getDoctors(category).map { it.toDoctorForPatient() }
 
+    override suspend fun getClinics(category: String): List<ClinicForPatient> =
+        patientApi.getClinics(category).map { it.toClinicForPatient() }
+
     override suspend fun getAllAppointmentsForDoctorAtDate(
         appointmentRequest: AppointmentRequest
     ): List<LocalTime> =
@@ -73,7 +76,7 @@ class PatientRepositoryImpl @Inject constructor(
             patientInfoMapper.toAppointmentRequestDto(appointmentRequest)
         )
 
-    override suspend fun getAllServicesForDoctor(doctorId: Int): List<Service> =
+    override suspend fun getAllServicesForDoctor(doctorId: String): List<Service> =
         patientApi.getServicesForDoctor(doctorId).map { it.toService() }
 
     override suspend fun scheduleAppointment(appointment: Appointment) {

@@ -44,7 +44,8 @@ class PatientScheduledViewModel @Inject constructor(
                             .also {
                                 it.addAll(appointmentWithDoctorList)
                             }.animated,
-                        isRefreshing = false
+                        isRefreshing = false,
+                        isListEmpty = appointmentWithDoctorList.isEmpty()
                     )
                 }
             }
@@ -111,12 +112,14 @@ class PatientScheduledViewModel @Inject constructor(
                         _scheduledState.value.appointmentToDelete!!
                     )
                     _scheduledState.update { state ->
+                        val animatedList = state.animatedAppointmentForPatientList
+                            .also {
+                                it.remove(state.appointmentToDelete!!)
+                            }
                         state.copy(
-                            animatedAppointmentForPatientList = state.animatedAppointmentForPatientList
-                                .also {
-                                    it.remove(state.appointmentToDelete!!)
-                                },
-                            appointmentToDelete = null
+                            animatedAppointmentForPatientList = animatedList,
+                            appointmentToDelete = null,
+                            isListEmpty = animatedList.size == 0
                         )
                     }
                 }

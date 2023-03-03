@@ -4,10 +4,7 @@ import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
-import androidx.compose.animation.core.EaseOutCubic
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -24,13 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import coil.compose.AsyncImage
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.google.accompanist.pager.rememberPagerState
 import io.github.boguszpawlowski.composecalendar.SelectableCalendar
 import io.github.boguszpawlowski.composecalendar.kotlinxDateTime.now
 import io.github.boguszpawlowski.composecalendar.rememberSelectableCalendarState
@@ -53,10 +59,12 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.composables.defaultButtonCol
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.BorderAnimatedItem
 import java.time.format.TextStyle
 import java.util.*
+import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DoctorAppointmentScreen(
@@ -65,9 +73,13 @@ fun DoctorAppointmentScreen(
     onBackPressed: () -> Unit
 ) {
     val context = LocalContext.current
+    val hapticFeedback = LocalHapticFeedback.current
     val appointmentState by patientHomeViewModel.appointmentState.collectAsState()
     var showScreen by rememberSaveable { mutableStateOf(false) }
     var examNameDropdownExpanded by rememberSaveable { mutableStateOf(false) }
+
+    val pagerState = rememberPagerState()
+    var lastPage by remember { mutableStateOf(-1) }
 
     val coroutineScope = rememberCoroutineScope()
     var snackBarJob by remember { mutableStateOf<Job?>(null) }
@@ -78,6 +90,14 @@ fun DoctorAppointmentScreen(
         patientHomeViewModel.fetchAvailableHoursForDate()
         delay(200L)
         showScreen = true
+    }
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            if (lastPage != -1) {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+            lastPage = page
+        }
     }
 
     val scaffoldState = rememberScaffoldState()
@@ -143,35 +163,102 @@ fun DoctorAppointmentScreen(
                     Box(
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 30.dp)
-                        ) {
-                            AsyncImage(
-                                model = doctor.imageRequest,
-                                contentDescription = "Doctor Image",
-                                modifier = Modifier.size(DOCTOR_IMAGE_SIZE)
-                            )
-                            Text(
-                                text = "${doctor.firstName} ${doctor.lastName}",
-                                fontFamily = Quicksand,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 30.sp,
-                                color = MaterialTheme.colors.textOnSecondary
-                            )
-                            Text(
-                                text = stringResource(
-                                    id = patientHomeViewModel.specializationIdToNameId(
-                                        doctor.specializationId
-                                    )
-                                ),
-                                fontFamily = Quicksand,
-                                fontSize = 20.sp,
-                                color = MaterialTheme.colors.textOnSecondary
-                            )
+                        HorizontalPager(
+                            count = 10,
+                            state = pagerState,
+                            contentPadding = PaddingValues(horizontal = 128.dp),
+                            modifier = Modifier.padding(top = 28.dp)
+                        ) { page ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .graphicsLayer {
+                                        // Calculate the absolute offset for the current page from the
+                                        // scroll position. We use the absolute value which allows us to mirror
+                                        // any effects for both directions
+                                        val pageOffset = calculateCurrentOffsetForPage(page)
+                                            .absoluteValue
+
+                                        // We animate the scaleX + scaleY, between 85% and 100%
+                                        lerp(
+                                            start = 0.5f,
+                                            stop = 1f,
+                                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                        ).also { scale ->
+                                            scaleX = scale
+                                            scaleY = scale
+                                        }
+
+                                        // We animate the alpha, between 50% and 100%
+                                        alpha = lerp(
+                                            start = 0.5f,
+                                            stop = 1f,
+                                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                        )
+                                    }
+                                    .fillMaxSize()
+                            ) {
+                                AsyncImage(
+                                    model = doctor.imageRequest,
+                                    contentDescription = "Doctor Image",
+                                    modifier = Modifier.size(DOCTOR_IMAGE_SIZE)
+                                )
+                                var text1Size by remember { mutableStateOf(26.sp) }
+                                var text2Size by remember { mutableStateOf(26.sp) }
+                                var text3Size by remember { mutableStateOf(20.sp) }
+
+                                Text(
+                                    text = doctor.firstName,
+                                    fontFamily = Quicksand,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = text1Size,
+                                    color = MaterialTheme.colors.textOnSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    onTextLayout = { textLayoutResult ->
+                                        val maxCurrentLineIndex: Int = textLayoutResult.lineCount - 1
+
+                                        if (textLayoutResult.isLineEllipsized(maxCurrentLineIndex)) {
+                                            text1Size = text1Size.times(0.9f)
+                                        }
+                                    }
+                                )
+                                Text(
+                                    text = doctor.lastName,
+                                    fontFamily = Quicksand,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = text2Size,
+                                    color = MaterialTheme.colors.textOnSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    onTextLayout = { textLayoutResult ->
+                                        val maxCurrentLineIndex: Int = textLayoutResult.lineCount - 1
+
+                                        if (textLayoutResult.isLineEllipsized(maxCurrentLineIndex)) {
+                                            text2Size = text2Size.times(0.9f)
+                                        }
+                                    }
+                                )
+                                Text(
+                                    text = stringResource(
+                                        id = patientHomeViewModel.specializationIdToNameId(
+                                            doctor.specializationId
+                                        )
+                                    ),
+                                    fontFamily = Quicksand,
+                                    fontSize = text3Size,
+                                    color = MaterialTheme.colors.textOnSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    onTextLayout = { textLayoutResult ->
+                                        val maxCurrentLineIndex: Int = textLayoutResult.lineCount - 1
+
+                                        if (textLayoutResult.isLineEllipsized(maxCurrentLineIndex)) {
+                                            text3Size = text3Size.times(0.9f)
+                                        }
+                                    }
+                                )
+                            }
                         }
                         SnackbarHost(
                             hostState = scaffoldState.snackbarHostState,
@@ -334,13 +421,21 @@ fun DoctorAppointmentScreen(
                             )
                         }
                         itemsIndexed(appointmentState.availableTimes) { index, time ->
-                            AppointmentTimeCard(
+                            BorderAnimatedItem(
                                 isSelected = appointmentState.selectedTime == index,
-                                time = time.toString(),
+                                borderColor = MaterialTheme.colors.textFieldOutline,
                                 onSelect = {
                                     patientHomeViewModel.onEvent(PatientEvent.SetAppointmentTime(index))
                                 }
-                            )
+                            ) {
+                                Text(
+                                    text = time.toString(),
+                                    fontFamily = Quicksand,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                         item(
                             span = { GridItemSpan(3) }
@@ -510,52 +605,3 @@ data class KotlinDayState<T : SelectionState>(
 
 private fun SelectionState.isDateSelected(date: LocalDate) = isDateSelected(date.toJavaLocalDate())
 private fun SelectionState.onDateSelected(date: LocalDate) = onDateSelected(date.toJavaLocalDate())
-
-@Composable
-fun AppointmentTimeCard(
-    time: String,
-    isSelected: Boolean,
-    onSelect: () -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val borderWidth by animateDpAsState(
-        targetValue = if (isSelected) 3.dp else 0.dp,
-        animationSpec = tween(durationMillis = 300)
-    )
-    val textSize by animateIntAsState(
-        targetValue = if (isSelected) 16 else 18,
-        animationSpec = tween(durationMillis = 100)
-    )
-
-    Card(
-        shape = RoundedCornerShape(10.dp),
-        backgroundColor = MaterialTheme.colors.calendarField,
-        border = if (isSelected)
-            BorderStroke(borderWidth, MaterialTheme.colors.textFieldOutline)
-        else null,
-        modifier = Modifier
-            .size(50.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-                onSelect()
-            }
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = time,
-                fontFamily = Quicksand,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = textSize.sp,
-                textAlign = TextAlign.Center,
-                color = if (isSelected)
-                    Color.White
-                else MaterialTheme.colors.calendarFieldText
-            )
-        }
-    }
-}

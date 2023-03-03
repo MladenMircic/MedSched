@@ -22,7 +22,9 @@ class RegisterUseCase @Inject constructor(
                 true -> emit(Resource.Success(response))
                 false -> {
                     when (response.accountExists) {
-                        true -> emit(Resource.Error(R.string.account_already_exists))
+                        true -> {
+                            emit(Resource.Error(R.string.account_already_exists))
+                        }
                         false -> emit(Resource.Error(R.string.unknown_error))
                     }
                 }

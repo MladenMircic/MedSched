@@ -1,11 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,11 +10,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -43,6 +39,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.ClinicForPatient
+import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.SearchField
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
@@ -52,6 +50,8 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.Patient
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.HorizontalDotLoader
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.VisibilityList
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animatedItemsIndexed
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -131,78 +131,172 @@ fun PatientStart(
         animationSpec = tween(durationMillis = 500)
     )
 
-    Column(
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 16.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxHeight(0.12f)
-                .padding(horizontal = 16.dp)
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxHeight(0.12f)
+                    .padding(horizontal = 16.dp)
             ) {
-                user?.let {
-                    val patient = it as Patient
-                    Text(
-                        text = "${stringResource(id = R.string.welcome)},",
-                        fontFamily = Quicksand,
-                        fontSize = 22.sp,
-                        color = MaterialTheme.colors.textOnPrimary
-                    )
-                    Text(
-                        text = "${patient.firstName} ${patient.lastName}",
-                        fontFamily = Quicksand,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp,
-                        color = MaterialTheme.colors.textOnPrimary,
-                        modifier = Modifier.offset(y = (-8).dp)
-                    )
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    user?.let {
+                        val patient = it as Patient
+                        Text(
+                            text = "${stringResource(id = R.string.welcome)},",
+                            fontFamily = Quicksand,
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colors.textOnPrimary
+                        )
+                        Text(
+                            text = "${patient.firstName} ${patient.lastName}",
+                            fontFamily = Quicksand,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp,
+                            color = MaterialTheme.colors.textOnPrimary,
+                            modifier = Modifier.offset(y = (-8).dp)
+                        )
+                    }
                 }
+                Image(
+                    painter = painterResource(id = R.drawable.caduceus),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(
+                        color = MaterialTheme.colors.textOnPrimary
+                    ),
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(80.dp)
+                )
             }
-            Image(
-                painter = painterResource(id = R.drawable.caduceus),
-                contentDescription = "",
-                colorFilter = ColorFilter.tint(
-                    color = MaterialTheme.colors.textOnPrimary
-                ),
-                contentScale = ContentScale.Fit
-            )
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(top = 30.dp)
-        ) {
-            SearchField(
-                searchKeyWord = patientState.searchKeyWord,
-                onKeyWordChange = {
-                    patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
-                },
-                label = R.string.doctor_search,
-                onSearchSubmit = searchDoctors,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.padding(top = 16.dp))
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(top = 30.dp)
+            ) {
+                SearchField(
+                    searchKeyWord = patientState.searchKeyWord,
+                    onKeyWordChange = {
+                        patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
+                    },
+                    label = R.string.doctor_search,
+                    onSearchSubmit = searchDoctors,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+        item {
             CategoriesList(
                 patientState = patientState,
                 onCategorySelected = {
-                    patientHomeViewModel.onEvent(PatientEvent.SelectService(it))
+                    patientHomeViewModel.onEvent(PatientEvent.SelectCategory(it))
                 },
                 getCategoryNameId = patientHomeViewModel::categoryIdToNameId
             )
-            Spacer(modifier = Modifier.padding(top = 16.dp))
-            DoctorsList(
-                patientState = patientState,
+        }
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val animationState = remember {
+                    MutableTransitionState(false).apply {
+                        targetState = true
+                    }
+                }
+                LaunchedEffect(key1 = animationState.currentState) {
+                    if (animationState.isIdle && !animationState.currentState) {
+                        patientHomeViewModel.onEvent(PatientEvent.ToggleDoctorsClinics)
+                        animationState.targetState = true
+                    }
+                }
+                AnimatedVisibility(
+                    visibleState = animationState,
+                    enter = slideInHorizontally(
+                        animationSpec = tween(durationMillis = 500),
+                        initialOffsetX = { -it }
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    exit = slideOutHorizontally(
+                            animationSpec = tween(durationMillis = 500),
+                            targetOffsetX = { -it }
+                    ) + fadeOut (
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = if (patientState.showingDoctors)
+                            stringResource(id = R.string.doctors_list)
+                        else stringResource(id = R.string.clinics_list),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 34.sp,
+                        color = MaterialTheme.colors.textOnPrimary
+                    )
+                }
+                AnimatedVisibility(
+                    visibleState = animationState,
+                    enter = slideInHorizontally(
+                        animationSpec = tween(durationMillis = 500),
+                        initialOffsetX = { it }
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    exit = slideOutHorizontally(
+                        animationSpec = tween(durationMillis = 500),
+                        targetOffsetX = { it }
+                    ) + fadeOut(
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    modifier = Modifier
+                        .padding(top = 9.dp, end = 16.dp)
+                ) {
+                    Text(
+                        text = if (patientState.showingDoctors)
+                            stringResource(id = R.string.show_clinics)
+                        else stringResource(id = R.string.show_doctors),
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colors.selectable,
+                        modifier = Modifier
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                patientHomeViewModel.onEvent(PatientEvent.ClearCurrentShowingList)
+                                animationState.targetState = false
+                            }
+                    )
+                }
+            }
+        }
+        if (patientState.showingDoctors) {
+            doctorsList(
+                list = patientState.currentDoctorList,
+                doctorsLoading = patientState.dataLoading,
                 onDoctorSelected = {
                     patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(it))
                     toggleBottomBar()
                 },
                 getSpecializationNameId = patientHomeViewModel::specializationIdToNameId
+            )
+        } else {
+            clinicsList(
+                list = patientState.currentClinicList
             )
         }
     }
@@ -260,7 +354,7 @@ fun CategoriesList(
         itemsIndexed(patientState.categoryList) { index, service ->
             Card(
                 shape = RoundedShape40,
-                backgroundColor = if (patientState.selectedService == index)
+                backgroundColor = if (patientState.selectedCategory == index)
                     MaterialTheme.colors.selectable
                 else Blue85,
                 modifier = Modifier
@@ -286,7 +380,7 @@ fun CategoriesList(
                             painter = painterResource(id = R.drawable.all_organs),
                             contentDescription = "Service icon",
                             colorFilter = ColorFilter.tint(
-                                color = if (patientState.selectedService == index)
+                                color = if (patientState.selectedCategory == index)
                                     Color.White
                                 else Color.Black
                             ),
@@ -302,7 +396,7 @@ fun CategoriesList(
                                 CircularProgressIndicator(color = Color.Black)
                             },
                             colorFilter = ColorFilter.tint(
-                                color = if (patientState.selectedService == index)
+                                color = if (patientState.selectedCategory == index)
                                     Color.White
                                 else Color.Black
                             ),
@@ -318,7 +412,7 @@ fun CategoriesList(
                         else "",
                         fontFamily = Quicksand,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (patientState.selectedService == index)
+                        color = if (patientState.selectedCategory == index)
                             Color.White
                         else Color.Black
                     )
@@ -328,34 +422,36 @@ fun CategoriesList(
     }
 }
 
-@Composable
-fun DoctorsList(
-    patientState: PatientState,
+fun LazyListScope.doctorsList(
+    list: VisibilityList<DoctorForPatient>,
+    doctorsLoading: Boolean,
     onDoctorSelected: (Int) -> Unit,
     getSpecializationNameId: (Int) -> Int
 ) {
-    Text(
-        text = stringResource(id = R.string.doctors_list),
-        fontFamily = Quicksand,
-        fontWeight = FontWeight.Bold,
-        fontSize = 34.sp,
-        color = MaterialTheme.colors.textOnPrimary,
-        modifier = Modifier.padding(start = 16.dp)
-    )
-    if (!patientState.doctorsLoading) {
-        Spacer(modifier = Modifier.padding(top = 26.dp))
-        LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            itemsIndexed(patientState.currentDoctorList) { index, doctor ->
+    if (!doctorsLoading) {
+        animatedItemsIndexed(
+            items = list,
+            enter = fadeIn(tween(300)) +
+                    slideInHorizontally(
+                        animationSpec = tween(300),
+                        initialOffsetX = { -it / 2 }
+                    ),
+            exit = fadeOut(tween(300)) +
+                    slideOutHorizontally(
+                        animationSpec = tween(300),
+                        targetOffsetX = { it / 2 }
+                    ),
+            exitDuration = 300,
+            animateItemPlacementSpec = tween(500)
+        ) { index, doctor ->
+            Box(modifier = Modifier.fillMaxWidth()) {
                 Card(
                     shape = RoundedShape20,
                     backgroundColor = MaterialTheme.colors.secondary,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .height(100.dp)
+                        .align(Alignment.Center)
                         .clickable {
                             onDoctorSelected(index)
                         }
@@ -404,13 +500,144 @@ fun DoctorsList(
             }
         }
     } else {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            HorizontalDotLoader(color = Blue85)
+        item {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillParentMaxWidth()
+            ) {
+                HorizontalDotLoader(color = Blue85)
+            }
         }
     }
 
+}
+
+fun LazyListScope.clinicsList(
+    list: VisibilityList<ClinicForPatient>
+) {
+    animatedItemsIndexed(
+        items = list,
+        enter = fadeIn(tween(300)) +
+                slideInHorizontally(
+                    animationSpec = tween(300),
+                    initialOffsetX = { -it / 2 }
+                ),
+        exit = fadeOut(tween(300)) +
+                slideOutHorizontally(
+                    animationSpec = tween(300),
+                    targetOffsetX = { it / 2 }
+                ),
+        exitDuration = 300,
+        animateItemPlacementSpec = tween(500)
+    ) { index, clinic ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            var doctorListExpanded by rememberSaveable { mutableStateOf(false) }
+            val arrowRotateAnimation by animateFloatAsState(
+                targetValue = if (doctorListExpanded) 180f else 0f,
+                animationSpec = tween(durationMillis = 200)
+            )
+            val listExpandAnimation by animateDpAsState(
+                targetValue = if (doctorListExpanded) 200.dp else 0.dp,
+                animationSpec = tween(durationMillis = 200)
+            )
+            Card(
+                shape = RoundedShape20,
+                backgroundColor = MaterialTheme.colors.secondary,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(100.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        doctorListExpanded = !doctorListExpanded
+                    }
+            ) {
+                Box {
+                    Text(
+                        text = clinic.name,
+                        fontFamily = Quicksand,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colors.textOnSecondary,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                    IconButton(
+                        onClick = { doctorListExpanded = !doctorListExpanded },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .graphicsLayer {
+                                rotationZ = arrowRotateAnimation
+                            }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "",
+                            tint = MaterialTheme.colors.textOnSecondary
+                        )
+                    }
+                }
+            }
+            LazyColumn(
+                contentPadding = PaddingValues(start = 32.dp, top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.height(listExpandAnimation))
+            {
+                itemsIndexed(items = clinic.doctors) { index, doctor ->
+                    Card(
+                        shape = RoundedShape20,
+                        backgroundColor = MaterialTheme.colors.secondary,
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(100.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+//                            SubcomposeAsyncImage(
+//                                model = doctor.imageRequest,
+//                                contentDescription = "Doctor image",
+//                                loading = {
+//                                    CircularProgressIndicator(
+//                                        color = MaterialTheme.colors.textOnSecondary,
+//                                        modifier = Modifier.size(CARD_IMAGE_SIZE)
+//                                    )
+//                                },
+//                                modifier = Modifier
+//                                    .padding(start = 10.dp)
+//                                    .clip(RoundedShape20)
+//                                    .size(CARD_IMAGE_SIZE)
+//                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(start = 10.dp)
+                            ) {
+                                Text(
+                                    text = "${doctor.firstName} ${doctor.lastName}",
+                                    fontFamily = Quicksand,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colors.textOnSecondary
+                                )
+//                                Text(
+//                                    text = stringResource(
+//                                        id = getSpecializationNameId(doctor.specializationId)
+//                                    ),
+//                                    fontFamily = Quicksand,
+//                                    fontSize = 16.sp,
+//                                    color = MaterialTheme.colors.textOnSecondary
+//                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

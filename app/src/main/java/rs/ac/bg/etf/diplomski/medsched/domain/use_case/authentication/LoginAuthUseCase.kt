@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.medsched.domain.use_case.authentication
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.onesignal.OneSignal
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -27,12 +28,13 @@ class LoginAuthUseCase @Inject constructor(
         try {
             val loginResponse = loginRegisterRepository.loginUser(user)
             // For saving JWT token to preferences data store
-            loginResponse.token?.let {
+            loginResponse.token?.let { token ->
                 dataStore.edit { preferences ->
-                    preferences[PreferenceKeys.USER_TOKEN_KEY] = loginResponse.token
+                    preferences[PreferenceKeys.USER_TOKEN_KEY] = token
                     preferences[PreferenceKeys.USER_INFO_KEY] =
                         moshi.adapter(User::class.java).toJson(loginResponse.user)
                 }
+                OneSignal.setExternalUserId(loginResponse.user!!.id.toString())
             }
             emit(Resource.Success(loginResponse))
         } catch (e: HttpException) {

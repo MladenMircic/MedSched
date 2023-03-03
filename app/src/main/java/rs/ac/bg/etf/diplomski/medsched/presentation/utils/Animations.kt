@@ -1,10 +1,13 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.utils
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.compose.*
@@ -29,7 +32,13 @@ fun HorizontalDotLoader(color: Color) {
     LottieAnimation(
         composition = composition,
         progress = { progress },
-        dynamicProperties = dynamicProperties
+        dynamicProperties = dynamicProperties,
+        modifier = Modifier
+            .size(100.dp)
+            .graphicsLayer {
+                scaleX = 6f
+                scaleY = 6f
+            }
     )
 }
 

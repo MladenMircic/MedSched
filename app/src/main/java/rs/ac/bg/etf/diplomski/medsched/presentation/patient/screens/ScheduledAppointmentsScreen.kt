@@ -1,13 +1,10 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
@@ -33,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -129,6 +127,34 @@ fun ScheduledAppointmentsScreen(
                         .fillMaxSize()
                         .background(MaterialTheme.colors.primary)
                 ) {
+                    AnimatedVisibility(
+                        visible = scheduledState.isListEmpty,
+                        enter = slideInHorizontally(
+                            animationSpec = tween(500),
+                            initialOffsetX = { -it }
+                        ),
+                        exit = slideOutHorizontally(
+                            animationSpec = tween(500),
+                            targetOffsetX = { it }
+                        )
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    id = R.string.no_available_appointments
+                                ),
+                                fontFamily = Quicksand,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 30.sp,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colors.textOnPrimary
+                            )
+                        }
+                    }
                     LazyColumn(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(6.dp),

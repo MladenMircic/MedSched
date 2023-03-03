@@ -11,7 +11,7 @@ import javax.inject.Inject
 class GetServicesForDoctorUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
-    suspend operator fun invoke(doctorId: Int): Resource<List<Service>> =
+    suspend operator fun invoke(doctorId: String): Resource<List<Service>> =
         try {
             Resource.Success(patientRepository.getAllServicesForDoctor(doctorId))
         } catch (e: HttpException) {

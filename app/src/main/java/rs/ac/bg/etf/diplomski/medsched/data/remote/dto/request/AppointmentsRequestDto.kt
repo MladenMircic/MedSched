@@ -5,6 +5,6 @@ import kotlinx.datetime.LocalDate
 
 @JsonClass(generateAdapter = true)
 data class AppointmentsRequestDto(
-    val doctorId: Int,
+    val doctorId: String,
     val date: LocalDate
 )

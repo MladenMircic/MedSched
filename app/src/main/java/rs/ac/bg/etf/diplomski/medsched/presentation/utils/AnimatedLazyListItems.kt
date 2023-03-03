@@ -30,7 +30,7 @@ data class VisibleItem<T>(
 
 class VisibilityList<T>(core: SnapshotStateList<T>, initialAnimated: Boolean = true) {
     private var _originalSize by mutableStateOf(0)
-    private var showDelay by mutableStateOf(0L)
+
     private val visibilityList = mutableStateListOf<VisibleItem<T>>()
         .apply {
             val state = if(initialAnimated)
@@ -55,12 +55,6 @@ class VisibilityList<T>(core: SnapshotStateList<T>, initialAnimated: Boolean = t
         get() = _originalSize
     val list: SnapshotStateList<VisibleItem<T>>
         get() = visibilityList
-
-    fun getDelayAndIncrement(): Long {
-        val delay = showDelay
-        showDelay += 200L
-        return delay
-    }
 
     fun add(item: T) {
         visibilityList.add(
@@ -110,7 +104,7 @@ class VisibilityList<T>(core: SnapshotStateList<T>, initialAnimated: Boolean = t
         val index = visibilityList.indexOfFirst {
             it.data == item
         }
-        if(index > -1){
+        if(index > -1) {
             visibilityList[index] = VisibleItem(
                 visible = false,
                 data = item,
@@ -184,7 +178,7 @@ class VisibilityList<T>(core: SnapshotStateList<T>, initialAnimated: Boolean = t
 
     fun indexOf(item: T): Int {
         return visibilityList.indexOfFirst {
-            it.data==item
+            it.data == item
         }
     }
 
@@ -222,22 +216,22 @@ inline fun <T> LazyListScope.animatedItems(
         else { item: VisibleItem<T> ->
             key(item.data)
         }
-    ) {
-        LaunchedEffect(key1 = it.visible){
-            if (!it.visible && it.state==VisibleItem.State.ADDING) {
-                items.makeVisible(it)
+    ) { item ->
+        LaunchedEffect(key1 = item.visible){
+            if (!item.visible && item.state==VisibleItem.State.ADDING) {
+                items.makeVisible(item)
                 return@LaunchedEffect
             }
-            if (!it.visible && it.state==VisibleItem.State.REMOVING) {
+            if (!item.visible && item.state==VisibleItem.State.REMOVING) {
                 if (exitDuration > 0) {
-                    items.makeInvisible(it)
+                    items.makeInvisible(item)
                     delay(exitDuration)
                 }
-                items.delete(it)
+                items.delete(item)
             }
         }
         AnimatedVisibility(
-            visible = it.visible,
+            visible = item.visible,
             enter = enter,
             exit = exit,
             modifier = Modifier.then(
@@ -246,7 +240,56 @@ inline fun <T> LazyListScope.animatedItems(
                 else Modifier
             )
         ) {
-            itemContent(it.data)
+            itemContent(item.data)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+inline fun <T> LazyListScope.animatedItemsIndexed(
+    items: VisibilityList<T>,
+    noinline key: ((index: Int, item: T) -> Any)? = null,
+    enter: EnterTransition = EnterTransition.None,
+    exit: ExitTransition = ExitTransition.None,
+    exitDuration: Long = 0,
+    animateItemPlacementSpec: FiniteAnimationSpec<IntOffset>? = spring(
+        stiffness = Spring.StiffnessMediumLow,
+        visibilityThreshold = IntOffset.VisibilityThreshold
+    ),
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+){
+    itemsIndexed(
+        items.list,
+        key = if(key == null)
+            null
+        else { index: Int, item: VisibleItem<T> ->
+            key(index, item.data)
+        }
+    ) { index, item ->
+        LaunchedEffect(key1 = item.visible) {
+            if (!item.visible && item.state==VisibleItem.State.ADDING) {
+                items.makeVisible(item)
+                return@LaunchedEffect
+            }
+            if (!item.visible && item.state==VisibleItem.State.REMOVING) {
+                if (exitDuration > 0) {
+                    items.makeInvisible(item)
+                    delay(exitDuration)
+                }
+                items.delete(item)
+            }
+        }
+        AnimatedVisibility(
+            visible = item.visible,
+            enter = enter,
+            exit = exit,
+            modifier = Modifier.then(
+                if (animateItemPlacementSpec != null)
+                    Modifier.animateItemPlacement(animateItemPlacementSpec)
+                else Modifier
+            )
+        ) {
+            itemContent(index, item.data)
         }
     }
 }

@@ -20,8 +20,11 @@ interface PatientApi {
     @GET("/${Constants.PATIENT_ENDPOINTS}/getDoctors")
     suspend fun getDoctors(@Query("category") category: String): List<DoctorForPatientDto>
 
+    @GET("/${Constants.PATIENT_ENDPOINTS}/getClinics")
+    suspend fun getClinics(@Query("category") category: String): List<ClinicForPatientDto>
+
     @GET("/${Constants.PATIENT_ENDPOINTS}/getServicesForDoctor/{doctorId}")
-    suspend fun getServicesForDoctor(@Path("doctorId") doctorId: Int): List<ServiceDto>
+    suspend fun getServicesForDoctor(@Path("doctorId") doctorId: String): List<ServiceDto>
 
     @POST("/${Constants.PATIENT_ENDPOINTS}/scheduledAppointmentsForDoctor")
     suspend fun getScheduledAppointments(
