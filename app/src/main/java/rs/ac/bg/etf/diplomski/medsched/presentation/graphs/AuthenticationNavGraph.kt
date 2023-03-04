@@ -45,7 +45,6 @@ fun NavGraphBuilder.authenticationNavGraph(
 
             LoginScreen(
                 onLoginSuccess = {
-                    rootViewModel.triggerAutoLogout()
                     navController.navigateWithPopInclusive(
                         toRoute = when (user) {
                             is Patient -> Graph.PATIENT

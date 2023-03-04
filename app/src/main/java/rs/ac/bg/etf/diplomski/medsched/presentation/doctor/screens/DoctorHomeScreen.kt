@@ -213,11 +213,7 @@ fun AppointmentForDoctorCard(
 
                                 val date = appointmentForDoctor.appointment.date
                                 Text(
-                                    text = CustomDateFormatter.dateAsString(
-                                        date.dayOfMonth,
-                                        date.month.name,
-                                        date.year
-                                    ),
+                                    text = CustomDateFormatter.dateAsString(date),
                                     fontFamily = Quicksand,
                                     fontSize = 16.sp,
                                     color = Color.Black
@@ -238,10 +234,7 @@ fun AppointmentForDoctorCard(
 
                                 val time = appointmentForDoctor.appointment.time
                                 Text(
-                                    text = CustomDateFormatter.timeAsString(
-                                        time.hour,
-                                        time.minute
-                                    ),
+                                    text = CustomDateFormatter.timeAsString(time),
                                     fontFamily = Quicksand,
                                     fontSize = 16.sp,
                                     color = Color.Black

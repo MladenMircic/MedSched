@@ -63,7 +63,7 @@
     <string name="categories_list">Kategorije</string>
     <string name="doctors_list">Doktori</string>
     <string name="clinics_list">Klinike</string>
-    <string name="doctor_search">Pretražite doktore</string>
+    <string name="search">Pretražite doktore</string>
     <string name="show_clinics">Prikaži klinike</string>
     <string name="show_doctors">Prikaži doktore</string>
     <string name="schedule_appointment">Zakaži pregled</string>
@@ -80,6 +80,16 @@
     <string name="no_available_appointments">Nema zakazanih pregleda</string>
     <string name="release_to_refresh">Pustite da osvežite</string>
     <string name="refreshing">Osvežava se</string>
+    <string name="notifications">Notifikacije</string>
+    <string name="appointment_scheduled_heading">Pregled potvrđen</string>
+    <string name="appointment_cancelled_heading">Pregled otkazan</string>
+    <string name="appointment_scheduled_content">
+        Uspešno ste zakazali pregled: Dr %1$s datuma %2$s, %3$s
+    </string>
+    <string name="appointment_cancelled_content">
+        Uspešno ste otkazali pregled: Dr %1$s datuma %2$s, %3$s
+    </string>
+    <string name="new_notification">Novo</string>
 
     <!-- Clinic -->
     <string name="work_days">Radni dani</string>

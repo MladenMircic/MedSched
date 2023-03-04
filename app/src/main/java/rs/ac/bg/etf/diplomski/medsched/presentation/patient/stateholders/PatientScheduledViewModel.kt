@@ -8,15 +8,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForPatient
+import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.NotificationsUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.CancelAppointmentUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetAllAppointmentsForPatientUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.ScheduledAppointmentsEvent
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.NotificationType
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.ScheduledState
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animated
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +32,7 @@ class PatientScheduledViewModel @Inject constructor(
     private val getAllAppointmentsForPatientUseCase: GetAllAppointmentsForPatientUseCase,
     private val cancelAppointmentUseCase: CancelAppointmentUseCase,
     private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase,
+    private val notificationsUseCase: NotificationsUseCase
 ) : ViewModel() {
 
     private val _scheduledState = MutableStateFlow(ScheduledState())
@@ -102,8 +110,9 @@ class PatientScheduledViewModel @Inject constructor(
     }
 
     private fun cancelAppointment() = viewModelScope.launch {
+        val appointmentForPatient = _scheduledState.value.appointmentToDelete!!
         val response = cancelAppointmentUseCase(
-            _scheduledState.value.appointmentToDelete!!.appointment.id
+            appointmentForPatient.appointment.id
         )
         response.collect { resource ->
             when (resource) {
@@ -122,6 +131,21 @@ class PatientScheduledViewModel @Inject constructor(
                             isListEmpty = animatedList.size == 0
                         )
                     }
+                    val currentDateTime = Instant
+                        .fromEpochMilliseconds(Date().time)
+                        .toLocalDateTime(
+                            TimeZone.currentSystemDefault()
+                        )
+                    notificationsUseCase.sendNotification(
+                        NotificationPatientEntity(
+                            dateOfAction = appointmentForPatient.appointment.date,
+                            timeOfAction = appointmentForPatient.appointment.time,
+                            dateNotified = currentDateTime.date,
+                            timeNotified = currentDateTime.time,
+                            doctorName = appointmentForPatient.doctorName,
+                            type = NotificationType.CANCELLED
+                        )
+                    )
                 }
                 is Resource.Error -> {}
                 is Resource.Loading -> {}

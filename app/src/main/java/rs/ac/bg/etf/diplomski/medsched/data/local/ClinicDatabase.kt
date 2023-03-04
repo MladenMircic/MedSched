@@ -9,11 +9,13 @@ import rs.ac.bg.etf.diplomski.medsched.data.local.dao.DoctorDao
 import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.AppointmentForDoctorEntity
 import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.AppointmentForPatientEntity
+import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
 
 @Database(
     entities = [
         AppointmentForPatientEntity::class,
-        AppointmentForDoctorEntity::class
+        AppointmentForDoctorEntity::class,
+        NotificationPatientEntity::class
     ],
     version = 1,
     exportSchema = false

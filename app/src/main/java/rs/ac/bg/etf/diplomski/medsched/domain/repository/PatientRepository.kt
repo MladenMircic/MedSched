@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.medsched.domain.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalTime
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
+import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.InfoChangeRequest
@@ -13,6 +14,7 @@ interface PatientRepository {
 
     val user: Flow<User?>
     val appointmentForPatientFlow: Flow<List<AppointmentForPatient>>
+    val notifications: Flow<List<NotificationPatientEntity>>
 
     suspend fun fetchAllAppointmentsForPatientAndSaveLocal()
     suspend fun getAppointmentsWithDoctorFromRemote(): List<AppointmentForPatient>
@@ -29,4 +31,7 @@ interface PatientRepository {
     suspend fun updateEmail(emailChangeRequest: EmailChangeRequest)
     suspend fun updatePassword(passwordChangeRequest: PasswordChangeRequest) : PasswordChangeResponse
     suspend fun updateInfo(infoChangeRequest: InfoChangeRequest)
+
+    suspend fun insertNotification(notificationPatientEntity: NotificationPatientEntity)
+    suspend fun updateNotification(notificationPatientEntity: NotificationPatientEntity)
 }

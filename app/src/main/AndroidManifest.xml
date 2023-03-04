@@ -38,6 +38,8 @@
             tools:node="remove">
         </provider>
 
+        <meta-data android:name="com.onesignal.NotificationServiceExtension"
+            android:value="rs.ac.bg.etf.diplomski.medsched.domain.NotificationServiceExtension" />
     </application>
 
 </manifest>

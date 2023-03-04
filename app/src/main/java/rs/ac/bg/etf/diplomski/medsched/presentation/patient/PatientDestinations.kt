@@ -25,6 +25,14 @@ object PatientHomeStart: PatientHomeDestinations {
     override val route: String = "patient_home_start"
 }
 
+object Notifications: PatientHomeDestinations {
+    override val route: String = "notifications"
+}
+
+object Search: PatientHomeDestinations {
+    override val route: String = "search"
+}
+
 object DoctorDetails: PatientHomeDestinations {
     override val route: String = "doctor_details"
 }

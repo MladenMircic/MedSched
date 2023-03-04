@@ -1,5 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -23,7 +26,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,9 +44,10 @@ import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.ClinicForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
-import rs.ac.bg.etf.diplomski.medsched.presentation.composables.SearchField
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.Notifications
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.Search
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
@@ -53,6 +56,7 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.utils.HorizontalDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.VisibilityList
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animatedItemsIndexed
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun PatientHomeScreen(
@@ -62,20 +66,47 @@ fun PatientHomeScreen(
     val doctorDetailsNavController = rememberAnimatedNavController()
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
+    var transitionToScheduling by rememberSaveable { mutableStateOf(false) }
 
     AnimatedNavHost(
         navController = doctorDetailsNavController,
         startDestination = PatientHomeStart.route,
-        enterTransition = { fadeIn(tween(durationMillis = 1)) },
-        exitTransition = { fadeOut(tween(durationMillis = 1)) }
     ) {
         composable(
-            route = PatientHomeStart.route
+            route = PatientHomeStart.route,
+            enterTransition = {
+                if (transitionToScheduling) {
+                    fadeIn(tween(durationMillis = 1))
+                } else {
+                    slideInHorizontally(
+                        animationSpec = tween(durationMillis = 300),
+                        initialOffsetX = { -it }
+                    )
+                }
+            },
+            exitTransition = {
+                if (transitionToScheduling) {
+                    fadeOut(tween(durationMillis = 1))
+                } else {
+                    slideOutHorizontally(
+                        animationSpec = tween(durationMillis = 300),
+                        targetOffsetX = { -it }
+                    )
+                }
+            }
         ) {
             PatientStart(
                 patientHomeViewModel = patientHomeViewModel,
                 navigateToDoctorDetails = {
+                    transitionToScheduling = true
                     doctorDetailsNavController.navigate(DoctorDetails.route)
+                },
+                navigateToNotifications = {
+                    transitionToScheduling = false
+                    doctorDetailsNavController.navigate(Notifications.route)
+                },
+                navigateToSearch = {
+                    doctorDetailsNavController.navigate(Search.route)
                 },
                 searchDoctors = {
                     keyboardController?.hide()
@@ -85,7 +116,47 @@ fun PatientHomeScreen(
             )
         }
         composable(
-            route = DoctorDetails.route
+            route = Notifications.route,
+            enterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(durationMillis = 300),
+                    initialOffsetX = { it }
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(durationMillis = 300),
+                    targetOffsetX = { it }
+                )
+            }
+        ) {
+            NotificationsScreen(
+                patientHomeViewModel = patientHomeViewModel,
+                onBack = {
+                    doctorDetailsNavController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = Search.route,
+            enterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(durationMillis = 300),
+                    initialOffsetX = { it }
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(durationMillis = 300),
+                    targetOffsetX = { it }
+                )
+            }
+        ) {
+
+        }
+        composable(
+            route = DoctorDetails.route,
+            enterTransition = { fadeIn(animationSpec = tween(durationMillis = 1)) }
         ) {
             DoctorAppointmentScreen(
                 patientHomeViewModel = patientHomeViewModel,
@@ -95,6 +166,7 @@ fun PatientHomeScreen(
                         delay(300L)
                         doctorDetailsNavController.popBackStack()
                         delay(200L)
+                        transitionToScheduling = false
                         patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(null))
                         toggleBottomBar()
                     }
@@ -109,6 +181,8 @@ fun PatientHomeScreen(
 fun PatientStart(
     patientHomeViewModel: PatientHomeViewModel,
     navigateToDoctorDetails: () -> Unit,
+    navigateToNotifications: () -> Unit,
+    navigateToSearch: () -> Unit,
     searchDoctors: () -> Unit,
     toggleBottomBar: () -> Unit
 ) {
@@ -136,7 +210,7 @@ fun PatientStart(
         contentPadding = PaddingValues(bottom = 16.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 16.dp)
+            .padding(top = 24.dp)
     ) {
         item {
             Row(
@@ -166,33 +240,91 @@ fun PatientStart(
                         )
                     }
                 }
-                Image(
-                    painter = painterResource(id = R.drawable.caduceus),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(
-                        color = MaterialTheme.colors.textOnPrimary
-                    ),
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(80.dp)
-                )
+                BadgedBox(
+                    badge = {
+                        if (patientState.newNotificationCount > 0) {
+                            Badge(
+                                backgroundColor = MaterialTheme.colors.secondary,
+                                contentColor = MaterialTheme.colors.textOnSecondary
+                            ) {
+                                Text(
+                                    text = "${patientState.newNotificationCount}",
+                                    fontFamily = Quicksand
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.padding(end = 8.dp)
+                ) {
+                    IconButton(
+                        onClick = navigateToNotifications,
+                        modifier = Modifier.size(30.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.notification_bell),
+                            contentDescription = "",
+                            tint = MaterialTheme.colors.textOnPrimary
+                        )
+                    }
+                }
             }
         }
         item {
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .padding(top = 30.dp)
+                    .padding(top = 12.dp)
             ) {
-                SearchField(
-                    searchKeyWord = patientState.searchKeyWord,
-                    onKeyWordChange = {
-                        patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
-                    },
-                    label = R.string.doctor_search,
-                    onSearchSubmit = searchDoctors,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Card(
+                    backgroundColor = MaterialTheme.colors.secondary,
+                    contentColor = MaterialTheme.colors.textOnSecondary,
+                    shape = RoundedShape20,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(60.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { navigateToSearch() }
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "",
+                                modifier = Modifier.padding(top = 2.dp)
+                            )
+                            Text(
+                                text = stringResource(id = R.string.search),
+                                fontFamily = Quicksand,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(start = 12.dp, bottom = 2.dp)
+                            )
+                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.filter),
+                            contentDescription = "",
+                            tint = MaterialTheme.colors.selectable,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+//                SearchField(
+//                    searchKeyWord = patientState.searchKeyWord,
+//                    onKeyWordChange = {
+//                        patientHomeViewModel.onEvent(PatientEvent.SearchTextChange(it))
+//                    },
+//                    label = R.string.search,
+//                    onSearchSubmit = searchDoctors,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
             }
         }
         item {

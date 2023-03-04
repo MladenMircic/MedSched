@@ -9,24 +9,32 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
+import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.NotificationsUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.NotificationType
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.AppointmentState
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animated
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,10 +47,12 @@ class PatientHomeViewModel @Inject constructor(
     private val getScheduledAppointmentsUseCase: GetScheduledAppointmentsUseCase,
     private val getServicesForDoctorUseCase: GetServicesForDoctorUseCase,
     private val scheduleAppointmentUseCase: ScheduleAppointmentUseCase,
-    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase
+    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase,
+    private val notificationsUseCase: NotificationsUseCase
 ): ViewModel() {
 
     val userFlow = getUserUseCase.userFlow
+    val notificationsFlow = notificationsUseCase.notificationsFlow
 
     private val _patientState = MutableStateFlow(PatientState())
     val patientState = _patientState.asStateFlow()
@@ -51,6 +61,17 @@ class PatientHomeViewModel @Inject constructor(
     val appointmentState = _appointmentState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            notificationsFlow.collect { notifications ->
+                _patientState.update {
+                    it.copy(
+                        newNotificationCount = notifications.count { notification ->
+                            !notification.read
+                        }
+                    )
+                }
+            }
+        }
         getAllCategories()
         getDoctorsForPatient()
     }
@@ -118,6 +139,9 @@ class PatientHomeViewModel @Inject constructor(
             }
             is PatientEvent.ScheduleAppointment -> {
                 scheduleAppointment()
+            }
+            is PatientEvent.UpdateNotificationsRead -> {
+                updateNotifications(patientEvent.indices)
             }
             PatientEvent.SetScheduleMessageNull -> {
                 _appointmentState.update { it.copy(scheduledMessageId = null) }
@@ -316,6 +340,7 @@ class PatientHomeViewModel @Inject constructor(
 
     private fun scheduleAppointment() = viewModelScope.launch {
         val appointmentInfo = _appointmentState.value
+        val patientInfo = _patientState.value
         val selectedTime = appointmentInfo.availableTimes[appointmentInfo.selectedTime]
         userFlow.collect { user ->
             val response = scheduleAppointmentUseCase(Appointment(
@@ -343,6 +368,19 @@ class PatientHomeViewModel @Inject constructor(
                                 scheduledMessageId = R.string.schedule_success
                             )
                         }
+                        val currentDateTime = Instant.fromEpochMilliseconds(Date().time)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                        val selectedDoctor = patientInfo.allDoctorList[patientInfo.selectedDoctor!!]
+                        notificationsUseCase.sendNotification(
+                            NotificationPatientEntity(
+                                type = NotificationType.SCHEDULED,
+                                doctorName = "${selectedDoctor.firstName} ${selectedDoctor.lastName}",
+                                dateOfAction = appointmentInfo.selectedDate,
+                                timeOfAction = selectedTime,
+                                dateNotified = currentDateTime.date,
+                                timeNotified = currentDateTime.time
+                            )
+                        )
                     }
                     is Resource.Error -> {
                         _appointmentState.update {
@@ -355,5 +393,15 @@ class PatientHomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun updateNotifications(visibleIndices: List<Int>) = viewModelScope.launch {
+        val notifications = notificationsFlow.first().filterIndexed { index, notification ->
+            visibleIndices.contains(index) && !notification.read
+        }
+        notifications.forEach { notification ->
+            notification.read = true
+        }
+        notificationsUseCase.updateNotifications(notifications)
     }
 }

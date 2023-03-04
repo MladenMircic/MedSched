@@ -11,6 +11,7 @@ import rs.ac.bg.etf.diplomski.medsched.data.local.dao.PatientDao
 import rs.ac.bg.etf.diplomski.medsched.data.mappers.PatientInfoMapper
 import rs.ac.bg.etf.diplomski.medsched.data.remote.PatientApi
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.*
+import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.InfoChangeRequest
@@ -44,6 +45,8 @@ class PatientRepositoryImpl @Inject constructor(
         patientDao.getAllAppointmentForPatientEntitiesFlow().map { appointmentPatientEntityList ->
             appointmentPatientEntityList.map { it.toAppointmentForPatient() }
         }
+    override val notifications: Flow<List<NotificationPatientEntity>> =
+        patientDao.getAllNotifications()
 
     override suspend fun fetchAllAppointmentsForPatientAndSaveLocal() {
         patientDao.deleteAllAppointmentForPatientEntities()
@@ -103,6 +106,14 @@ class PatientRepositoryImpl @Inject constructor(
 
     override suspend fun updateInfo(infoChangeRequest: InfoChangeRequest) {
         patientApi.updateInfo(patientInfoMapper.toInfoChangeRequestDto(infoChangeRequest))
+    }
+
+    override suspend fun insertNotification(notificationPatientEntity: NotificationPatientEntity) {
+        patientDao.insertNotification(notificationPatientEntity)
+    }
+
+    override suspend fun updateNotification(notificationPatientEntity: NotificationPatientEntity) {
+        patientDao.updateNotification(notificationPatientEntity)
     }
 
 }

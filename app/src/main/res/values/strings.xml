@@ -65,7 +65,7 @@
     <string name="clinics_list">Clinics</string>
     <string name="show_clinics">Show clinics</string>
     <string name="show_doctors">Show doctors</string>
-    <string name="doctor_search">Search for doctors</string>
+    <string name="search">Search</string>
     <string name="schedule_appointment">Schedule an appointment</string>
     <string name="scheduled_appointments">Scheduled appointments</string>
     <string name="schedule_appointment_button">Schedule</string>
@@ -80,6 +80,16 @@
     <string name="no_available_appointments">No available appointments</string>
     <string name="release_to_refresh">Release to refresh</string>
     <string name="refreshing">Refreshing</string>
+    <string name="notifications">Notifications</string>
+    <string name="appointment_scheduled_heading">Appointment scheduled</string>
+    <string name="appointment_cancelled_heading">Appointment cancelled</string>
+    <string name="appointment_scheduled_content">
+        You have successfully scheduled an appointment with Dr %1$s on %2$s, %3$s
+    </string>
+    <string name="appointment_cancelled_content">
+        You have successfully cancelled an appointment with Dr %1$s on %2$s, %3$s
+    </string>
+    <string name="new_notification">New</string>
 
     <!-- Clinic -->
     <string name="work_days">Work days</string>

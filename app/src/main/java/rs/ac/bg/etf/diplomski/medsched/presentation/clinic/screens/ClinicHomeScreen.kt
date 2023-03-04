@@ -93,7 +93,7 @@ fun ClinicHomeScreen(
                     onKeyWordChange = { keyWord ->
                         clinicHomeViewModel.onEvent(ClinicHomeEvent.SearchTextChange(keyWord))
                     },
-                    label = R.string.doctor_search,
+                    label = R.string.search,
                     onSearchSubmit = { clinicHomeViewModel.onEvent(ClinicHomeEvent.SearchForDoctor) },
                     modifier = Modifier
                         .padding(vertical = 20.dp)

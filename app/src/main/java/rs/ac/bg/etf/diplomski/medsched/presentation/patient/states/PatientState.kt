@@ -15,5 +15,6 @@ data class PatientState(
     val currentClinicList: VisibilityList<ClinicForPatient> = VisibilityList(mutableStateListOf()),
     val selectedDoctor: Int? = null,
     val dataLoading: Boolean = false,
-    val showingDoctors: Boolean = true
+    val showingDoctors: Boolean = true,
+    val newNotificationCount: Int = 0
 )
