@@ -32,6 +32,7 @@ import rs.ac.bg.etf.diplomski.medsched.commons.CustomDateFormatter
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForDoctor
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Doctor
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.User
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.doctor.stateholders.DoctorHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
 
@@ -99,7 +100,9 @@ fun DoctorHomeScreen(
                 AppointmentForDoctorCard(
                     appointmentForDoctor = appointmentForDoctor,
                     onCancelAppointment = { },
-                    getServiceId = doctorHomeViewModel::serviceIdToNameId,
+                    getServiceId = {
+                        ClinicIdToNameMapUseCase.serviceIdToNameId(it)
+                    },
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .animateItemPlacement(
@@ -176,17 +179,18 @@ fun AppointmentForDoctorCard(
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
-                        Text(
-                            text = stringResource(
-                                id = getServiceId(appointmentForDoctor.appointment.examId)
-                            ),
-                            fontFamily = Quicksand,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .weight(1f)
-                        )
+                        //TODO izmeniti
+//                        Text(
+//                            text = stringResource(
+//                                id = getServiceId(appointmentForDoctor.appointment.examId)
+//                            ),
+//                            fontFamily = Quicksand,
+//                            fontWeight = FontWeight.SemiBold,
+//                            fontSize = 16.sp,
+//                            color = Color.Black,
+//                            modifier = Modifier
+//                                .weight(1f)
+//                        )
                     }
                     Divider(
                         color = Color.Black.copy(alpha = 0.3f),

@@ -13,7 +13,6 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Clinic
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.WorkDay
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.DoctorRegisterRequest
@@ -28,7 +27,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ClinicAddDoctorViewModel @Inject constructor(
     getUserUseCase: GetUserUseCase,
-    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase,
     private val getCategoriesClinicUseCase: GetCategoriesClinicUseCase,
     private val registerDoctorUseCase: RegisterDoctorUseCase
 ): ViewModel() {
@@ -196,14 +194,10 @@ class ClinicAddDoctorViewModel @Inject constructor(
         }
         return !hasError
     }
-
-    fun categoryToNameId(category: Category): Int? =
-        clinicIdToNameMapUseCase.categoryIdToNameId(categoryId = category.id)
-
     fun getSelectedCategoryNameId(): Int? {
         val addDoctorValue = _addDoctorState.value
         return addDoctorValue.selectedCategory?.let {
-            clinicIdToNameMapUseCase.categoryIdToNameId(
+            ClinicIdToNameMapUseCase.categoryIdToNameId(
                 categoryId = addDoctorValue.categoryList[it].id
             )
         }

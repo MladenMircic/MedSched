@@ -27,21 +27,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CustomDateFormatter
 import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
+import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.NotificationsViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.Quicksand
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.selectable
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.textOnPrimary
 
 @Composable
 fun NotificationsScreen(
-    patientHomeViewModel: PatientHomeViewModel,
+    notificationsViewModel: NotificationsViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
-    val notifications by patientHomeViewModel.notificationsFlow.collectAsState(initial = listOf())
+    val notifications by notificationsViewModel.notificationsFlow.collectAsState(initial = listOf())
     val state = rememberLazyListState()
     val visibleItemIds: List<Int> by remember {
         derivedStateOf {
@@ -65,7 +65,9 @@ fun NotificationsScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .background(color = MaterialTheme.colors.primary)
+            .fillMaxSize()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -75,9 +77,7 @@ fun NotificationsScreen(
         ) {
             IconButton(
                 onClick = {
-                    patientHomeViewModel.onEvent(
-                        PatientEvent.UpdateNotificationsRead(readIndices)
-                    )
+                    notificationsViewModel.updateNotifications(readIndices)
                     onBack()
                 },
             ) {
@@ -103,16 +103,16 @@ fun NotificationsScreen(
             contentPadding = PaddingValues(vertical = 24.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(items = notifications) { notification ->
+            items(
+                items = notifications
+            ) { notification ->
                 NotificationItem(notification = notification)
             }
         }
     }
 
     BackHandler {
-        patientHomeViewModel.onEvent(
-            PatientEvent.UpdateNotificationsRead(readIndices)
-        )
+        notificationsViewModel.updateNotifications(readIndices)
         onBack()
     }
 }

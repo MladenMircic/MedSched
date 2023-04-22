@@ -18,7 +18,6 @@ data class AppointmentForPatient(
             doctorName = doctorName,
             doctorSpecializationId = doctorSpecializationId,
             patientId = appointment.patientId,
-            examId = appointment.examId,
             confirmed = appointment.confirmed,
             cancelledBy = appointment.cancelledBy
         )

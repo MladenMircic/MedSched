@@ -86,11 +86,13 @@ dependencies {
     // Navigation dependency
     implementation 'androidx.navigation:navigation-compose:2.6.0-alpha04'
 
-    // Navigation animations dependency
+    // Accompanist dependencies
     def accompanist_version = "0.28.0"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
 
     // Hilt dependencies
     def hilt_dagger_version = "2.44"

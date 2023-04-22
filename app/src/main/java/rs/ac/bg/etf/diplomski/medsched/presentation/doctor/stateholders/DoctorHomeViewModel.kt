@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForDoctor
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.doctor.GetAllAppointmentsForDoctorUseCase
@@ -25,8 +24,7 @@ import javax.inject.Inject
 class DoctorHomeViewModel @Inject constructor(
     imageRequestUseCase: ImageRequestUseCase,
     getAllAppointmentsForDoctorUseCase: GetAllAppointmentsForDoctorUseCase,
-    getUserUseCase: GetUserUseCase,
-    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase
+    getUserUseCase: GetUserUseCase
 ): ViewModel() {
 
     val userFlow = getUserUseCase.userFlow
@@ -47,7 +45,4 @@ class DoctorHomeViewModel @Inject constructor(
             }
         }
     }
-
-    fun serviceIdToNameId(serviceId: Int): Int =
-        clinicIdToNameMapUseCase.serviceIdToNameId(serviceId = serviceId)
 }

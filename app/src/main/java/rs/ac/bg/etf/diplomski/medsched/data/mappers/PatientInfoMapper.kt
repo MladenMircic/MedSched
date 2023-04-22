@@ -1,12 +1,12 @@
 package rs.ac.bg.etf.diplomski.medsched.data.mappers
 
-import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AppointmentsRequestDto
+import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.AvailableTimesRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.EmailChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.InfoChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.request.PasswordChangeRequestDto
 import rs.ac.bg.etf.diplomski.medsched.data.remote.dto.response.AppointmentDto
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
-import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
+import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AvailableTimesRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.EmailChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.InfoChangeRequest
 import rs.ac.bg.etf.diplomski.medsched.domain.model.request.PasswordChangeRequest
@@ -16,10 +16,12 @@ import javax.inject.Singleton
 @Singleton
 class PatientInfoMapper @Inject constructor() {
 
-    fun toAppointmentRequestDto(appointmentRequest: AppointmentRequest): AppointmentsRequestDto {
-        return AppointmentsRequestDto(
-            appointmentRequest.doctorId,
-            appointmentRequest.date
+    fun toAvailableTimesRequestDto(
+        availableTimesRequest: AvailableTimesRequest
+    ): AvailableTimesRequestDto {
+        return AvailableTimesRequestDto(
+            doctorIds = availableTimesRequest.doctorIds,
+            patientId = availableTimesRequest.patientId
         )
     }
 
@@ -30,8 +32,8 @@ class PatientInfoMapper @Inject constructor() {
             time = appointment.time,
             doctorId = appointment.doctorId,
             patientId = appointment.patientId,
-            examId = appointment.examId,
             confirmed = appointment.confirmed,
+            services = appointment.services,
             cancelledBy = appointment.cancelledBy
         )
     }

@@ -66,10 +66,22 @@
     <string name="show_clinics">Show clinics</string>
     <string name="show_doctors">Show doctors</string>
     <string name="search">Search</string>
+    <string name="search_results">Results</string>
+    <string name="no_doctors_selected">No doctors selected</string>
+    <plurals name="doctors_selected">
+        <item quantity="one">%1$d doctor selected</item>
+        <item quantity="other">%1$d doctors selected</item>
+    </plurals>
+    <string name="filter">Filter</string>
+    <string name="apply_filter">Apply</string>
+    <string name="reset_filter">Reset</string>
     <string name="schedule_appointment">Schedule an appointment</string>
     <string name="scheduled_appointments">Scheduled appointments</string>
     <string name="schedule_appointment_button">Schedule</string>
+    <string name="appointment_services">Services</string>
+    <string name="appointment_date">Date</string>
     <string name="appointment_time">Time</string>
+    <string name="appointment_current_datetime">Current date/time:</string>
     <string name="exam_name">Exam name</string>
     <string name="schedule_success">Successfully scheduled</string>
     <string name="schedule_failure">Scheduling failed, please try again</string>
@@ -120,6 +132,7 @@
 
     <!-- Categories -->
     <string name="category">Category</string>
+    <string name="category_all">All</string>
     <string name="category_brain">Brain</string>
     <string name="category_glands">Glands</string>
     <string name="category_heart">Heart</string>
@@ -131,7 +144,6 @@
     <string name="spec_gastroenterologist">Gastroenterologist</string>
     
     <!-- Services -->
-    <string name="service_all">All</string>
     <string name="service_specialist">Specialist exam</string>
     <string name="service_abdominal_ultrasound">Abdominal ultrasound</string>
     <string name="service_gastroscopy">Gastroscopy</string>

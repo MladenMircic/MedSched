@@ -13,10 +13,10 @@ import javax.inject.Inject
 class GetDoctorsUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
-    operator fun invoke(category: String) : Flow<Resource<List<DoctorForPatient>>> = flow {
+    operator fun invoke(doctorName: String, categories: String) : Flow<Resource<List<DoctorForPatient>>> = flow {
         emit(Resource.Loading())
         try {
-            emit(Resource.Success(patientRepository.getDoctors(category)))
+            emit(Resource.Success(patientRepository.getDoctors(doctorName, categories)))
         } catch (e: HttpException) {
             emit(Resource.Error(R.string.unknown_error))
         } catch (e: IOException) {

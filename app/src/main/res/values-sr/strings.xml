@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">MedSched</string>
     <string name="login_as">Logujte se kao</string>
 
@@ -63,13 +63,25 @@
     <string name="categories_list">Kategorije</string>
     <string name="doctors_list">Doktori</string>
     <string name="clinics_list">Klinike</string>
-    <string name="search">Pretražite doktore</string>
+    <string name="search">Pretraži</string>
+    <string name="search_results">Rezultati pretrage</string>
+    <string name="no_doctors_selected">Nema izabranih doktora</string>
+    <plurals name="doctors_selected" tools:ignore="MissingQuantity">
+        <item quantity="one">%1$d doktor izabran</item>
+        <item quantity="other">%1$d doktora izabrano</item>
+    </plurals>
+    <string name="filter">Filter</string>
+    <string name="apply_filter">Primeni</string>
+    <string name="reset_filter">Ukloni</string>
     <string name="show_clinics">Prikaži klinike</string>
     <string name="show_doctors">Prikaži doktore</string>
     <string name="schedule_appointment">Zakaži pregled</string>
     <string name="scheduled_appointments">Zakazani pregledi</string>
     <string name="schedule_appointment_button">Zakaži</string>
+    <string name="appointment_date">Datum</string>
     <string name="appointment_time">Vreme</string>
+    <string name="appointment_current_datetime">Trenutni datum/vreme:</string>
+    <string name="appointment_services">Usluge</string>
     <string name="exam_name">Ime pregleda</string>
     <string name="schedule_success">Uspešno zakazano</string>
     <string name="schedule_failure">Neuspelo zakazivanje, pokušajte ponovo</string>
@@ -131,7 +143,7 @@
     <string name="spec_gastroenterologist">Gastroenterolog</string>
 
     <!-- Services -->
-    <string name="service_all">Sve</string>
+    <string name="category_all">Sve</string>
     <string name="service_specialist">Specijalistički pregled</string>
     <string name="service_abdominal_ultrasound">Ultrazvuk abdomena</string>
     <string name="service_gastroscopy">Gastroskopija</string>

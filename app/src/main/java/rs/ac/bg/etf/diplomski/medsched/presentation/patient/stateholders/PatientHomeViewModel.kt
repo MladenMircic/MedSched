@@ -4,7 +4,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.boguszpawlowski.composecalendar.kotlinxDateTime.now
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,28 +12,18 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Appointment
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Category
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
-import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
-import rs.ac.bg.etf.diplomski.medsched.domain.model.request.AppointmentRequest
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.GetUserUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.NotificationsUseCase
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.*
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetCategoriesPatientUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetClinicsUseCase
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.GetDoctorsUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens.NotificationType
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.AppointmentState
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animated
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,10 +33,6 @@ class PatientHomeViewModel @Inject constructor(
     private val imageRequestUseCase: ImageRequestUseCase,
     private val getDoctorsUseCase: GetDoctorsUseCase,
     private val getClinicsUseCase: GetClinicsUseCase,
-    private val getScheduledAppointmentsUseCase: GetScheduledAppointmentsUseCase,
-    private val getServicesForDoctorUseCase: GetServicesForDoctorUseCase,
-    private val scheduleAppointmentUseCase: ScheduleAppointmentUseCase,
-    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase,
     private val notificationsUseCase: NotificationsUseCase
 ): ViewModel() {
 
@@ -56,9 +41,6 @@ class PatientHomeViewModel @Inject constructor(
 
     private val _patientState = MutableStateFlow(PatientState())
     val patientState = _patientState.asStateFlow()
-
-    private val _appointmentState = MutableStateFlow(AppointmentState())
-    val appointmentState = _appointmentState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -118,38 +100,14 @@ class PatientHomeViewModel @Inject constructor(
                     )
                 }
             }
-            is PatientEvent.SetAppointmentExamNameId -> {
-                _appointmentState.update { it.copy(currentExamNameId = patientEvent.nameId) }
-            }
-            is PatientEvent.SetAppointmentDate -> {
-                _appointmentState.update {
-                    it.copy(selectedDate = patientEvent.date ?: LocalDate.now())
-                }
-            }
-            is PatientEvent.SetAppointmentTime -> {
-                _appointmentState.update {
-                    it.copy(selectedTime = patientEvent.timeIndex)
-                }
-            }
             is PatientEvent.SelectDoctor -> {
                 _patientState.update { it.copy(selectedDoctor = patientEvent.index) }
             }
             is PatientEvent.GetAllCategories -> {
                 getAllCategories()
             }
-            is PatientEvent.ScheduleAppointment -> {
-                scheduleAppointment()
-            }
             is PatientEvent.UpdateNotificationsRead -> {
                 updateNotifications(patientEvent.indices)
-            }
-            PatientEvent.SetScheduleMessageNull -> {
-                _appointmentState.update { it.copy(scheduledMessageId = null) }
-            }
-            PatientEvent.ClearAvailableHours -> {
-                _appointmentState.update { it.copy(
-                    selectedDate = LocalDate.now()
-                ) }
             }
             PatientEvent.ToggleDoctorsClinics -> {
                 _patientState.update { state ->
@@ -183,66 +141,12 @@ class PatientHomeViewModel @Inject constructor(
         }
     }
 
+    fun getCategoryIdsAsString(): String =
+        _patientState.value.categoryList
+            .joinToString(separator = ",") { it.id.toString() }
+
     fun getSelectedDoctor(): DoctorForPatient =
         _patientState.value.allDoctorList[_patientState.value.selectedDoctor ?: 0]
-
-    fun fetchAvailableHoursForDate() = viewModelScope.launch {
-        val patientStateValue = _patientState.value
-        val response = getScheduledAppointmentsUseCase(
-            AppointmentRequest(
-                doctorId = patientStateValue.allDoctorList[patientStateValue.selectedDoctor!!].id,
-                date = _appointmentState.value.selectedDate
-            )
-        )
-
-        response.collect { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    _appointmentState.update {
-                        it.copy(
-                            availableTimes = resource.data!!,
-                            selectedTime = -1
-                        )
-                    }
-                }
-                is Resource.Error -> {
-
-                }
-                is Resource.Loading -> {
-
-                }
-            }
-        }
-    }
-
-    fun fetchServicesForDoctor() = viewModelScope.launch {
-        val patientStateValue = _patientState.value
-        when (val resource = getServicesForDoctorUseCase(
-            patientStateValue.allDoctorList[patientStateValue.selectedDoctor!!].id
-        )) {
-            is Resource.Success -> {
-                val serviceList = resource.data!!
-                _appointmentState.update { state ->
-                    state.copy(
-                        serviceList = serviceList,
-                        examNameIdList = serviceList.map {
-                            clinicIdToNameMapUseCase.serviceIdToNameId(it.id)
-                        },
-                        currentExamNameId = clinicIdToNameMapUseCase
-                            .serviceIdToNameId(serviceList[0].id)
-                    )
-                }
-            }
-            is Resource.Error -> TODO()
-            is Resource.Loading -> TODO()
-        }
-    }
-
-    fun categoryIdToNameId(categoryId: Int): Int? =
-        clinicIdToNameMapUseCase.categoryIdToNameId(categoryId)
-
-    fun specializationIdToNameId(specializationId: Int): Int =
-        clinicIdToNameMapUseCase.specializationIdToNameId(specializationId)
 
     private fun getDoctorsForPatient() = viewModelScope.launch {
         delay(300L)
@@ -250,7 +154,7 @@ class PatientHomeViewModel @Inject constructor(
         val serviceCategory: String = if (patientState.selectedCategory != null)
             "${patientState.categoryList[patientState.selectedCategory].id}"
         else ""
-        val response = getDoctorsUseCase(serviceCategory)
+        val response = getDoctorsUseCase("", serviceCategory)
 
         response.collect { resource ->
             when (resource) {
@@ -333,63 +237,6 @@ class PatientHomeViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
 
-                }
-            }
-        }
-    }
-
-    private fun scheduleAppointment() = viewModelScope.launch {
-        val appointmentInfo = _appointmentState.value
-        val patientInfo = _patientState.value
-        val selectedTime = appointmentInfo.availableTimes[appointmentInfo.selectedTime]
-        userFlow.collect { user ->
-            val response = scheduleAppointmentUseCase(Appointment(
-                date = appointmentInfo.selectedDate,
-                time = selectedTime,
-                doctorId = getSelectedDoctor().id,
-                patientId = user!!.id,
-                examId = appointmentInfo.serviceList[
-                    appointmentInfo.examNameIdList.indexOf(appointmentInfo.currentExamNameId)
-                ].id,
-                confirmed = true,
-                cancelledBy = -1
-            ))
-
-            response.collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        _appointmentState.update {
-                            it.copy(
-                                availableTimes = it.availableTimes
-                                    .filter { time ->
-                                        time != selectedTime
-                                    },
-                                selectedTime = -1,
-                                scheduledMessageId = R.string.schedule_success
-                            )
-                        }
-                        val currentDateTime = Instant.fromEpochMilliseconds(Date().time)
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
-                        val selectedDoctor = patientInfo.allDoctorList[patientInfo.selectedDoctor!!]
-                        notificationsUseCase.sendNotification(
-                            NotificationPatientEntity(
-                                type = NotificationType.SCHEDULED,
-                                doctorName = "${selectedDoctor.firstName} ${selectedDoctor.lastName}",
-                                dateOfAction = appointmentInfo.selectedDate,
-                                timeOfAction = selectedTime,
-                                dateNotified = currentDateTime.date,
-                                timeNotified = currentDateTime.time
-                            )
-                        )
-                    }
-                    is Resource.Error -> {
-                        _appointmentState.update {
-                            it.copy(scheduledMessageId = R.string.schedule_failure)
-                        }
-                    }
-                    is Resource.Loading -> {
-
-                    }
                 }
             }
         }

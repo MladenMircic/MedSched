@@ -70,6 +70,26 @@ fun CircleDotLoader(
 }
 
 @Composable
+fun ItemSelectedIcon() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.done))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1,
+        speed = 8f
+    )
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier
+            .size(100.dp)
+            .graphicsLayer {
+                scaleX = 2f
+                scaleY = 2f
+            }
+    )
+}
+
+@Composable
 fun PulseRefreshLoading(
     modifier: Modifier = Modifier,
     progress: Float = 0f,

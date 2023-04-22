@@ -10,6 +10,5 @@ data class ScheduledState(
         mutableStateListOf<AppointmentForPatient>().animated,
     val appointmentToDelete: AppointmentForPatient? = null,
     val message: String? = null,
-    val isRefreshing: Boolean = false,
-    val isListEmpty: Boolean = false
+    val isRefreshing: Boolean = false
 )

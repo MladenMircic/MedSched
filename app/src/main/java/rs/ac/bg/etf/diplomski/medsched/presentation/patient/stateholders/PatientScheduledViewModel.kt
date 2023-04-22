@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -14,7 +17,6 @@ import kotlinx.datetime.toLocalDateTime
 import rs.ac.bg.etf.diplomski.medsched.commons.Resource
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.AppointmentForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.entities.NotificationPatientEntity
-import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ImageRequestUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.NotificationsUseCase
 import rs.ac.bg.etf.diplomski.medsched.domain.use_case.patient.CancelAppointmentUseCase
@@ -31,29 +33,28 @@ class PatientScheduledViewModel @Inject constructor(
     private val imageRequestUseCase: ImageRequestUseCase,
     private val getAllAppointmentsForPatientUseCase: GetAllAppointmentsForPatientUseCase,
     private val cancelAppointmentUseCase: CancelAppointmentUseCase,
-    private val clinicIdToNameMapUseCase: ClinicIdToNameMapUseCase,
     private val notificationsUseCase: NotificationsUseCase
 ) : ViewModel() {
 
     private val _scheduledState = MutableStateFlow(ScheduledState())
     val scheduledState = _scheduledState.asStateFlow()
 
-    private val appointmentsWithDoctorFlow: Flow<List<AppointmentForPatient>> =
-        getAllAppointmentsForPatientUseCase.appointmentWithDoctorFlow
+    private val appointmentsForPatientFlow = getAllAppointmentsForPatientUseCase
+        .appointmentsForPatientFlow
 
     init {
         viewModelScope.launch {
-            appointmentsWithDoctorFlow.collectLatest { appointmentWithDoctorList ->
-                _scheduledState.value.animatedAppointmentForPatientList.clear(true)
-                delay(500L)
+            appointmentsForPatientFlow.collectLatest { appointmentsForPatient ->
+                val filteredAppointments = appointmentsForPatient.filter {
+                    it.appointment.confirmed
+                }
+                delay(200L)
                 _scheduledState.update { state ->
                     state.copy(
                         animatedAppointmentForPatientList = mutableStateListOf<AppointmentForPatient>()
                             .also {
-                                it.addAll(appointmentWithDoctorList)
-                            }.animated,
-                        isRefreshing = false,
-                        isListEmpty = appointmentWithDoctorList.isEmpty()
+                                it.addAll(filteredAppointments)
+                            }.animated
                     )
                 }
             }
@@ -85,25 +86,30 @@ class PatientScheduledViewModel @Inject constructor(
     }
 
     private fun refreshAppointments() {
-        _scheduledState.update {
-            it.copy(
-                isRefreshing = true
-            )
-        }
         viewModelScope.launch {
-            delay(1000L)
             val response = getAllAppointmentsForPatientUseCase.fetchAllAppointmentsAndSaveInLocal()
             response.collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
-                        _scheduledState.update {
-                            it.copy(
+                        _scheduledState.update { state ->
+                            state.copy(
                                 isRefreshing = false
                             )
                         }
                     }
                     is Resource.Error -> {}
-                    is Resource.Loading -> {}
+                    is Resource.Loading -> {
+                        _scheduledState.update { state ->
+                            state.copy(
+                                animatedAppointmentForPatientList = state.animatedAppointmentForPatientList
+                                    .also {
+                                          it.clear(animated = true)
+                                    },
+                                isRefreshing = true
+                            )
+                        }
+                        delay(1000L)
+                    }
                 }
             }
         }
@@ -127,12 +133,10 @@ class PatientScheduledViewModel @Inject constructor(
                             }
                         state.copy(
                             animatedAppointmentForPatientList = animatedList,
-                            appointmentToDelete = null,
-                            isListEmpty = animatedList.size == 0
+                            appointmentToDelete = null
                         )
                     }
-                    val currentDateTime = Instant
-                        .fromEpochMilliseconds(Date().time)
+                    val currentDateTime = Instant.fromEpochMilliseconds(Date().time)
                         .toLocalDateTime(
                             TimeZone.currentSystemDefault()
                         )
@@ -146,16 +150,12 @@ class PatientScheduledViewModel @Inject constructor(
                             type = NotificationType.CANCELLED
                         )
                     )
+                    delay(500L)
+                    cancelAppointmentUseCase.cancelInLocal(appointmentForPatient.appointment.id)
                 }
                 is Resource.Error -> {}
                 is Resource.Loading -> {}
             }
         }
     }
-
-    fun specializationIdToNameId(specializationId: Int): Int =
-        clinicIdToNameMapUseCase.specializationIdToNameId(specializationId = specializationId)
-
-    fun serviceIdToNameId(serviceId: Int): Int =
-        clinicIdToNameMapUseCase.serviceIdToNameId(serviceId = serviceId)
 }

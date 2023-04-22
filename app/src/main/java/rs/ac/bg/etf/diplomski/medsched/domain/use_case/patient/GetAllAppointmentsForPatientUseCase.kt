@@ -12,9 +12,9 @@ import javax.inject.Inject
 class GetAllAppointmentsForPatientUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
-    val appointmentWithDoctorFlow = patientRepository.appointmentForPatientFlow
+    val appointmentsForPatientFlow = patientRepository.appointmentForPatientFlow
 
-    suspend fun getAllAppointmentsWithDoctorFromLocal() =
+    suspend fun getAllAppointmentsFromLocal() =
         patientRepository.getAppointmentsWithDoctorFromLocal()
 
     suspend fun getAllAppointmentsFromRemote() =

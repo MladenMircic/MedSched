@@ -37,22 +37,18 @@ import coil.compose.SubcomposeAsyncImage
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.commons.CARD_IMAGE_SIZE
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.ClinicForPatient
-import rs.ac.bg.etf.diplomski.medsched.domain.model.business.DoctorForPatient
 import rs.ac.bg.etf.diplomski.medsched.domain.model.business.Patient
+import rs.ac.bg.etf.diplomski.medsched.domain.use_case.ClinicIdToNameMapUseCase
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.DoctorDetails
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.Notifications
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.PatientHomeStart
-import rs.ac.bg.etf.diplomski.medsched.presentation.patient.Search
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.events.PatientEvent
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.stateholders.PatientHomeViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.states.PatientState
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
-import rs.ac.bg.etf.diplomski.medsched.presentation.utils.HorizontalDotLoader
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.VisibilityList
 import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animatedItemsIndexed
 
@@ -61,16 +57,17 @@ import rs.ac.bg.etf.diplomski.medsched.presentation.utils.animatedItemsIndexed
 @Composable
 fun PatientHomeScreen(
     patientHomeViewModel: PatientHomeViewModel = hiltViewModel(),
-    toggleBottomBar: () -> Unit
+    toggleBottomBar: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
+    onNavigateToSearch: (String) -> Unit
 ) {
     val doctorDetailsNavController = rememberAnimatedNavController()
-    val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
     var transitionToScheduling by rememberSaveable { mutableStateOf(false) }
 
     AnimatedNavHost(
         navController = doctorDetailsNavController,
-        startDestination = PatientHomeStart.route,
+        startDestination = PatientHomeStart.route
     ) {
         composable(
             route = PatientHomeStart.route,
@@ -101,77 +98,33 @@ fun PatientHomeScreen(
                     transitionToScheduling = true
                     doctorDetailsNavController.navigate(DoctorDetails.route)
                 },
-                navigateToNotifications = {
-                    transitionToScheduling = false
-                    doctorDetailsNavController.navigate(Notifications.route)
-                },
+                navigateToNotifications = onNavigateToNotifications,
                 navigateToSearch = {
-                    doctorDetailsNavController.navigate(Search.route)
+                    onNavigateToSearch(patientHomeViewModel.getCategoryIdsAsString())
                 },
-                searchDoctors = {
-                    keyboardController?.hide()
-                    patientHomeViewModel.onEvent(PatientEvent.SearchForDoctor)
-                },
-                toggleBottomBar = toggleBottomBar
+                    searchDoctors = {
+                        keyboardController?.hide()
+                        patientHomeViewModel.onEvent(PatientEvent.SearchForDoctor)
+                    },
+                    toggleBottomBar = toggleBottomBar
             )
-        }
-        composable(
-            route = Notifications.route,
-            enterTransition = {
-                slideInHorizontally(
-                    animationSpec = tween(durationMillis = 300),
-                    initialOffsetX = { it }
-                )
-            },
-            popExitTransition = {
-                slideOutHorizontally(
-                    animationSpec = tween(durationMillis = 300),
-                    targetOffsetX = { it }
-                )
-            }
-        ) {
-            NotificationsScreen(
-                patientHomeViewModel = patientHomeViewModel,
-                onBack = {
-                    doctorDetailsNavController.popBackStack()
-                }
-            )
-        }
-        composable(
-            route = Search.route,
-            enterTransition = {
-                slideInHorizontally(
-                    animationSpec = tween(durationMillis = 300),
-                    initialOffsetX = { it }
-                )
-            },
-            popExitTransition = {
-                slideOutHorizontally(
-                    animationSpec = tween(durationMillis = 300),
-                    targetOffsetX = { it }
-                )
-            }
-        ) {
-
         }
         composable(
             route = DoctorDetails.route,
             enterTransition = { fadeIn(animationSpec = tween(durationMillis = 1)) }
         ) {
-            DoctorAppointmentScreen(
-                patientHomeViewModel = patientHomeViewModel,
-                doctor = patientHomeViewModel.getSelectedDoctor(),
-                onBackPressed = {
-                    coroutineScope.launch {
-                        delay(300L)
-                        doctorDetailsNavController.popBackStack()
-                        delay(200L)
-                        transitionToScheduling = false
-                        patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(null))
-                        toggleBottomBar()
-                    }
-                }
-            )
+//            DoctorAppointmentScreen(
+//                doctors = patientHomeViewModel.getSelectedDoctor(),
+//                onBackPressed = {
+//                    coroutineScope.launch {
+//                        delay(400L)
+//                        doctorDetailsNavController.popBackStack()
+//                        delay(200L)
+//                        transitionToScheduling = false
+//                        patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(null))
+//                    }
+//                }
+//            )
         }
     }
 
@@ -197,6 +150,8 @@ fun PatientStart(
         finishedListener = {
             if (patientState.selectedDoctor != null) {
                 navigateToDoctorDetails()
+            } else {
+                toggleBottomBar()
             }
         }
     )
@@ -333,7 +288,9 @@ fun PatientStart(
                 onCategorySelected = {
                     patientHomeViewModel.onEvent(PatientEvent.SelectCategory(it))
                 },
-                getCategoryNameId = patientHomeViewModel::categoryIdToNameId
+                getCategoryNameId = {
+                    ClinicIdToNameMapUseCase.categoryIdToNameId(it)
+                }
             )
         }
         item {
@@ -417,15 +374,17 @@ fun PatientStart(
             }
         }
         if (patientState.showingDoctors) {
-            doctorsList(
-                list = patientState.currentDoctorList,
-                doctorsLoading = patientState.dataLoading,
-                onDoctorSelected = {
-                    patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(it))
-                    toggleBottomBar()
-                },
-                getSpecializationNameId = patientHomeViewModel::specializationIdToNameId
-            )
+//            doctorsList(
+//                list = patientState.currentDoctorList,
+//                doctorsLoading = patientState.dataLoading,
+//                onDoctorSelectedForSchedule = {
+//                    patientHomeViewModel.onEvent(PatientEvent.SelectDoctor(it))
+//                    toggleBottomBar()
+//                },
+//                getSpecializationNameId = {
+//                    ClinicIdToNameMapUseCase.specializationIdToNameId(it)
+//                }
+//            )
         } else {
             clinicsList(
                 list = patientState.currentClinicList
@@ -483,7 +442,7 @@ fun CategoriesList(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
-        itemsIndexed(patientState.categoryList) { index, service ->
+        itemsIndexed(patientState.categoryList) { index, category ->
             Card(
                 shape = RoundedShape40,
                 backgroundColor = if (patientState.selectedCategory == index)
@@ -522,7 +481,7 @@ fun CategoriesList(
                         )
                     } else {
                         SubcomposeAsyncImage(
-                            model = service.imageRequest,
+                            model = category.imageRequest,
                             contentDescription = "Service icon",
                             loading = {
                                 CircularProgressIndicator(color = Color.Black)
@@ -537,7 +496,7 @@ fun CategoriesList(
                                 .padding(bottom = 10.dp)
                         )
                     }
-                    val categoryNameId = getCategoryNameId(service.id)
+                    val categoryNameId = getCategoryNameId(category.id)
                     Text(
                         text = if (categoryNameId != null)
                             stringResource(id = categoryNameId)
@@ -552,97 +511,6 @@ fun CategoriesList(
             }
         }
     }
-}
-
-fun LazyListScope.doctorsList(
-    list: VisibilityList<DoctorForPatient>,
-    doctorsLoading: Boolean,
-    onDoctorSelected: (Int) -> Unit,
-    getSpecializationNameId: (Int) -> Int
-) {
-    if (!doctorsLoading) {
-        animatedItemsIndexed(
-            items = list,
-            enter = fadeIn(tween(300)) +
-                    slideInHorizontally(
-                        animationSpec = tween(300),
-                        initialOffsetX = { -it / 2 }
-                    ),
-            exit = fadeOut(tween(300)) +
-                    slideOutHorizontally(
-                        animationSpec = tween(300),
-                        targetOffsetX = { it / 2 }
-                    ),
-            exitDuration = 300,
-            animateItemPlacementSpec = tween(500)
-        ) { index, doctor ->
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Card(
-                    shape = RoundedShape20,
-                    backgroundColor = MaterialTheme.colors.secondary,
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .height(100.dp)
-                        .align(Alignment.Center)
-                        .clickable {
-                            onDoctorSelected(index)
-                        }
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SubcomposeAsyncImage(
-                            model = doctor.imageRequest,
-                            contentDescription = "Doctor image",
-                            loading = {
-                                CircularProgressIndicator(
-                                    color = MaterialTheme.colors.textOnSecondary,
-                                    modifier = Modifier.size(CARD_IMAGE_SIZE)
-                                )
-                            },
-                            modifier = Modifier
-                                .padding(start = 10.dp)
-                                .clip(RoundedShape20)
-                                .size(CARD_IMAGE_SIZE)
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(start = 10.dp)
-                        ) {
-                            Text(
-                                text = "${doctor.firstName} ${doctor.lastName}",
-                                fontFamily = Quicksand,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                color = MaterialTheme.colors.textOnSecondary
-                            )
-                            Text(
-                                text = stringResource(
-                                    id = getSpecializationNameId(doctor.specializationId)
-                                ),
-                                fontFamily = Quicksand,
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colors.textOnSecondary
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    } else {
-        item {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillParentMaxWidth()
-            ) {
-                HorizontalDotLoader(color = Blue85)
-            }
-        }
-    }
-
 }
 
 fun LazyListScope.clinicsList(

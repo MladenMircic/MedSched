@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,6 +11,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,6 +32,7 @@ import rs.ac.bg.etf.diplomski.medsched.commons.NotificationUtil
 import rs.ac.bg.etf.diplomski.medsched.presentation.RootViewModel
 import rs.ac.bg.etf.diplomski.medsched.presentation.graphs.RootNavigationGraph
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.MedSchedTheme
+import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.selectable
 
 @OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
@@ -72,11 +75,19 @@ class MainActivity : ComponentActivity() {
                     color = Color.Transparent,
                     modifier = Modifier.fillMaxSize()
                 )
-                rootViewModel = viewModel()
-                RootNavigationGraph(
-                    navController = rememberAnimatedNavController(),
-                    rootViewModel = rootViewModel
+                val customTextSelectionColors = TextSelectionColors(
+                    handleColor = MaterialTheme.colors.selectable,
+                    backgroundColor = MaterialTheme.colors.selectable
                 )
+                rootViewModel = viewModel()
+                CompositionLocalProvider(
+                    LocalTextSelectionColors provides customTextSelectionColors
+                ) {
+                    RootNavigationGraph(
+                        navController = rememberAnimatedNavController(),
+                        rootViewModel = rootViewModel
+                    )
+                }
             }
         }
     }

@@ -31,7 +31,7 @@ class AppointmentAvailabilityCheckWorker @AssistedInject constructor(
     @RequiresApi(Build.VERSION_CODES.M)
     override suspend fun doWork(): Result {
         val remoteAppointments = getAllAppointmentsForPatientUseCase.getAllAppointmentsFromRemote()
-        val localAppointments = getAllAppointmentsForPatientUseCase.getAllAppointmentsWithDoctorFromLocal()
+        val localAppointments = getAllAppointmentsForPatientUseCase.getAllAppointmentsFromLocal()
         for (remoteAppointment in remoteAppointments) {
             val remoteAppointmentInLocal = localAppointments.firstOrNull {
                 it.appointment.id == remoteAppointment.appointment.id

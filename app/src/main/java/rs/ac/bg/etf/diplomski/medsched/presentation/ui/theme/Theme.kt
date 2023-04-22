@@ -9,14 +9,14 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
     primary = BackgroundPrimaryDark,
-    primaryVariant = BackgroundSecondaryDark,
+    primaryVariant = BackgroundPrimaryDarkVariant,
     secondary = BackgroundSecondaryDark,
     background = DarkBackgroundColor
 )
 
 private val LightColorPalette = lightColors(
     primary = BackgroundPrimaryLight,
-    primaryVariant = Purple700,
+    primaryVariant = BackgroundPrimaryLightVariant,
     secondary = BackgroundSecondaryLight,
     background = BackgroundPrimaryLight
 

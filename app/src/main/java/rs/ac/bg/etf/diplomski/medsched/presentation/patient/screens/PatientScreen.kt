@@ -1,5 +1,7 @@
 package rs.ac.bg.etf.diplomski.medsched.presentation.patient.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
@@ -13,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
@@ -27,7 +30,9 @@ import rs.ac.bg.etf.diplomski.medsched.R
 import rs.ac.bg.etf.diplomski.medsched.presentation.composables.CustomBottomBar
 import rs.ac.bg.etf.diplomski.medsched.presentation.patient.*
 import rs.ac.bg.etf.diplomski.medsched.presentation.ui.theme.*
+import rs.ac.bg.etf.diplomski.medsched.presentation.utils.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PatientScreen(navController: NavHostController = rememberAnimatedNavController()) {
@@ -39,192 +44,249 @@ fun PatientScreen(navController: NavHostController = rememberAnimatedNavControll
         mutableStateOf<PatientProfileDestinations>(MainProfile)
     }
 
-    Scaffold(
-        bottomBar = {
-            AnimatedVisibility(
-                visible = bottomBarVisible,
-                enter = slideInVertically(
-                    animationSpec = tween(
-                        durationMillis = 200,
-                        delayMillis = 300
-                    ),
-                    initialOffsetY = { it }
-                ),
-                exit = slideOutVertically(
-                    animationSpec = tween(
-                        durationMillis = 500
-                    ),
-                    targetOffsetY = { it }
-                )
-            ) {
-                CustomBottomBar(
-                    destinations = patientRoutes,
-                    navController = navController
-                )
-            }
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = speedDialVisible,
-                enter = scaleIn(
-                    animationSpec = tween(
-                        durationMillis = 200,
-                        delayMillis = 100
-                    ),
-                ),
-                exit = scaleOut(
-                    animationSpec = tween(
-                        durationMillis = 200,
-                        delayMillis = 100
-                    ),
-                )
-            ) {
-                SpeedDial(
-                    state = speedDialState,
-                    fabShape = CircleShape,
-                    fabClosedContainerColor = MaterialTheme.colors.selectable,
-                    fabOpenedContainerColor = MaterialTheme.colors.selectable,
-                    onFabClick = { expanded ->
-                        overlayVisible = !expanded
-                        speedDialState = speedDialState.toggle()
-                    },
-                    fabOpenedContent = {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = "Close Icon",
-                            tint = Color.White
-                        )
-                    },
-                    fabClosedContent = {
-                        Icon(
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = "Edit Icon",
-                            tint = MaterialTheme.colors.textOnSecondary
-                        )
-                    }
-                ) {
-                    item {
-                        FabWithLabel(
-                            onClick = {
-                                currentProfileDestination = ChangeInfo
-                                speedDialState = SpeedDialState.Collapsed
-                            },
-                            labelContent = {
-                                Text(
-                                    text = stringResource(id = R.string.change_info),
-                                    fontFamily = Quicksand,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            },
-                            labelColors = AssistChipDefaults.elevatedAssistChipColors(
-                                labelColor = MaterialTheme.colors.textOnPrimary,
-                                containerColor = Blue85
-                            ),
-                            fabContainerColor = Blue85
-                        ) {
-                            Icon(Icons.Default.Info, null)
-                        }
-                    }
-                    item {
-                        FabWithLabel(
-                            onClick = {
-                                currentProfileDestination = ChangePassword
-                                speedDialState = SpeedDialState.Collapsed
-                            },
-                            labelContent = {
-                                Text(
-                                    text = stringResource(id = R.string.change_password),
-                                    fontFamily = Quicksand,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            },
-                            labelColors = AssistChipDefaults.elevatedAssistChipColors(
-                                labelColor = MaterialTheme.colors.textOnPrimary,
-                                containerColor = Blue85
-                            ),
-                            fabContainerColor = Blue85
-                        ) {
-                            Icon(Icons.Default.Password, null)
-                        }
-                    }
-                    item {
-                        FabWithLabel(
-                            onClick = {
-                                currentProfileDestination = ChangeEmail
-                                speedDialState = SpeedDialState.Collapsed
-                            },
-                            labelContent = {
-                                Text(
-                                    text = stringResource(id = R.string.change_email),
-                                    fontFamily = Quicksand,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            },
-                            labelColors = AssistChipDefaults.elevatedAssistChipColors(
-                                labelColor = MaterialTheme.colors.textOnPrimary,
-                                containerColor = Blue85
-                            ),
-                            fabContainerColor = Blue85
-                        ) {
-                            Icon(Icons.Default.Email, null)
-                        }
-                    }
-                }
-            }
-        },
-        floatingActionButtonPosition = FabPosition.End,
-        backgroundColor = MaterialTheme.colors.primary
+    val density = LocalDensity.current
+    val inScreenNavController = rememberAnimatedNavController()
+    Surface(
+        color = MaterialTheme.colors.primary
     ) {
         AnimatedNavHost(
-            navController = navController,
-            startDestination = PatientHome.route,
-            modifier = Modifier.padding(it),
-            enterTransition = { fadeIn(tween(durationMillis = 500)) },
-            exitTransition = { fadeOut(tween(durationMillis = 500)) }
+            navController = inScreenNavController,
+            startDestination = PatientMainPages.route,
+            enterTransition = { SharedXAxisEnterTransition(density) },
+            exitTransition = { SharedXAxisExitTransition(density) },
+            popEnterTransition = { SharedXAxisPopEnterTransition(density) },
+            popExitTransition = { SharedXAxisPopExitTransition(density) }
         ) {
-            composable(route = PatientHome.route) {
-                LaunchedEffect(true) {
-                    speedDialVisible = false
-                    overlayVisible = false
-                    speedDialState = SpeedDialState.Collapsed
+            composable(
+                route = PatientMainPages.route
+            ) {
+                Scaffold(
+                    bottomBar = {
+                        AnimatedVisibility(
+                            visible = bottomBarVisible,
+                            enter = slideInVertically(
+                                animationSpec = tween(
+                                    durationMillis = 300
+                                ),
+                                initialOffsetY = { it }
+                            ),
+                            exit = slideOutVertically(
+                                animationSpec = tween(
+                                    durationMillis = 100
+                                ),
+                                targetOffsetY = { it }
+                            )
+                        ) {
+                            CustomBottomBar(
+                                destinations = patientRoutes,
+                                navController = navController
+                            )
+                        }
+                    },
+                    floatingActionButton = {
+                        AnimatedVisibility(
+                            visible = speedDialVisible,
+                            enter = scaleIn(
+                                animationSpec = tween(
+                                    durationMillis = 200,
+                                    delayMillis = 100
+                                ),
+                            ),
+                            exit = scaleOut(
+                                animationSpec = tween(
+                                    durationMillis = 200,
+                                    delayMillis = 100
+                                ),
+                            )
+                        ) {
+                            SpeedDial(
+                                state = speedDialState,
+                                fabShape = CircleShape,
+                                fabClosedContainerColor = MaterialTheme.colors.selectable,
+                                fabOpenedContainerColor = MaterialTheme.colors.selectable,
+                                onFabClick = { expanded ->
+                                    overlayVisible = !expanded
+                                    speedDialState = speedDialState.toggle()
+                                },
+                                fabOpenedContent = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = "Close Icon",
+                                        tint = Color.White
+                                    )
+                                },
+                                fabClosedContent = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Edit Icon",
+                                        tint = MaterialTheme.colors.textOnSecondary
+                                    )
+                                }
+                            ) {
+                                item {
+                                    FabWithLabel(
+                                        onClick = {
+                                            currentProfileDestination = ChangeInfo
+                                            speedDialState = SpeedDialState.Collapsed
+                                        },
+                                        labelContent = {
+                                            Text(
+                                                text = stringResource(id = R.string.change_info),
+                                                fontFamily = Quicksand,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        },
+                                        labelColors = AssistChipDefaults.elevatedAssistChipColors(
+                                            labelColor = MaterialTheme.colors.textOnPrimary,
+                                            containerColor = Blue85
+                                        ),
+                                        fabContainerColor = Blue85
+                                    ) {
+                                        Icon(Icons.Default.Info, null)
+                                    }
+                                }
+                                item {
+                                    FabWithLabel(
+                                        onClick = {
+                                            currentProfileDestination = ChangePassword
+                                            speedDialState = SpeedDialState.Collapsed
+                                        },
+                                        labelContent = {
+                                            Text(
+                                                text = stringResource(id = R.string.change_password),
+                                                fontFamily = Quicksand,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        },
+                                        labelColors = AssistChipDefaults.elevatedAssistChipColors(
+                                            labelColor = MaterialTheme.colors.textOnPrimary,
+                                            containerColor = Blue85
+                                        ),
+                                        fabContainerColor = Blue85
+                                    ) {
+                                        Icon(Icons.Default.Password, null)
+                                    }
+                                }
+                                item {
+                                    FabWithLabel(
+                                        onClick = {
+                                            currentProfileDestination = ChangeEmail
+                                            speedDialState = SpeedDialState.Collapsed
+                                        },
+                                        labelContent = {
+                                            Text(
+                                                text = stringResource(id = R.string.change_email),
+                                                fontFamily = Quicksand,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        },
+                                        labelColors = AssistChipDefaults.elevatedAssistChipColors(
+                                            labelColor = MaterialTheme.colors.textOnPrimary,
+                                            containerColor = Blue85
+                                        ),
+                                        fabContainerColor = Blue85
+                                    ) {
+                                        Icon(Icons.Default.Email, null)
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    floatingActionButtonPosition = FabPosition.End,
+                    backgroundColor = MaterialTheme.colors.primary
+                ) {
+                    AnimatedNavHost(
+                        navController = navController,
+                        startDestination = PatientHome.route,
+                        modifier = Modifier.padding(it),
+                        enterTransition = { FadeThroughEnterTransition },
+                        exitTransition = { FadeThroughExitTransition }
+                    ) {
+                        composable(route = PatientHome.route) {
+                            LaunchedEffect(true) {
+                                speedDialVisible = false
+                                overlayVisible = false
+                                speedDialState = SpeedDialState.Collapsed
+                            }
+                            PatientHomeScreen(
+                                toggleBottomBar = {
+                                    bottomBarVisible = !bottomBarVisible
+                                },
+                                onNavigateToNotifications = {
+                                    inScreenNavController.navigate(Notifications.route)
+                                },
+                                onNavigateToSearch = { categoryIds ->
+                                    inScreenNavController.navigate(
+                                        "${Search.route}/${categoryIds}"
+                                    )
+                                }
+                            )
+                        }
+                        composable(
+                            route = PatientScheduled.route,
+                            deepLinks = PatientScheduled.deepLinks
+                        ) {
+                            LaunchedEffect(true) {
+                                speedDialVisible = false
+                                overlayVisible = false
+                                speedDialState = SpeedDialState.Collapsed
+                            }
+                            ScheduledAppointmentsScreen()
+                        }
+                        composable(route = PatientAccount.route) {
+                            LaunchedEffect(key1 = currentProfileDestination) {
+                                speedDialVisible = currentProfileDestination == MainProfile
+                                bottomBarVisible = currentProfileDestination == MainProfile
+                                overlayVisible = false
+                            }
+                            PatientProfileScreen(
+                                profileDestination = currentProfileDestination,
+                                setStartProfileDestination = {
+                                    speedDialState = SpeedDialState.Collapsed
+                                    currentProfileDestination = MainProfile
+                                }
+                            )
+                        }
+                    }
+                    SpeedDialOverlay(
+                        visible = overlayVisible,
+                        color = Color.Black.copy(alpha = 0.66f),
+                        onClick = {
+                            overlayVisible = false
+                            speedDialState = speedDialState.toggle()
+                        },
+                    )
                 }
-                PatientHomeScreen(toggleBottomBar = {
-                    bottomBarVisible = !bottomBarVisible
-                })
             }
             composable(
-                route = PatientScheduled.route,
-                deepLinks = PatientScheduled.deepLinks
+                route = Notifications.route
             ) {
-                LaunchedEffect(true) {
-                    speedDialVisible = false
-                    overlayVisible = false
-                    speedDialState = SpeedDialState.Collapsed
-                }
-                ScheduledAppointmentsScreen()
+                NotificationsScreen(
+                    onBack = {
+                        inScreenNavController.popBackStack()
+                    }
+                )
             }
-            composable(route = PatientAccount.route) {
-                LaunchedEffect(key1 = currentProfileDestination) {
-                    speedDialVisible = currentProfileDestination == MainProfile
-                    bottomBarVisible = currentProfileDestination == MainProfile
-                    overlayVisible = false
+            composable(
+                route = "${Search.route}/{categoryIds}",
+                arguments = Search.arguments
+            ) { backStackNavEntry ->
+                val categories by remember {
+                    derivedStateOf {
+                        backStackNavEntry
+                            .arguments
+                            ?.getString("categoryIds")
+                            ?.split(",")
+                            ?.map { it.toInt() } ?: listOf()
+                    }
                 }
-                PatientProfileScreen(
-                    profileDestination = currentProfileDestination,
-                    setStartProfileDestination = {
-                        speedDialState = SpeedDialState.Collapsed
-                        currentProfileDestination = MainProfile
+                SearchScreen(
+                    categoryIds = categories,
+                    onBack = {
+                        inScreenNavController.popBackStack()
                     }
                 )
             }
         }
-        SpeedDialOverlay(
-            visible = overlayVisible,
-            color = Color.Black.copy(alpha = 0.66f),
-            onClick = {
-                overlayVisible = false
-                speedDialState = speedDialState.toggle()
-            },
-        )
     }
 }

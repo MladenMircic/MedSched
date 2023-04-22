@@ -21,6 +21,10 @@ interface PatientHomeDestinations {
     val route: String
 }
 
+object PatientMainPages: PatientHomeDestinations {
+    override val route: String = "main_pages"
+}
+
 object PatientHomeStart: PatientHomeDestinations {
     override val route: String = "patient_home_start"
 }
@@ -31,10 +35,25 @@ object Notifications: PatientHomeDestinations {
 
 object Search: PatientHomeDestinations {
     override val route: String = "search"
+    val arguments = listOf(
+        navArgument("categoryIds") {
+            type = NavType.StringType
+        }
+    )
 }
 
 object DoctorDetails: PatientHomeDestinations {
     override val route: String = "doctor_details"
+}
+
+// Search screen destinations
+
+object SearchHome: PatientHomeDestinations {
+    override val route: String = "search_home"
+}
+
+object SearchToSchedule: PatientHomeDestinations {
+    override val route: String = "search_to_schedule"
 }
 
 // Patient bottom bar destinations
